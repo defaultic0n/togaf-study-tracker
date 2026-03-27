@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>TOGAF Study Tracker</title>
+<meta name="description" content="Track your TOGAF Foundation exam study sessions — 20 sessions, 30 min/day.">
+<meta name="theme-color" content="#0E1117">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="TOGAF Study">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0E1117;--surface:#161B26;--surface2:#1E2535;--surface3:#252D40;
+  --teal:#2DD4BF;--teal-dim:#1A8C7D;--teal-bg:rgba(45,212,191,0.1);
+  --amber:#F59E0B;--amber-bg:rgba(245,158,11,0.1);
+  --blue:#60A5FA;--blue-bg:rgba(96,165,250,0.1);
+  --purple:#A78BFA;--purple-bg:rgba(167,139,250,0.1);
+  --coral:#FB7185;--coral-bg:rgba(251,113,133,0.1);
+  --text:#F1F5F9;--text2:#94A3B8;--text3:#475569;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
+  --radius:16px;--radius-sm:10px;
+}
+html{background:var(--bg)}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;padding-bottom:env(safe-area-inset-bottom,20px)}
+
+/* Install banner */
+#install-banner{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--surface2);border-top:1px solid var(--border2);padding:14px 20px calc(14px + env(safe-area-inset-bottom,0px));z-index:100;align-items:center;gap:12px}
+#install-banner.show{display:flex}
+.install-text{flex:1;font-size:13px;color:var(--text2);line-height:1.4}
+.install-text strong{color:var(--text);display:block;font-size:14px;margin-bottom:2px}
+.install-btn{padding:9px 18px;background:var(--teal);color:#0E1117;font-size:13px;font-weight:600;border:none;border-radius:8px;cursor:pointer;white-space:nowrap}
+.install-dismiss{padding:8px;color:var(--text3);background:transparent;border:none;cursor:pointer;font-size:18px;line-height:1}
+
+/* Header */
+.app-header{padding:max(28px,env(safe-area-inset-top,28px)) 20px 16px;background:var(--bg);position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border)}
+.app-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);letter-spacing:-0.3px}
+.app-sub{font-size:12px;color:var(--text3);margin-top:2px;font-weight:300;letter-spacing:0.3px}
+.offline-badge{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;background:var(--amber-bg);color:var(--amber);margin-left:8px;vertical-align:middle;display:none}
+.offline-badge.show{display:inline-block}
+
+/* Progress card */
+.progress-card{margin:16px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px;display:flex;align-items:center;gap:20px}
+.ring-wrap{position:relative;flex-shrink:0}
+.ring-svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(--surface3);stroke-width:6}
+.ring-fg{fill:none;stroke:var(--teal);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 0.6s cubic-bezier(.4,0,.2,1)}
+.ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring-pct{font-size:18px;font-weight:600;color:var(--text);line-height:1}
+.ring-label{font-size:9px;color:var(--text3);margin-top:2px;letter-spacing:0.4px;text-transform:uppercase}
+.prog-details{flex:1}
+.prog-stat{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.prog-stat-label{font-size:12px;color:var(--text2)}
+.prog-stat-value{font-size:13px;font-weight:500;color:var(--text)}
+.prog-bar-track{height:4px;background:var(--surface3);border-radius:2px;overflow:hidden;margin-top:4px}
+.prog-bar-fill{height:100%;background:linear-gradient(90deg,var(--teal-dim),var(--teal));border-radius:2px;transition:width 0.6s cubic-bezier(.4,0,.2,1)}
+
+/* Filter tabs */
+.tabs{display:flex;gap:6px;padding:4px 20px 12px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex-shrink:0;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--border);color:var(--text2);background:transparent;cursor:pointer;transition:all 0.15s}
+.tab.active{background:var(--teal);border-color:var(--teal);color:#0E1117}
+
+/* Week group */
+.week-group{margin:0 20px 6px}
+.week-label{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--text3);padding:14px 0 8px}
+
+/* Session card */
+.session-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden;transition:border-color 0.15s}
+.session-card.done{opacity:0.6}
+.session-card.expanded{border-color:var(--border2)}
+.session-head{display:flex;align-items:center;gap:12px;padding:14px;cursor:pointer}
+.check-btn{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border2);background:transparent;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s}
+.check-btn.checked{background:var(--teal);border-color:var(--teal)}
+.check-icon{width:10px;height:7px;border-left:2px solid #0E1117;border-bottom:2px solid #0E1117;transform:rotate(-45deg) translate(1px,-1px);opacity:0}
+.check-btn.checked .check-icon{opacity:1}
+.session-info{flex:1;min-width:0}
+.session-meta{font-size:10px;color:var(--text3);margin-bottom:3px}
+.session-title{font-size:14px;font-weight:500;color:var(--text);line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.session-card.done .session-title{text-decoration:line-through;color:var(--text3)}
+.session-tag{flex-shrink:0;font-size:10px;font-weight:600;padding:3px 8px;border-radius:6px}
+.tag-adm{background:var(--teal-bg);color:var(--teal)}
+.tag-core{background:var(--blue-bg);color:var(--blue)}
+.tag-gov{background:var(--purple-bg);color:var(--purple)}
+.tag-review{background:var(--amber-bg);color:var(--amber)}
+.tag-content{background:var(--coral-bg);color:var(--coral)}
+.chevron{width:16px;height:16px;flex-shrink:0;transition:transform 0.2s;opacity:0.4}
+.session-card.expanded .chevron{transform:rotate(180deg)}
+
+/* Detail */
+.session-detail{max-height:0;overflow:hidden;transition:max-height 0.3s cubic-bezier(.4,0,.2,1)}
+.session-detail.open{max-height:400px}
+.detail-inner{padding:0 14px 14px;border-top:1px solid var(--border)}
+.detail-section{padding-top:12px}
+.detail-heading{font-size:10px;font-weight:600;letter-spacing:0.6px;text-transform:uppercase;color:var(--text3);margin-bottom:8px}
+.topic-item{display:flex;gap:8px;padding:5px 0;align-items:flex-start}
+.topic-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);margin-top:7px;flex-shrink:0}
+.topic-text{font-size:13px;color:var(--text2);line-height:1.5}
+.detail-footer{display:flex;align-items:center;justify-content:space-between;padding-top:12px;margin-top:4px;border-top:1px solid var(--border)}
+.detail-duration{font-size:11px;color:var(--text3)}
+.mark-btn{font-size:12px;font-weight:500;padding:7px 16px;border-radius:8px;border:1px solid var(--teal);color:var(--teal);background:transparent;cursor:pointer;transition:all 0.15s}
+.mark-btn:active{background:var(--teal-bg)}
+.mark-btn.done-btn{border-color:var(--text3);color:var(--text3)}
+
+/* Streak banner */
+.streak-banner{margin:0 20px 4px;background:var(--amber-bg);border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;gap:8px}
+.streak-text{font-size:12px;color:var(--amber);font-weight:500}
+.empty{text-align:center;padding:40px 20px;color:var(--text3);font-size:14px}
+
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+.check-btn.pop{animation:pop 0.2s ease}
+</style>
+</head>
+<body>
+
+<div id="install-banner">
+  <div class="install-text">
+    <strong>Add to Home Screen</strong>
+    Install for offline access &amp; faster loading
+  </div>
+  <button class="install-btn" id="install-btn">Install</button>
+  <button class="install-dismiss" id="install-dismiss">✕</button>
+</div>
+
+<div class="app-header">
+  <div style="display:flex;align-items:center;gap:8px">
+    <div class="app-title">TOGAF Foundation</div>
+    <span class="offline-badge" id="offline-badge">Offline</span>
+  </div>
+  <div class="app-sub">Study Tracker · 20 sessions · 30 min/day</div>
+</div>
+
+<div class="progress-card">
+  <div class="ring-wrap">
+    <svg class="ring-svg" width="72" height="72" viewBox="0 0 72 72">
+      <circle class="ring-bg" cx="36" cy="36" r="30"/>
+      <circle class="ring-fg" id="ring" cx="36" cy="36" r="30" stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
+    </svg>
+    <div class="ring-text">
+      <span class="ring-pct" id="ring-pct">0%</span>
+      <span class="ring-label">done</span>
+    </div>
+  </div>
+  <div class="prog-details">
+    <div class="prog-stat">
+      <span class="prog-stat-label">Sessions complete</span>
+      <span class="prog-stat-value" id="done-label">0 / 20</span>
+    </div>
+    <div class="prog-bar-track"><div class="prog-bar-fill" id="prog-bar" style="width:0%"></div></div>
+    <div class="prog-stat" style="margin-top:10px;margin-bottom:0">
+      <span class="prog-stat-label">Remaining</span>
+      <span class="prog-stat-value" id="remain-label">10 hrs 0 min</span>
+    </div>
+  </div>
+</div>
+
+<div class="tabs" id="tabs">
+  <button class="tab active" data-filter="all">All</button>
+  <button class="tab" data-filter="adm">ADM</button>
+  <button class="tab" data-filter="core">Core</button>
+  <button class="tab" data-filter="gov">Governance</button>
+  <button class="tab" data-filter="content">Content</button>
+  <button class="tab" data-filter="review">Review</button>
+  <button class="tab" data-filter="pending">Pending</button>
+  <button class="tab" data-filter="done">Done</button>
+</div>
+
+<div id="app"></div>
+
+<script>
+const SESSIONS=[
+{w:1,d:"Mon",day:1,title:"TOGAF Overview & Core Concepts",tag:"core",tagLabel:"Core",points:["TOGAF definition and purpose","Four architecture domains: Business, Data, Application, Technology","Key terminology: enterprise, architecture, stakeholders","ADM cycle high-level overview","TOGAF components overview"]},
+{w:1,d:"Tue",day:2,title:"ADM Cycle & Preliminary Phase",tag:"adm",tagLabel:"ADM",points:["ADM as the core process of TOGAF","Preliminary Phase: framework & principles","Architecture principles definition and examples","Tailoring TOGAF to the enterprise","Key inputs and outputs of Preliminary Phase"]},
+{w:1,d:"Wed",day:3,title:"Phase A: Architecture Vision",tag:"adm",tagLabel:"ADM",points:["Objectives of Phase A","Statement of Architecture Work","Architecture Vision document","Stakeholder identification and concerns","Request for Architecture Work trigger"]},
+{w:1,d:"Thu",day:4,title:"Phase B: Business Architecture",tag:"adm",tagLabel:"ADM",points:["Business architecture definition and scope","Business capabilities and value streams","Organization map and actors","Baseline vs target business architecture","Business architecture catalogs, matrices, diagrams"]},
+{w:2,d:"Mon",day:5,title:"Phase C: Information Systems Architecture",tag:"adm",tagLabel:"ADM",points:["Data architecture: entities, logical data components","Application architecture: logical and physical components","Application interaction matrix","Data dissemination diagram","Inputs, steps, and outputs of Phase C"]},
+{w:2,d:"Tue",day:6,title:"Phase D: Technology Architecture",tag:"adm",tagLabel:"ADM",points:["Technology architecture components and standards","Platform services and application platform","Technology portfolio catalog","Environments and location diagram","Relationship to Phase C outputs"]},
+{w:2,d:"Wed",day:7,title:"Phase E: Opportunities & Solutions",tag:"adm",tagLabel:"ADM",points:["Transition architectures concept","Work packages and implementation projects","Project context diagram","Consolidated gaps analysis","Criteria for solution selection"]},
+{w:2,d:"Thu",day:8,title:"Phase F: Migration Planning",tag:"adm",tagLabel:"ADM",points:["Detailed implementation and migration plan","Assessing dependencies, costs, and benefits","Migration planning techniques","Architecture roadmap refinement","Stakeholder reviews and sign-off"]},
+{w:3,d:"Mon",day:9,title:"Phase G: Implementation Governance",tag:"gov",tagLabel:"Governance",points:["Architecture contracts and compliance","Implementation governance role","Conformance vs compliance reviews","Architecture compliance review process","Inputs, steps, and outputs of Phase G"]},
+{w:3,d:"Tue",day:10,title:"Phase H: Architecture Change Management",tag:"gov",tagLabel:"Governance",points:["Change management triggers and types","Dispensations and exceptions","Architecture change requests process","Technology and business change impact","Maintenance vs redesign decisions"]},
+{w:3,d:"Wed",day:11,title:"ADM Requirements Management",tag:"adm",tagLabel:"ADM",points:["Requirements management as a continuous phase","Requirements impact on ADM phases","Architecture requirements specification","Storing and managing requirements","How requirements affect change control"]},
+{w:3,d:"Thu",day:12,title:"ADM Guidelines & Techniques",tag:"adm",tagLabel:"ADM",points:["ADM iteration patterns","Security architecture in ADM","SOA in ADM","Business transformation readiness assessment","Risk management approach in TOGAF"]},
+{w:4,d:"Mon",day:13,title:"Architecture Content Framework",tag:"content",tagLabel:"Content",points:["Deliverables vs artifacts vs building blocks","ABBs vs SBBs","Content metamodel overview","Reusability of building blocks","Key deliverables per ADM phase"]},
+{w:4,d:"Tue",day:14,title:"Enterprise Continuum & Repository",tag:"core",tagLabel:"Core",points:["Architecture Continuum: Foundation to Organization","Solutions Continuum structure","Architecture Repository components","Architecture Landscape levels","Reference Library, Standards Library, Governance Log"]},
+{w:4,d:"Wed",day:15,title:"Architecture Capability Framework",tag:"gov",tagLabel:"Governance",points:["Establishing and operating an architecture practice","Architecture maturity models","Architecture skills framework","Roles: Chief Architect, Architecture Board, Sponsor","Architecture Centre of Excellence"]},
+{w:4,d:"Thu",day:16,title:"Architecture Governance",tag:"gov",tagLabel:"Governance",points:["Governance definition and levels","Architecture Board composition and responsibilities","Architecture contracts purpose and content","Compliance vs conformance","IT governance vs architecture governance"]},
+{w:5,d:"Mon",day:17,title:"Stakeholder Management & Views",tag:"core",tagLabel:"Core",points:["Stakeholder map and analysis technique","Architecture concerns and viewpoints","Architecture views vs viewpoints","Communications plan","Stakeholder engagement across ADM phases"]},
+{w:5,d:"Tue",day:18,title:"Reference Models: TRM & III-RM",tag:"core",tagLabel:"Core",points:["Technical Reference Model (TRM) overview","TRM taxonomy and application platform","Integrated Information Infrastructure Reference Model","Boundaryless information flow concept","Using reference models in Phase D"]},
+{w:5,d:"Wed",day:19,title:"Full Review — All Domains",tag:"review",tagLabel:"Review",points:["ADM phases quick recap (all 10 phases)","Content Framework: deliverables, artifacts, BBs","Enterprise Continuum & Repository recap","Governance & Capability Framework recap","Common exam pitfalls and tricky distinctions"]},
+{w:5,d:"Thu",day:20,title:"Mock Exam & Exam Strategy",tag:"review",tagLabel:"Review",points:["40-question format, 60 min, 55% pass mark","Eliminate wrong answers first","Focus: ADM phases, objectives, inputs/outputs","Review knowledge gap areas","Exam day tips and time management"]},
+];
+
+const WEEK_LABELS=["Week 1 — Foundation & Core","Week 2 — ADM: Data through Migration","Week 3 — Governance & Techniques","Week 4 — Content, Continuum & Governance","Week 5 — Stakeholders, Ref. Models & Review"];
+let done={},filter="all",expanded=null;
+
+function loadDone(){
+  try{const r=localStorage.getItem("togaf_done");if(r)done=JSON.parse(r);}catch(e){}
+}
+function saveDone(){
+  try{localStorage.setItem("togaf_done",JSON.stringify(done));}catch(e){}
+}
+function countDone(){return Object.values(done).filter(Boolean).length}
+
+function updateProgress(){
+  const n=countDone(),pct=Math.round(n/20*100);
+  const offset=188.5-(188.5*pct/100);
+  document.getElementById("ring").style.strokeDashoffset=offset;
+  document.getElementById("ring-pct").textContent=pct+"%";
+  document.getElementById("done-label").textContent=n+" / 20";
+  const rem=(20-n)*30,h=Math.floor(rem/60),m=rem%60;
+  document.getElementById("remain-label").textContent=h+" hrs "+(m?m+" min":"0 min");
+  document.getElementById("prog-bar").style.width=pct+"%";
+}
+
+function filteredSessions(){
+  if(filter==="all") return SESSIONS;
+  if(filter==="pending") return SESSIONS.filter(s=>!done[s.day]);
+  if(filter==="done") return SESSIONS.filter(s=>done[s.day]);
+  return SESSIONS.filter(s=>s.tag===filter);
+}
+
+function render(){
+  const app=document.getElementById("app");
+  const sessions=filteredSessions();
+  if(!sessions.length){app.innerHTML='<div class="empty">No sessions here yet.</div>';updateProgress();return;}
+
+  const byWeek={};
+  sessions.forEach(s=>{if(!byWeek[s.w])byWeek[s.w]=[];byWeek[s.w].push(s);});
+
+  let html="";
+  let streak=0;
+  for(let i=1;i<=20;i++){if(done[i])streak++;else break;}
+  if(streak>0){
+    html+=`<div class="streak-banner"><span style="font-size:16px">🔥</span><span class="streak-text">${streak} session${streak>1?"s":""} in a row — keep it up!</span></div>`;
+  }
+
+  Object.keys(byWeek).sort((a,b)=>a-b).forEach(w=>{
+    html+=`<div class="week-group"><div class="week-label">${WEEK_LABELS[w-1]}</div>`;
+    byWeek[w].forEach(s=>{
+      const isDone=!!done[s.day],isExp=expanded===s.day;
+      html+=`
+      <div class="session-card${isDone?" done":""}${isExp?" expanded":""}" id="card${s.day}">
+        <div class="session-head" onclick="toggleExpand(${s.day})">
+          <div class="check-btn${isDone?" checked":""}" id="chk${s.day}" onclick="toggleDone(event,${s.day})">
+            <div class="check-icon"></div>
+          </div>
+          <div class="session-info">
+            <div class="session-meta">Day ${s.day} · ${s.d} · Week ${s.w}</div>
+            <div class="session-title">${s.title}</div>
+          </div>
+          <span class="session-tag tag-${s.tag}">${s.tagLabel}</span>
+          <svg class="chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M4 6l4 4 4-4"/>
+          </svg>
+        </div>
+        <div class="session-detail${isExp?" open":""}" id="det${s.day}">
+          <div class="detail-inner">
+            <div class="detail-section">
+              <div class="detail-heading">Topics covered</div>
+              ${s.points.map(p=>`<div class="topic-item"><div class="topic-dot"></div><div class="topic-text">${p}</div></div>`).join("")}
+            </div>
+            <div class="detail-footer">
+              <span class="detail-duration">⏱ 30 min session</span>
+              <button class="mark-btn${isDone?" done-btn":""}" onclick="toggleDone(event,${s.day})">${isDone?"Mark pending":"Mark done"}</button>
+            </div>
+          </div>
+        </div>
+      </div>`;
+    });
+    html+="</div>";
+  });
+  app.innerHTML=html;
+  updateProgress();
+}
+
+function toggleExpand(day){expanded=expanded===day?null:day;render();}
+
+function toggleDone(e,day){
+  e.stopPropagation();
+  done[day]=!done[day];
+  saveDone();
+  const btn=document.getElementById("chk"+day);
+  if(btn){btn.classList.add("pop");setTimeout(()=>btn.classList.remove("pop"),200);}
+  render();
+}
+
+document.getElementById("tabs").addEventListener("click",function(e){
+  const t=e.target.closest(".tab");
+  if(!t) return;
+  document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+  t.classList.add("active");
+  filter=t.dataset.filter;expanded=null;render();
+});
+
+// Offline detection
+window.addEventListener("offline",()=>document.getElementById("offline-badge").classList.add("show"));
+window.addEventListener("online",()=>document.getElementById("offline-badge").classList.remove("show"));
+if(!navigator.onLine) document.getElementById("offline-badge").classList.add("show");
+
+// PWA install prompt
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  document.getElementById("install-banner").classList.add("show");
+});
+document.getElementById("install-btn").addEventListener("click",async()=>{
+  if(!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const {outcome}=await deferredPrompt.userChoice;
+  deferredPrompt=null;
+  document.getElementById("install-banner").classList.remove("show");
+});
+document.getElementById("install-dismiss").addEventListener("click",()=>{
+  document.getElementById("install-banner").classList.remove("show");
+});
+window.addEventListener("appinstalled",()=>{
+  document.getElementById("install-banner").classList.remove("show");
+});
+
+// Service worker registration
+if("serviceWorker" in navigator){
+  window.addEventListener("load",()=>{
+    navigator.serviceWorker.register("sw.js").catch(()=>{});
+  });
+}
+
+loadDone();
+render();
+</script>
+</body>
+</html>
