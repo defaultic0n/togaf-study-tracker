@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 11 Slides — ADM Requirements Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;--teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);--gold:#F0B429;--gold2:rgba(240,180,41,0.15);--slate:#94A3B8;--slate2:#64748B;--slate3:#334155;--white:#F8FAFC;--white2:#E2E8F0;--coral:#FB7185;--coral2:rgba(251,113,133,0.15);--blue:#60A5FA;--blue2:rgba(96,165,250,0.12);--purple:#A78BFA;--purple2:rgba(167,139,250,0.12);--green:#4ADE80;--green2:rgba(74,222,128,0.12);--amber:#FBBF24;--amber2:rgba(251,191,36,0.12)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:.06}
+.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;padding:0 24px;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;padding:0 32px;line-height:1.6;margin-bottom:48px}
+.start-meta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:56px}
+.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
+.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer}
+.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
+#deck{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column;display:none}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.slide.exit-left{animation:exitLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-right{animation:enterRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.exit-right{animation:exitRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-left{animation:enterLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes exitLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes enterRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes exitRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
+@keyframes enterLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}
+.slide-body::-webkit-scrollbar{display:none}
+.slide-title .slide-body,.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:32px 28px}
+.title-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
+.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:20px}
+.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
+.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
+.section-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
+.section-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.section-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
+.section-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
+.content-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.content-h{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:14px}
+.callout{border-radius:10px;padding:13px 15px;margin-bottom:11px}
+.callout.teal{background:var(--teal3);border-left:3px solid var(--teal)}.callout.gold{background:var(--gold2);border-left:3px solid var(--gold)}.callout.blue{background:var(--blue2);border-left:3px solid var(--blue)}.callout.purple{background:var(--purple2);border-left:3px solid var(--purple)}.callout.green{background:var(--green2);border-left:3px solid var(--green)}.callout.amber{background:var(--amber2);border-left:3px solid var(--amber)}.callout.coral{background:var(--coral2);border-left:3px solid var(--coral)}
+.callout-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.callout.teal .callout-label{color:var(--teal)}.callout.gold .callout-label{color:var(--gold)}.callout.blue .callout-label{color:var(--blue)}.callout.purple .callout-label{color:var(--purple)}.callout.green .callout-label{color:var(--green)}.callout.amber .callout-label{color:var(--amber)}.callout.coral .callout-label{color:var(--coral)}
+.callout p{font-size:13px;line-height:1.6;margin:0}
+.callout.teal p{color:rgba(45,212,191,.9)}.callout.gold p{color:rgba(240,180,41,.9)}.callout.blue p{color:rgba(96,165,250,.9)}.callout.purple p{color:rgba(167,139,250,.9)}.callout.green p{color:rgba(74,222,128,.9)}.callout.amber p{color:rgba(251,191,36,.9)}.callout.coral p{color:rgba(251,113,133,.9)}
+.bullet-list{display:flex;flex-direction:column;gap:8px;margin-bottom:11px}
+.bullet{display:flex;gap:11px;align-items:flex-start}
+.bullet-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
+.bullet-text{font-size:13px;color:var(--white2);line-height:1.55}
+.bullet-text strong{color:var(--white)}.bullet-text em{color:var(--teal);font-style:normal}
+.exam-bar{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:11px 13px;margin-bottom:11px;display:flex;gap:10px}
+.exam-star{font-size:15px;flex-shrink:0}.exam-text{font-size:12px;color:rgba(240,180,41,.9);line-height:1.6}
+.exam-text strong{color:var(--gold)}
+.def-list{display:flex;flex-direction:column;gap:7px;margin-bottom:11px}
+.def-item{background:var(--navy3);border-radius:7px;padding:9px 11px;border:1px solid rgba(255,255,255,.05)}
+.def-term{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:2px}
+.def-text{font-size:12px;color:var(--slate);line-height:1.45}
+.phase-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.phase-card{background:var(--navy3);border-radius:7px;padding:9px 11px;border:1px solid rgba(255,255,255,.05)}
+.phase-name{font-size:11px;font-weight:700;color:var(--teal);margin-bottom:3px}
+.phase-desc{font-size:11px;color:var(--slate);line-height:1.4}
+.req-type-row{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:var(--navy3);border-radius:7px;border:1px solid rgba(255,255,255,.05);margin-bottom:6px}
+.req-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;flex-shrink:0;white-space:nowrap}
+.req-desc{font-size:12px;color:var(--slate);line-height:1.45}
+.io-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+.io-box{background:var(--navy3);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+.io-hd{padding:7px 10px;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.io-hd.in{background:var(--blue2);color:var(--blue)}.io-hd.out{background:var(--teal3);color:var(--teal)}
+.io-ul{list-style:none;padding:7px 10px;display:flex;flex-direction:column;gap:3px}
+.io-ul li{font-size:11px;color:var(--slate);display:flex;gap:5px}
+.io-ul li::before{content:'·';color:var(--slate2);flex-shrink:0}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.sum-card{background:var(--navy3);border-radius:9px;padding:11px;border:1px solid rgba(255,255,255,.06)}
+.sum-num{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px;letter-spacing:1px}
+.sum-text{font-size:11px;color:var(--white2);line-height:1.5}
+.sum-text strong{color:var(--white)}
+#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
+#progress-fill{height:100%;background:var(--teal);transition:width .4s}
+#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
+.ctrl-btn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0;color:var(--white2)}
+.ctrl-btn:active{background:var(--navy4)}.ctrl-btn svg{width:16px;height:16px}
+.ctrl-btn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}
+.ctrl-btn.primary svg{width:18px;height:18px}
+.ctrl-btn:disabled{opacity:.3;cursor:not-allowed}
+.slide-counter{flex:1;text-align:center;font-size:12px;color:var(--slate2)}
+.slide-counter strong{color:var(--slate)}
+.voice-status{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
+.voice-dots{display:flex;gap:3px;align-items:center}
+.voice-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vdot 1.2s infinite}
+.voice-dot:nth-child(2){animation-delay:.2s}.voice-dot:nth-child(3){animation-delay:.4s}
+@keyframes vdot{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
+.speed-btn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
+.swipe-hint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+</style>
+</head>
+<body>
+<div id="start-overlay">
+  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="200" cy="100" r="180" fill="#60A5FA"/><circle cx="40" cy="500" r="130" fill="#2DD4BF"/><circle cx="360" cy="600" r="100" fill="#A78BFA"/></svg>
+  <div class="start-logo">TOGAF Foundation · Day 11</div>
+  <div class="start-title">ADM Requirements Management</div>
+  <p class="start-sub">20 slides with voiceover narration.<br>Approx. 30 minutes to complete.</p>
+  <div class="start-meta"><span class="start-pill">📊 20 slides</span><span class="start-pill">🎙 Narrated</span><span class="start-pill">⏱ ~30 min</span></div>
+  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Presentation</button>
+  <p class="start-note">Tap Start to enable voice · Swipe or use controls to navigate</p>
+</div>
+<div id="deck">
+  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
+  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
+  <div style="padding:2px 16px 0"><div class="voice-status" id="voice-status"></div><div class="swipe-hint">swipe left/right to navigate</div></div>
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+    <button class="ctrl-btn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
+    <button class="ctrl-btn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+    <div class="slide-counter"><strong id="slide-num">1</strong> / <span id="slide-total">20</span></div>
+    <button class="speed-btn" id="speed-btn" onclick="cycleSpeed()">1×</button>
+    <button class="ctrl-btn" id="btn-done" onclick="markDone()" title="Mark complete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+  </div>
+</div>
+<script>
+const SLIDES=[
+{type:"title",bg:"navy",
+html:`<div class="title-eyebrow">TOGAF Foundation · Day 11 of 20</div><h1 class="title-h">ADM Requirements Management</h1><div class="title-rule"></div><p class="title-sub">The only phase that runs continuously throughout the entire ADM cycle — managing requirements so they never get lost and always drive architecture decisions.</p><div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">⭐ Week 3</span></div>`,
+voice:`Welcome to Day 11 — Wednesday of Week 3. Today is ADM Requirements Management — the one phase in the ADM cycle that never stops. While every other phase has a clear start and end, Requirements Management runs in parallel with all of them from Preliminary through Phase H. We'll cover why it's continuous, how requirements impact each ADM phase, what the Architecture Requirements Specification contains, how requirements are stored, and how requirements trigger change control. Let's go.`},
+
+{type:"section",bg:"blue",
+html:`<div class="section-num">01</div><div class="section-label">Section One</div><h2 class="section-h">Requirements Management — A Continuous Phase</h2><p class="section-desc">Why this phase never stops — and what that means for the entire ADM cycle.</p>`,
+voice:`Section one: Requirements Management as a continuous phase. This is the most structurally unusual feature of the ADM.`},
+
+{type:"content",
+html:`<div class="content-label">Always running</div><h2 class="content-h">The Phase That Never Stops</h2>
+<div class="callout teal"><div class="callout-label">Definition</div><p>Requirements Management is the <strong>continuous ADM phase</strong> that manages the identification, storage, and feeding of requirements into and out of all other ADM phases. It runs from the Preliminary Phase through Phase H — never stopping.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>All other phases</strong> have a defined start, middle, and end</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Requirements Management</strong> runs alongside every phase simultaneously</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Requirements <em>feed into</em> phases: each phase receives requirements it must satisfy</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Requirements <em>emerge from</em> phases: each phase may identify new requirements or change existing ones</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">The repository of requirements is <strong>always live</strong> — it changes as the ADM progresses</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Exam tip:</strong> Requirements Management is the <strong>only continuous phase</strong> in the ADM. If asked "which phase runs throughout the entire ADM cycle?" — always answer Requirements Management.</div></div>`,
+voice:`Requirements Management is the only continuous phase in the ADM. Every other phase — Preliminary, A through H — has a defined start and end. Requirements Management runs alongside all of them simultaneously. It works in two directions. Requirements feed into each phase: Phase A receives requirements about what the architecture must achieve. Phase B receives requirements about business capabilities. Phase C about data and applications. And so on. But requirements also emerge from phases: as each phase progresses, new requirements are discovered or existing ones change. The requirements repository is always live. For the exam: if asked which phase runs throughout the entire ADM cycle, always answer Requirements Management.`},
+
+{type:"section",bg:"teal",
+html:`<div class="section-num">02</div><div class="section-label">Section Two</div><h2 class="section-h">Requirements Impact on ADM Phases</h2><p class="section-desc">How requirements flow into and out of each ADM phase throughout the cycle.</p>`,
+voice:`Section two: how requirements impact each ADM phase. The bidirectional flow of requirements is what makes this phase so important.`},
+
+{type:"content",
+html:`<div class="content-label">Phase by phase</div><h2 class="content-h">Requirements Flow Through the ADM</h2>
+<div class="phase-grid">
+  <div class="phase-card"><div class="phase-name">Phase A (Vision)</div><div class="phase-desc">Receives: business goals and constraints as requirements. Produces: refined requirements from stakeholder concerns.</div></div>
+  <div class="phase-card"><div class="phase-name">Phase B (Business)</div><div class="phase-desc">Receives: business requirements for capabilities and processes. Produces: updated requirements as gaps are identified.</div></div>
+  <div class="phase-card"><div class="phase-name">Phase C (IS)</div><div class="phase-desc">Receives: data and application requirements from Phase B. Produces: integration and data quality requirements.</div></div>
+  <div class="phase-card"><div class="phase-name">Phase D (Technology)</div><div class="phase-desc">Receives: platform and infrastructure requirements. Produces: technology standards requirements.</div></div>
+  <div class="phase-card"><div class="phase-name">Phase E (Opps)</div><div class="phase-desc">Receives: requirements for work package scope. Produces: implementation constraints as requirements.</div></div>
+  <div class="phase-card"><div class="phase-name">Phase F (Migration)</div><div class="phase-desc">Receives: prioritisation criteria as requirements. Produces: scheduling and resource requirements.</div></div>
+  <div class="phase-card"><div class="phase-name">Phase G (Gov)</div><div class="phase-desc">Receives: conformance requirements from Architecture Contracts. Produces: compliance gap requirements.</div></div>
+  <div class="phase-card"><div class="phase-name">Phase H (Change)</div><div class="phase-desc">Receives: change drivers as new requirements. Produces: updated requirements from approved changes.</div></div>
+</div>`,
+voice:`Here's how requirements flow through every phase. Phase A receives business goals and constraints as requirements, and produces refined requirements from stakeholder concerns. Phase B receives business requirements for capabilities and processes, and produces updated requirements as gaps are identified. Phase C receives data and application requirements from Phase B, producing integration and data quality requirements. Phase D receives platform requirements, producing technology standards requirements. Phase E receives requirements for work package scope. Phase F receives prioritisation criteria. Phase G receives conformance requirements from Architecture Contracts. And Phase H receives change drivers as new requirements, producing updated requirements from approved changes. Every phase is in a constant dialogue with Requirements Management.`},
+
+{type:"section",bg:"purple",
+html:`<div class="section-num">03</div><div class="section-label">Section Three</div><h2 class="section-h">Architecture Requirements Specification</h2><p class="section-desc">The formal document that captures requirements and drives architectural decision-making.</p>`,
+voice:`Section three: the Architecture Requirements Specification. This is the key formal output of Requirements Management.`},
+
+{type:"content",
+html:`<div class="content-label">The key document</div><h2 class="content-h">Architecture Requirements Specification</h2>
+<div class="callout purple"><div class="callout-label">Definition</div><p>The <strong>Architecture Requirements Specification</strong> provides a set of quantitative statements about the business, technical, and architecture requirements that must be met. It is updated continuously as requirements evolve through the ADM.</p></div>
+<div class="req-type-row"><span class="req-badge" style="background:var(--blue2);color:var(--blue)">Business</span><div class="req-desc">Business capability requirements, strategic goals, business constraints. Typically originate in Phase A and B.</div></div>
+<div class="req-type-row"><span class="req-badge" style="background:var(--teal3);color:var(--teal)">Functional</span><div class="req-desc">What the solution must do — specific functionality, behaviours, and capabilities required of information systems.</div></div>
+<div class="req-type-row"><span class="req-badge" style="background:var(--purple2);color:var(--purple)">Non-Functional</span><div class="req-desc">Quality attributes: performance, security, availability, scalability, usability. Often called quality-of-service requirements.</div></div>
+<div class="req-type-row"><span class="req-badge" style="background:var(--amber2);color:var(--amber)">Technical</span><div class="req-desc">Technology standards compliance, integration requirements, infrastructure constraints. Typically from Phases C and D.</div></div>
+<div class="req-type-row"><span class="req-badge" style="background:var(--green2);color:var(--green)">Architecture</span><div class="req-desc">Principles compliance, conformance requirements, architecture pattern adherence.</div></div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">The Architecture Requirements Specification is <strong>continuously updated</strong> — not a one-time deliverable. It evolves as each ADM phase adds, changes, or removes requirements.</div></div>`,
+voice:`The Architecture Requirements Specification is the key formal document produced by Requirements Management. It captures five types of requirements. Business requirements — capabilities, goals, and constraints originating in Phase A and B. Functional requirements — what the solution must do, specific behaviours and capabilities. Non-functional requirements — quality attributes like performance, security, availability, and scalability. Technical requirements — standards compliance, integration requirements, and infrastructure constraints from Phases C and D. And Architecture requirements — principles compliance and conformance requirements. Crucially, the Architecture Requirements Specification is continuously updated — it is not a one-time deliverable. Every phase can add, change, or remove requirements.`},
+
+{type:"section",bg:"amber",
+html:`<div class="section-num">04</div><div class="section-label">Section Four</div><h2 class="section-h">Storing and Managing Requirements</h2><p class="section-desc">How the Architecture Repository acts as the system of record for all requirements.</p>`,
+voice:`Section four: storing and managing requirements. Requirements must be formally stored and traceable throughout the ADM.`},
+
+{type:"content",
+html:`<div class="content-label">The repository role</div><h2 class="content-h">Requirements in the Architecture Repository</h2>
+<div class="callout amber"><div class="callout-label">Storage location</div><p>All requirements are stored in the <strong>Architecture Repository</strong> — the enterprise's single source of truth for all architecture-related information. Requirements are structured, version-controlled, and linked to the architecture elements they affect.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Traceability</strong> — every requirement links to the business driver that created it and the architecture element that satisfies it</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Version control</strong> — requirements change; every version is retained so the evolution of requirements can be understood</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Status tracking</strong> — each requirement has a status: proposed, approved, implemented, deferred, or withdrawn</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Priority</strong> — requirements are prioritised (mandatory, high, medium, low) to guide decision-making when trade-offs are needed</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Impact assessment</strong> — changes to requirements are assessed for impact on the architecture before being approved</div></div>
+</div>
+<div class="callout green"><div class="callout-label">Requirements and the Architecture Landscape</div><p>Requirements link not just to current architecture elements but to the <strong>Architecture Landscape</strong> — the baseline, transition, and target architectures. A requirement may be satisfiable in the baseline, or only after a transition architecture, or only in the target. This phasing is captured in requirements management.</p></div>`,
+voice:`Requirements are stored in the Architecture Repository — the enterprise's single source of truth for all architecture information. Five things matter for requirements storage. Traceability: every requirement links to the business driver that created it and the architecture element that satisfies it. Version control: requirements change over time, so every version is retained. Status tracking: each requirement has a status — proposed, approved, implemented, deferred, or withdrawn. Priority: requirements are prioritised as mandatory, high, medium, or low to guide trade-off decisions. And impact assessment: changes to requirements are assessed for their impact on the architecture before being approved. Requirements also link to the Architecture Landscape — a requirement might be satisfied in the baseline, or only after a transition architecture, or only in the final target.`},
+
+{type:"section",bg:"coral",
+html:`<div class="section-num">05</div><div class="section-label">Section Five</div><h2 class="section-h">Requirements and Change Control</h2><p class="section-desc">How new and changed requirements trigger formal change control throughout the ADM.</p>`,
+voice:`Section five: how requirements interact with change control. This is where Requirements Management connects back to Phase H.`},
+
+{type:"content",
+html:`<div class="content-label">Change triggers</div><h2 class="content-h">Requirements Driving Change</h2>
+<div class="callout coral"><div class="callout-label">The change connection</div><p>New requirements or changes to existing requirements can arise at any point in the ADM — from external business changes, technology shifts, or regulatory changes. Each one must be formally assessed for its <strong>impact on the current architecture</strong> before being accepted.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot" style="background:var(--coral)"></div><div class="bullet-text"><strong>New requirement identified</strong> → assessed for impact → approved → fed to relevant ADM phase → architecture updated</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--amber)"></div><div class="bullet-text"><strong>Existing requirement changes</strong> → impact assessed → approved change → may trigger Phase H Architecture Change Management</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--teal)"></div><div class="bullet-text"><strong>Requirement conflicts</strong> → adjudicated by Architecture Board → resolution recorded in Governance Log</div></div>
+</div>
+<div class="callout blue"><div class="callout-label">Requirements vs change requests</div><p>A <strong>requirement</strong> describes what the architecture must achieve. A <strong>change request</strong> is a formal request to modify the approved architecture. When new requirements cannot be satisfied by the current approved architecture, they generate change requests that go through Phase H — Architecture Change Management.</p></div>
+<div class="sum-grid">
+  <div class="sum-card"><div class="sum-num">01</div><div class="sum-text"><strong>Only continuous phase</strong> — runs alongside every other ADM phase, never stops.</div></div>
+  <div class="sum-card"><div class="sum-num">02</div><div class="sum-text"><strong>Bidirectional flow</strong> — requirements feed into phases and emerge from phases.</div></div>
+  <div class="sum-card"><div class="sum-num">03</div><div class="sum-text"><strong>Architecture Requirements Specification</strong> — the living document capturing 5 requirement types.</div></div>
+  <div class="sum-card"><div class="sum-num">04</div><div class="sum-text"><strong>Repository storage</strong> — traceable, versioned, prioritised, status-tracked.</div></div>
+</div>`,
+voice:`Requirements and change control interact continuously. A new requirement is identified, assessed for its impact on the architecture, approved, fed to the relevant ADM phase, and the architecture is updated accordingly. A change to an existing requirement follows the same path, but may trigger Phase H — Architecture Change Management — if the approved architecture needs to be formally modified. Requirement conflicts are adjudicated by the Architecture Board, with the resolution recorded in the Governance Log. The key distinction to remember: a requirement describes what the architecture must achieve. A change request is a formal request to modify the approved architecture. When new requirements cannot be satisfied by the current approved architecture, they escalate into change requests going through Phase H.`},
+
+{type:"title",bg:"end",
+html:`<div class="title-eyebrow">Day 11 Complete</div><h1 class="title-h" style="font-size:clamp(24px,6vw,40px)">Requirements Mgmt — done.</h1><div class="title-rule"></div><p class="title-sub" style="margin-bottom:24px">Next up: <strong>Day 12 — ADM Guidelines &amp; Techniques</strong>. The practical tools and approaches that help you apply the ADM effectively — iteration, risk management, security, and SOA.</p>
+<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+  <a href="togaf-day11.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Open reading version · Take the quiz</a>
+  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 11 as done</button>
+</div>`,
+voice:`Day 11 is complete. Requirements Management is the only continuous ADM phase — running in parallel with every other phase, feeding requirements in and capturing new requirements as they emerge. The Architecture Requirements Specification is the living document that captures business, functional, non-functional, technical, and architecture requirements. All stored in the Architecture Repository with full traceability and version control. And new or changed requirements that the current architecture can't satisfy generate change requests for Phase H. Take the quiz on the reading version. Day 12 covers ADM Guidelines and Techniques — the practical toolbox for applying the ADM effectively. See you there.`},
+];
+
+let cur=0,play=false,spdIdx=1,utt=null,tx=0,anim=false;
+const SPDS=[0.8,1,1.2,1.5];
+const wrap=document.getElementById("slides-wrap");
+document.getElementById("slide-total").textContent=SLIDES.length;
+function getBg(b){return{navy:"var(--navy2)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",amber:"linear-gradient(135deg,#1A1000,#251800)",coral:"linear-gradient(135deg,#1A0A0E,#2A0D15)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"}[b]||"var(--navy2)";}
+SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="s"+i;d.style.background=getBg(s.bg);d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
+function goTo(i,dir){if(anim||i<0||i>=SLIDES.length)return;anim=true;stopSp();const f=document.getElementById("s"+cur),t=document.getElementById("s"+i);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");anim=false;cur=i;upUI();if(play)spk();},420);}
+function nextSlide(){if(cur<SLIDES.length-1)goTo(cur+1,1);}
+function prevSlide(){if(cur>0)goTo(cur-1,-1);}
+function upUI(){document.getElementById("slide-num").textContent=cur+1;document.getElementById("progress-fill").style.width=((cur+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=cur===0;document.getElementById("btn-next").disabled=cur===SLIDES.length-1;}
+function spk(){stopSp();if(!("speechSynthesis"in window))return;const txt=SLIDES[cur].voice;if(!txt){if(play)setTimeout(nextSlide,800);return;}utt=new SpeechSynthesisUtterance(txt);utt.rate=SPDS[spdIdx];utt.lang="en-GB";const vs=speechSynthesis.getVoices();const p=vs.find(v=>v.lang.startsWith("en")&&(v.name.includes("Daniel")||v.name.includes("Samantha")||v.name.includes("Karen")||v.name.includes("Google UK")))||vs.find(v=>v.lang.startsWith("en"))||vs[0];if(p)utt.voice=p;utt.onstart=()=>setSt("speaking");utt.onend=()=>{setSt("");if(play&&cur<SLIDES.length-1)setTimeout(nextSlide,600);else if(cur===SLIDES.length-1){play=false;upPlay();}};utt.onerror=()=>setSt("");speechSynthesis.speak(utt);}
+function stopSp(){if("speechSynthesis"in window)speechSynthesis.cancel();utt=null;setSt("");}
+function togglePlay(){play=!play;upPlay();if(play)spk();else stopSp();}
+function upPlay(){document.getElementById("play-icon").innerHTML=play?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
+function setSt(s){const el=document.getElementById("voice-status");el.innerHTML=s==="speaking"?`<div class="voice-dots"><div class="voice-dot"></div><div class="voice-dot"></div><div class="voice-dot"></div></div><span>Narrating…</span>`:s||"";}
+function cycleSpeed(){spdIdx=(spdIdx+1)%SPDS.length;document.getElementById("speed-btn").textContent=SPDS[spdIdx]+"×";if(play){stopSp();setTimeout(spk,100);}}
+function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[11]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="var(--teal3)";b.style.borderColor="var(--teal)";b.querySelector("svg").style.stroke="var(--teal)";goTo(SLIDES.length-1,1);}
+document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";upUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{play=true;upPlay();spk();},400);}});
+wrap.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
+if("speechSynthesis"in window)speechSynthesis.onvoiceschanged=()=>{};
+</script>
+</body>
+</html>

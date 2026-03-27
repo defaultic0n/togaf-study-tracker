@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 10 — Phase H: Architecture Change Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAF7;--ink:#1A1A18;--ink2:#4A4A42;--ink3:#8A8A80;--teal:#0D6E5E;--teal-light:#E6F4F1;--teal-mid:#1A9B86;--amber:#92530A;--amber-light:#FDF3E3;--blue:#1A4A7A;--blue-light:#E8F0F8;--purple:#4A2A7A;--purple-light:#F0EAF8;--green:#1A5A2A;--green-light:#E8F4E8;--coral:#8A2A2A;--coral-light:#F8EAEA;--rule:#E0DFD8;--surface:#FFFFFF;--reading-max:680px}
+html{background:var(--bg);scroll-behavior:smooth}
+body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100;transition:width 0.1s}
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}
+.nav-day{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3)}
+.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer}
+.done-btn.completed{background:#2EAA8A}
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}
+.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}
+.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px;transition:color .15s}
+.toc-list a:hover{color:var(--teal)}
+.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+.section{margin-bottom:48px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+p{margin-bottom:16px;color:var(--ink2)} p strong{color:var(--ink);font-weight:600}
+.hl{border-radius:10px;padding:16px 18px;margin:20px 0}
+.hl.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}.hl.amber{background:var(--amber-light);border-left:3px solid #D4860E}.hl.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}.hl.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}.hl.green{background:var(--green-light);border-left:3px solid #2A7A3A}.hl.coral{background:var(--coral-light);border-left:3px solid #C84A4A}
+.hl-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.hl.teal .hl-lbl{color:var(--teal)}.hl.amber .hl-lbl{color:var(--amber)}.hl.blue .hl-lbl{color:var(--blue)}.hl.purple .hl-lbl{color:var(--purple)}.hl.green .hl-lbl{color:var(--green)}.hl.coral .hl-lbl{color:var(--coral)}
+.hl p{margin-bottom:0;font-size:15px;line-height:1.65}
+.hl.teal p{color:var(--teal)}.hl.amber p{color:var(--amber)}.hl.blue p{color:var(--blue)}.hl.purple p{color:var(--purple)}.hl.green p{color:var(--green)}.hl.coral p{color:var(--coral)}
+.def-grid{display:grid;gap:10px;margin:20px 0}
+.def-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.def-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.def-text{font-size:14px;color:var(--ink2);line-height:1.6;margin:0}
+.term{font-weight:600;color:var(--teal);border-bottom:1px dotted var(--teal-mid)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.col-box{background:var(--surface);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.col-head{padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase}
+.col-head.in{background:var(--blue-light);color:var(--blue)}.col-head.out{background:var(--teal-light);color:var(--teal)}.col-head.maint{background:var(--green-light);color:var(--green)}.col-head.redesign{background:var(--coral-light);color:var(--coral)}
+.col-list{list-style:none;padding:10px 14px;display:flex;flex-direction:column;gap:5px}
+.col-list li{font-size:13px;color:var(--ink2);line-height:1.5;display:flex;gap:6px;align-items:flex-start}
+.col-list li::before{content:'·';color:var(--ink3);flex-shrink:0}
+.trigger-grid{display:grid;gap:10px;margin:20px 0}
+.trigger-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:12px 16px;display:flex;gap:10px;align-items:flex-start}
+.trigger-icon{font-size:20px;flex-shrink:0}
+.trigger-head{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px}
+.trigger-desc{font-size:13px;color:var(--ink2);line-height:1.5}
+.change-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+.change-table th{background:var(--teal-light);color:var(--teal);font-weight:600;padding:9px 12px;text-align:left;border:1px solid var(--rule)}
+.change-table td{padding:8px 12px;border:1px solid var(--rule);color:var(--ink2);vertical-align:top;line-height:1.5}
+.change-table tr:nth-child(even) td{background:#F7F6F3}
+.process-flow{display:flex;flex-direction:column;gap:8px;margin:20px 0}
+.flow-step{display:flex;gap:12px;align-items:center}
+.flow-box{flex:1;background:var(--teal-light);border:1px solid var(--teal-mid);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--teal);font-weight:500}
+.flow-arrow{color:var(--ink3);font-size:18px;text-align:center;width:20px;flex-shrink:0}
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+.sum-grid{display:grid;gap:10px;margin-top:32px}
+.sum-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.sum-icon{font-size:18px;flex-shrink:0}
+.sum-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.sum-body{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}
+.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}
+.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}
+.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}
+.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}
+.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}
+.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}
+.quiz-reset.show{display:block}
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav class="top-nav">
+  <div class="nav-left"><span class="nav-day">Day 10 · Week 3</span><span class="nav-title">Phase H: Architecture Change Management</span></div>
+  <div class="nav-right"><div class="timer-badge">⏱ <span id="read-timer">0:00</span></div><button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button></div>
+</nav>
+<header class="hero">
+  <div class="hero-label">Study Session · Day 10 of 20</div>
+  <h1 class="hero-title">Phase H:<br>Architecture Change Management</h1>
+  <div class="hero-meta"><span class="meta-pill">📖 ~30 min read</span><span class="meta-pill">5 topics</span><span class="meta-pill">5 quiz questions</span><span class="meta-pill">Governance</span></div>
+  <p class="hero-intro">Phase H ensures the architecture remains valid as the world changes around it. Business strategy shifts, new technologies emerge, implementation discovers unforeseen constraints — Phase H decides when to update the architecture and when to keep it stable.</p>
+</header>
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>Phase H Objective &amp; Context</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Change Management Triggers &amp; Types</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>Dispensations &amp; Exceptions</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Architecture Change Request Process</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Maintenance vs Redesign &amp; Phase H Outputs</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>Knowledge Check</a></li>
+  </ol>
+</nav>
+<article class="article">
+
+  <section class="section" id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">Phase H Objective &amp; Context</h2></div>
+    <div class="hl teal"><div class="hl-lbl">Objective</div><p>Phase H establishes and manages an <strong>Architecture Change Management process</strong> to ensure the enterprise architecture lifecycle is maintained in response to new developments, ensuring the architecture remains current, relevant, and fit for purpose.</p></div>
+    <p>After Phase G has overseen delivery, the enterprise enters an operational steady state with the new architecture in place. But change is constant — business strategies evolve, new technologies emerge, regulations change, and implementation discovers gaps the architecture didn't anticipate. Phase H is the mechanism that keeps the architecture alive and responsive to all of these changes.</p>
+    <div class="hl blue"><div class="hl-lbl">Phase H's position in the ADM</div><p>Phase H is the <strong>last lettered phase</strong> in the ADM cycle. But it is not an end — it is the gateway back to the beginning. When Phase H determines that a change is significant enough to require a new architecture cycle, it generates a new <strong>Request for Architecture Work</strong> — triggering a new ADM cycle starting from Phase A.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Architecture Maintenance</div><p class="def-text">Minor updates to the architecture that don't require re-running the full ADM cycle — small adjustments, clarifications, additions of new standards or guidelines.</p></div>
+      <div class="def-item"><div class="def-term">Architecture Redesign</div><p class="def-text">Significant changes that require a new or partial ADM cycle — major business transformation, fundamental technology shifts, or significant scope changes.</p></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Phase H is the <strong>last ADM phase</strong> and loops back to the beginning. When significant changes occur, Phase H generates a new <strong>Request for Architecture Work</strong> — triggering a new ADM cycle. This makes the ADM a <em>continuous cycle</em>, not a linear process.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">Change Management Triggers &amp; Types</h2></div>
+    <p>Phase H is activated by <span class="term">change triggers</span> — events or circumstances that suggest the current architecture may need to be updated. TOGAF categorises these into business-driven and technology-driven triggers.</p>
+    <div class="trigger-grid">
+      <div class="trigger-card"><span class="trigger-icon">📈</span><div><div class="trigger-head">Business strategy change</div><div class="trigger-desc">Mergers, acquisitions, new market entry, strategic pivots, or major changes to business model that invalidate architecture assumptions.</div></div></div>
+      <div class="trigger-card"><span class="trigger-icon">📋</span><div><div class="trigger-head">New regulations or compliance requirements</div><div class="trigger-desc">New laws, standards, or regulatory requirements that impose new constraints or obligations on the architecture.</div></div></div>
+      <div class="trigger-card"><span class="trigger-icon">💻</span><div><div class="trigger-head">Technology change</div><div class="trigger-desc">Emergence of disruptive new technologies, product end-of-life, platform migrations, or major version upgrades that affect the architecture.</div></div></div>
+      <div class="trigger-card"><span class="trigger-icon">🔍</span><div><div class="trigger-head">Implementation discoveries</div><div class="trigger-desc">Findings during Phase G that reveal architecture gaps, incorrect assumptions, or unforeseen constraints that require architecture changes.</div></div></div>
+      <div class="trigger-card"><span class="trigger-icon">⚡</span><div><div class="trigger-head">Lessons learned</div><div class="trigger-desc">Completed projects reveal improvements to the architecture — better patterns, standards updates, or reusable building blocks identified.</div></div></div>
+      <div class="trigger-card"><span class="trigger-icon">🌍</span><div><div class="trigger-head">External market developments</div><div class="trigger-desc">Competitive landscape changes, new market standards, partner ecosystem changes, or industry disruption requiring strategic architecture response.</div></div></div>
+    </div>
+    <div class="hl teal"><div class="hl-lbl">Two change categories</div><p>All change requests fall into two categories. <strong>Business-driven changes</strong> originate from strategy shifts, regulatory requirements, or market conditions. <strong>Technology-driven changes</strong> originate from infrastructure changes, product lifecycles, security vulnerabilities, or platform evolution. Each category may require different governance handling.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Know the difference between <strong>business-driven</strong> and <strong>technology-driven</strong> change triggers. Both types flow through the Architecture Change Request process in Phase H — but they may have different urgency, impact scope, and required governance response.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">Dispensations &amp; Exceptions</h2></div>
+    <p>Not all deviations from the architecture require a full change cycle. Some can be handled through the formal <span class="term">dispensation</span> and <span class="term">exception</span> processes — controlled ways to permit specific departures from the architecture without reopening the full design.</p>
+    <div class="hl blue"><div class="hl-lbl">Dispensation</div><p>A <strong>dispensation</strong> is a formal, time-limited permission from the Architecture Board to deviate from an architecture requirement. It is not a permanent change to the architecture — it is a controlled exception with defined boundaries and an expiry.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Why dispensations are needed</div><p class="def-text">Implementation constraints may make full conformance impractical — cost, technical feasibility, timelines. A dispensation allows work to proceed while maintaining governance visibility over the exception.</p></div>
+      <div class="def-item"><div class="def-term">Dispensation vs permanent change</div><p class="def-text">A dispensation is temporary — it expires. If the exception becomes permanent or widespread, it should become a formal architecture change instead. The Architecture Board monitors dispensations to identify patterns.</p></div>
+      <div class="def-item"><div class="def-term">Dispensation record</div><p class="def-text">Every dispensation is recorded in the Architecture Repository's Governance Log — who requested it, what was permitted, the rationale, expiry date, and conditions. This creates an auditable exception record.</p></div>
+      <div class="def-item"><div class="def-term">Exception escalation</div><p class="def-text">If a dispensation is refused or if the non-conformance cannot be accommodated by any dispensation, it escalates to a full Architecture Change Request — potentially triggering a new ADM cycle.</p></div>
+    </div>
+    <div class="hl amber"><div class="hl-lbl">Dispensations and the Governance Log</div><p>The <span class="term">Governance Log</span> in the Architecture Repository records all dispensations, exceptions, and compliance decisions. It provides the audit trail that demonstrates the architecture governance process is working — essential for regulated industries where proof of governance is required.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>A <strong>dispensation</strong> is a <em>temporary, formal, board-approved exception</em> — not a permanent architecture change. Dispensations are recorded in the <strong>Governance Log</strong>. If a dispensation pattern becomes persistent, it should be converted into a formal <strong>Architecture Change Request</strong>.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">Architecture Change Request Process</h2></div>
+    <p>The <span class="term">Architecture Change Request (ACR)</span> is the formal mechanism for proposing and managing changes to the architecture. It ensures all changes are assessed, governed, and traceable.</p>
+    <div class="process-flow">
+      <div class="flow-step"><div class="flow-box">📥 Change Request received — from Phase G, business, or technology trigger</div></div>
+      <div class="flow-step"><div class="flow-arrow">↓</div></div>
+      <div class="flow-step"><div class="flow-box">🔍 Impact Assessment — scope, cost, risk, affected components</div></div>
+      <div class="flow-step"><div class="flow-arrow">↓</div></div>
+      <div class="flow-step"><div class="flow-box">⚖️ Architecture Board Review — assess significance and recommend response</div></div>
+      <div class="flow-step"><div class="flow-arrow">↓</div></div>
+      <div class="flow-step"><div class="flow-box">📋 Decision — Maintenance update, Redesign cycle, Dispensation, or Rejection</div></div>
+      <div class="flow-step"><div class="flow-arrow">↓</div></div>
+      <div class="flow-step"><div class="flow-box">🔄 If Redesign → new Request for Architecture Work → new ADM cycle from Phase A</div></div>
+    </div>
+    <div class="hl teal"><div class="hl-lbl">Technology impact assessment</div><p>For technology-driven changes, the impact assessment must trace the change through all affected architecture domains — from Technology (Phase D) up through Application (Phase C), Data (Phase C), and Business (Phase B). A new technology standard, for example, may affect application interfaces, data schemas, and ultimately business processes.</p></div>
+    <div class="hl purple"><div class="hl-lbl">Business impact assessment</div><p>For business-driven changes, the impact assessment works top-down through the architecture — from Business (Phase B) through Information Systems (Phase C) and Technology (Phase D). A business strategy change triggers ripple effects across the entire BDAT stack.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The key output of Phase H for significant changes is a new <strong>Request for Architecture Work</strong> — the same document that triggers Phase A. This is how the ADM cycle restarts. Phase H is what makes architecture management <em>continuous</em> rather than one-time.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">Maintenance vs Redesign &amp; Phase H Outputs</h2></div>
+    <p>The most critical decision in Phase H is whether a change requires <span class="term">architecture maintenance</span> — a minor update handled within Phase H — or <span class="term">architecture redesign</span> — a significant change requiring a new ADM cycle.</p>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-head maint">Architecture Maintenance</div>
+        <ul class="col-list">
+          <li>Incremental, non-breaking changes</li>
+          <li>Updates to standards or guidelines</li>
+          <li>Adding new building blocks to existing patterns</li>
+          <li>Minor scope extensions within current architecture</li>
+          <li>Technology version upgrades maintaining compatibility</li>
+          <li>Clarifications and corrections to architecture documentation</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-head redesign">Architecture Redesign</div>
+        <ul class="col-list">
+          <li>Major business transformation or merger</li>
+          <li>Fundamental change to architecture principles</li>
+          <li>Disruptive technology requiring architecture rethink</li>
+          <li>Significant change to scope of the architecture</li>
+          <li>Multiple components requiring coordinated redesign</li>
+          <li>Changes that invalidate existing transition architectures</li>
+        </ul>
+      </div>
+    </div>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-head in">Key Inputs to Phase H</div>
+        <ul class="col-list">
+          <li>Change Requests (from Phase G) ★</li>
+          <li>Architecture Repository (Governance Log)</li>
+          <li>Architecture Definition Document</li>
+          <li>Architecture Vision</li>
+          <li>Business and technology change drivers</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-head out">Key Outputs of Phase H</div>
+        <ul class="col-list">
+          <li>Architecture updates (maintenance) ★</li>
+          <li>New Request for Architecture Work (redesign) ★</li>
+          <li>Dispensations (for approved exceptions)</li>
+          <li>Governance Log updates</li>
+          <li>Updated Architecture Repository</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hl teal"><div class="hl-lbl">The ADM as a continuous cycle</div><p>Phase H completes the ADM cycle — but more importantly, it restarts it. The Preliminary Phase sets up the architecture capability. Phase A through F designs and plans the architecture. Phase G governs delivery. Phase H responds to change. A new Request for Architecture Work from Phase H loops back into Phase A — making the ADM <strong>perpetually relevant</strong> as the enterprise evolves.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Phase H has two responses: <strong>Maintenance</strong> (minor update, no new ADM cycle) and <strong>Redesign</strong> (significant change, new ADM cycle via Request for Architecture Work). The decision criteria is the scope and impact of the change. This distinction is tested in scenario-based exam questions.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2 style="font-family:'Lora',serif;font-size:20px;color:var(--ink);margin-bottom:16px">Session summary</h2>
+    <div class="sum-grid">
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Phase H = last phase, loops to Phase A</div><p class="sum-body">Architecture Change Management — keeps the architecture relevant. Significant changes generate a new Request for Architecture Work, restarting the ADM cycle.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Business and technology triggers</div><p class="sum-body">Both business-driven and technology-driven changes flow through the Architecture Change Request process for assessment and governance.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Dispensations = temporary approved exceptions</div><p class="sum-body">Formal, time-limited board-approved deviations. Recorded in the Governance Log. Persistent patterns become formal change requests.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Maintenance vs Redesign</div><p class="sum-body">Minor incremental changes = maintenance (handled in Phase H). Major structural changes = redesign (triggers new ADM cycle).</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Architecture is continuous, not one-time</div><p class="sum-body">The ADM cycle repeats indefinitely. Phase H ensures architecture evolves with the enterprise rather than becoming a historical artefact.</p></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">Knowledge Check</div>
+    <div class="quiz-sub">5 questions · Phase H: Architecture Change Management</div>
+    <div class="quiz-q" id="quiz-q1">
+      <div class="quiz-q-text">1. Phase H determines that a change is significant enough to require a new architecture cycle. What does it produce to trigger this?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. A new Architecture Vision document</button>
+        <button class="quiz-opt" onclick="answer(1,'b')">B. An updated Implementation and Migration Plan</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. A new Request for Architecture Work — triggering a new ADM cycle from Phase A</button>
+        <button class="quiz-opt" onclick="answer(1,'d')">D. A Change Request sent to Phase G for compliance checking</button>
+      </div>
+      <div class="quiz-feedback" id="fb1"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q2">
+      <div class="quiz-q-text">2. A dispensation in Phase H is best described as:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. A permanent change to the architecture approved by the Architecture Board</button>
+        <button class="quiz-opt" onclick="answer(2,'b')">B. A formal, time-limited, board-approved permission to deviate from an architecture requirement</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. An informal exception agreed between the delivery team and the project manager</button>
+        <button class="quiz-opt" onclick="answer(2,'d')">D. A new architecture principle replacing a previous one</button>
+      </div>
+      <div class="quiz-feedback" id="fb2"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q3">
+      <div class="quiz-q-text">3. Which of the following would be classified as a technology-driven change trigger in Phase H?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. A company merger requiring architecture scope expansion</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. A new regulatory compliance requirement from government</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. A software vendor announcing end-of-life for a platform the architecture depends on</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. A change to the organisation's business strategy</button>
+      </div>
+      <div class="quiz-feedback" id="fb3"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q4">
+      <div class="quiz-q-text">4. Phase H decides a change requires Architecture Maintenance rather than Architecture Redesign. This means:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. The change is handled within Phase H without triggering a new ADM cycle</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. A new full ADM cycle must be started from Phase A</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. The change is delegated to the delivery team without Architecture Board involvement</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. The change is rejected and the current architecture is maintained unchanged</button>
+      </div>
+      <div class="quiz-feedback" id="fb4"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q5">
+      <div class="quiz-q-text">5. Where are dispensations and exception decisions recorded in TOGAF?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. In the Statement of Architecture Work</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. In the Architecture Vision document</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. In the Governance Log within the Architecture Repository</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. In the Implementation and Migration Plan</button>
+      </div>
+      <div class="quiz-feedback" id="fb5"></div>
+    </div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+</article>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+let sec=0;const tEl=document.getElementById("read-timer");const iv=setInterval(()=>{sec++;tEl.textContent=Math.floor(sec/60)+":"+(sec%60<10?"0":"")+sec%60;},1000);
+window.addEventListener("scroll",()=>{const d=document.documentElement;document.getElementById("progress-bar").style.width=Math.min(100,(d.scrollTop/(d.scrollHeight-d.clientHeight))*100)+"%";document.getElementById("scroll-top").classList.toggle("show",d.scrollTop>400);});
+function markDone(){clearInterval(iv);try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[10]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("done-btn");b.textContent="✓ Done!";b.classList.add("completed");}
+const ANS={1:'c',2:'b',3:'c',4:'a',5:'c'};
+const FB={
+  1:{c:"Correct! When Phase H determines a significant change is needed, it produces a new Request for Architecture Work — the same document that triggered Phase A at the start. This restarts the ADM cycle, making architecture management continuous.",x:"Not quite. Phase H produces a new Request for Architecture Work to trigger a new ADM cycle from Phase A. This is the mechanism that makes the ADM continuous rather than a one-time exercise."},
+  2:{b:"Correct! A dispensation is a formal, time-limited, Architecture Board-approved permission to deviate from an architecture requirement. It is temporary, documented in the Governance Log, and expires — unlike a permanent architecture change.",x:"Not quite. A dispensation is a formal, time-limited, board-approved exception. It is not permanent (that would be an architecture change), not informal (must be board-approved), and not a new principle."},
+  3:{c:"Correct! A software vendor announcing end-of-life for a platform is a technology-driven change trigger — it originates from technology infrastructure change rather than from business strategy or regulation.",x:"Not quite. Technology-driven triggers originate from infrastructure changes, product lifecycles, or platform evolution. End-of-life announcement is a classic technology trigger. Mergers, regulations, and strategy changes are business-driven triggers."},
+  4:{a:"Correct! Architecture Maintenance means the change is minor enough to be handled within Phase H — updating documentation, adding standards, or making incremental adjustments — without triggering a new ADM cycle. Redesign would trigger a new cycle.",x:"Not quite. Maintenance = handled within Phase H without a new ADM cycle. Redesign = triggers a new ADM cycle from Phase A. The distinction is the scope and structural impact of the change."},
+  5:{c:"Correct! Dispensations, exceptions, and all governance decisions are recorded in the Governance Log within the Architecture Repository. This creates the auditable trail of all architecture exceptions and decisions.",x:"Not quite. Dispensations and exception decisions are recorded in the Governance Log within the Architecture Repository — not in project documents like the SoAW or the Migration Plan."}
+};
+let answered={},score=0;
+function answer(q,opt){if(answered[q])return;answered[q]=opt;const ok=opt===ANS[q];if(ok)score++;document.querySelectorAll(`#quiz-q${q} .quiz-opt`).forEach((b,i)=>{const o=['a','b','c','d'][i];b.classList.add(o===ANS[q]?"correct":o===opt&&!ok?"wrong":"reveal");});const fb=document.getElementById("fb"+q);fb.textContent=(ok?"✓ ":"✗ ")+(ok?FB[q][opt]:FB[q].x);fb.className="quiz-feedback show "+(ok?"ok":"no");if(Object.keys(answered).length===5){const msgs=["Keep going!","Getting there!","Good effort!","Strong result!","Perfect score! Ready for Day 11."];document.getElementById("quiz-score").textContent=`You scored ${score}/5. ${msgs[score-1]||msgs[0]}`;document.getElementById("quiz-score").classList.add("show");document.getElementById("quiz-reset").classList.add("show");if(score===5)markDone();}}
+function resetQuiz(){answered={};score=0;document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});document.getElementById("quiz-score").classList.remove("show");document.getElementById("quiz-reset").classList.remove("show");}
+</script>
+</body>
+</html>

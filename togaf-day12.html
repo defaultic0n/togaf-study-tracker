@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 12 — ADM Guidelines &amp; Techniques</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAF7;--ink:#1A1A18;--ink2:#4A4A42;--ink3:#8A8A80;--teal:#0D6E5E;--teal-light:#E6F4F1;--teal-mid:#1A9B86;--amber:#92530A;--amber-light:#FDF3E3;--blue:#1A4A7A;--blue-light:#E8F0F8;--purple:#4A2A7A;--purple-light:#F0EAF8;--green:#1A5A2A;--green-light:#E8F4E8;--coral:#8A2A2A;--coral-light:#F8EAEA;--rule:#E0DFD8;--surface:#FFFFFF;--reading-max:680px}
+html{background:var(--bg);scroll-behavior:smooth}
+body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100;transition:width 0.1s}
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}
+.nav-day{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3)}
+.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer}
+.done-btn.completed{background:#2EAA8A}
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}
+.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}
+.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px;transition:color .15s}
+.toc-list a:hover{color:var(--teal)}
+.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+.section{margin-bottom:48px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+p{margin-bottom:16px;color:var(--ink2)} p strong{color:var(--ink);font-weight:600}
+.hl{border-radius:10px;padding:16px 18px;margin:20px 0}
+.hl.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}.hl.amber{background:var(--amber-light);border-left:3px solid #D4860E}.hl.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}.hl.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}.hl.green{background:var(--green-light);border-left:3px solid #2A7A3A}.hl.coral{background:var(--coral-light);border-left:3px solid #C84A4A}
+.hl-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.hl.teal .hl-lbl{color:var(--teal)}.hl.amber .hl-lbl{color:var(--amber)}.hl.blue .hl-lbl{color:var(--blue)}.hl.purple .hl-lbl{color:var(--purple)}.hl.green .hl-lbl{color:var(--green)}.hl.coral .hl-lbl{color:var(--coral)}
+.hl p{margin-bottom:0;font-size:15px;line-height:1.65}
+.hl.teal p{color:var(--teal)}.hl.amber p{color:var(--amber)}.hl.blue p{color:var(--blue)}.hl.purple p{color:var(--purple)}.hl.green p{color:var(--green)}.hl.coral p{color:var(--coral)}
+.def-grid{display:grid;gap:10px;margin:20px 0}
+.def-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.def-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.def-text{font-size:14px;color:var(--ink2);line-height:1.6;margin:0}
+.term{font-weight:600;color:var(--teal);border-bottom:1px dotted var(--teal-mid)}
+.iter-card{background:var(--surface);border:1px solid var(--rule);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.iter-head{padding:10px 14px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px}
+.iter-head.arch{background:var(--blue-light);color:var(--blue)}
+.iter-head.trans{background:var(--teal-light);color:var(--teal)}
+.iter-head.cap{background:var(--purple-light);color:var(--purple)}
+.iter-body{padding:10px 14px;font-size:13px;color:var(--ink2);line-height:1.6}
+.risk-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+.risk-table th{background:var(--teal-light);color:var(--teal);font-weight:600;padding:9px 12px;text-align:left;border:1px solid var(--rule)}
+.risk-table td{padding:8px 12px;border:1px solid var(--rule);color:var(--ink2);vertical-align:top;line-height:1.5}
+.risk-table tr:nth-child(even) td{background:#F7F6F3}
+.readiness-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+.readiness-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:12px}
+.readiness-title{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.readiness-desc{font-size:13px;color:var(--ink2);line-height:1.5}
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+.sum-grid{display:grid;gap:10px;margin-top:32px}
+.sum-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.sum-icon{font-size:18px;flex-shrink:0}
+.sum-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.sum-body{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}
+.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}
+.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}
+.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}
+.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}
+.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}
+.quiz-reset.show{display:block}
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav class="top-nav">
+  <div class="nav-left"><span class="nav-day">Day 12 · Week 3</span><span class="nav-title">ADM Guidelines &amp; Techniques</span></div>
+  <div class="nav-right">
+    <div class="timer-badge">⏱ <span id="read-timer">0:00</span></div>
+    <button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-label">Study Session · Day 12 of 20</div>
+  <h1 class="hero-title">ADM Guidelines<br>&amp; Techniques</h1>
+  <div class="hero-meta">
+    <span class="meta-pill">📖 ~30 min read</span><span class="meta-pill">5 topics</span><span class="meta-pill">5 quiz questions</span><span class="meta-pill">ADM</span>
+  </div>
+  <p class="hero-intro">TOGAF's ADM is not a rigid sequential process — it comes with a set of guidelines and techniques for adapting it to different contexts: iterating across phases, addressing security, applying SOA, assessing organisational readiness, and managing risk throughout the cycle.</p>
+</header>
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>ADM Iteration Patterns</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Security Architecture in the ADM</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>SOA in the ADM</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Business Transformation Readiness Assessment</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Risk Management in TOGAF</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>Knowledge Check</a></li>
+  </ol>
+</nav>
+<article class="article">
+
+  <section class="section" id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">ADM Iteration Patterns</h2></div>
+    <div class="hl teal"><div class="hl-lbl">Core principle</div><p>The ADM is not a one-time linear process. It is designed to be <strong>iterated</strong> — both within individual phases and across multiple cycles. TOGAF explicitly supports iterating the ADM to adapt to the scale, complexity, and speed of the enterprise's architecture needs.</p></div>
+    <p>The ADM cycle is often depicted as a circle — reflecting the fact that after completing Phase H, the cycle returns to Phase A (or the Preliminary Phase if fundamental framework changes are needed). This cycling is not failure; it is by design, reflecting that enterprise architecture is a continuous activity, not a one-time project.</p>
+    <div class="iter-card">
+      <div class="iter-head arch">🔄 Architecture Iteration</div>
+      <div class="iter-body">Iterating across the full ADM cycle — completing B through H and then returning to A for the next architecture engagement. Each cycle refines and extends the enterprise architecture. This is the most common iteration pattern for large enterprises running an ongoing architecture practice.</div>
+    </div>
+    <div class="iter-card">
+      <div class="iter-head trans">🔄 Transition Iteration</div>
+      <div class="iter-body">Iterating within Phases E and F to plan multiple transition architectures. Rather than planning a single massive transition, the team iterates to define a series of manageable transition steps. Each iteration of E and F plans one transition architecture in detail.</div>
+    </div>
+    <div class="iter-card">
+      <div class="iter-head cap">🔄 Capability Iteration</div>
+      <div class="iter-body">Running multiple simultaneous or sequential ADM cycles at different scopes — one at enterprise level and one at a specific business unit, project, or capability level. Each sub-cycle feeds into the enterprise-level cycle through the Architecture Repository.</div>
+    </div>
+    <div class="hl blue"><div class="hl-lbl">ADM iteration and scope</div><p>Not every cycle needs to address all four BDAT domains. An iteration might focus only on Business Architecture (Phase B) if the driver is business transformation. Or only on Technology Architecture (Phase D) if the driver is a platform refresh. The ADM guidelines allow scoping of iterations to match the specific need.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The ADM supports three main iteration patterns: <strong>Architecture</strong> (full cycle repeating), <strong>Transition</strong> (within E and F), and <strong>Capability</strong> (multiple simultaneous cycles at different scopes). Iteration is a deliberate design feature, not a workaround.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">Security Architecture in the ADM</h2></div>
+    <p>Security is not a separate activity added after the architecture is designed — TOGAF requires it to be <strong>integrated throughout the ADM</strong>. Every phase has security considerations.</p>
+    <div class="hl blue"><div class="hl-lbl">Security across the ADM</div><p>Security architecture runs through every ADM phase. Security requirements are identified in Phase A, business security controls defined in Phase B, data classification and application security in Phase C, technology security services in Phase D, and security compliance checked in Phase G. Security is a cross-cutting concern — not a Phase D afterthought.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Security in Phase A (Vision)</div><p class="def-text">Security stakeholders and their concerns are identified. Security requirements and regulatory constraints (GDPR, PCI-DSS, ISO 27001) are captured as high-level requirements.</p></div>
+      <div class="def-item"><div class="def-term">Security in Phase B (Business)</div><p class="def-text">Business security policies, access control principles, and governance controls are defined. Who can access what data and under what authority.</p></div>
+      <div class="def-item"><div class="def-term">Security in Phase C (IS)</div><p class="def-text">Data classification (confidential, restricted, public) applied to data entities. Application security controls — authentication, authorisation, encryption, audit logging — defined for each application component.</p></div>
+      <div class="def-item"><div class="def-term">Security in Phase D (Technology)</div><p class="def-text">Security services in the Application Platform — identity management, PKI, SIEM, network security — specified. Physical and environmental security for infrastructure locations.</p></div>
+      <div class="def-item"><div class="def-term">Security in Phase G (Governance)</div><p class="def-text">Security conformance requirements in Architecture Contracts. Security compliance reviews at each milestone. Penetration testing and security assessments as Phase G governance activities.</p></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Security is a <strong>cross-cutting concern addressed in every ADM phase</strong> — not something done only in Phase D. The exam may present security as purely a technology concern — that is incorrect. Security spans Business (policies), Information Systems (data classification, app controls), and Technology (platform security services).</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">SOA in the ADM</h2></div>
+    <p>Service-Oriented Architecture (SOA) is a design paradigm that TOGAF explicitly supports through its guidelines and techniques. SOA aligns naturally with the TOGAF framework's emphasis on reusability and the Enterprise Continuum.</p>
+    <div class="hl purple"><div class="hl-lbl">What SOA means in TOGAF</div><p>SOA organises applications as a collection of <strong>services</strong> — discrete, reusable business capabilities exposed through well-defined interfaces. In TOGAF, SOA is applied primarily in Phase C (Application Architecture) but its principles influence all BDAT domains.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Service</div><p class="def-text">A discrete unit of business functionality, accessible through a defined interface, that can be independently deployed, discovered, and consumed by other services or applications.</p></div>
+      <div class="def-item"><div class="def-term">Service Contract</div><p class="def-text">The formal specification of a service's interface — what it accepts, what it returns, and what quality-of-service guarantees it provides. The application-level equivalent of an Architecture Contract.</p></div>
+      <div class="def-item"><div class="def-term">Loose Coupling</div><p class="def-text">Services communicate through interfaces without depending on each other's internal implementation. Enables independent change and reduces cascade failures.</p></div>
+      <div class="def-item"><div class="def-term">Service Reuse</div><p class="def-text">A service built for one business function can be consumed by multiple other functions. Directly supports the Enterprise Continuum's emphasis on reusability across the architecture landscape.</p></div>
+    </div>
+    <div class="hl green"><div class="hl-lbl">SOA and the Enterprise Continuum</div><p>SOA services are excellent candidates for Architecture Building Blocks (ABBs) and Solution Building Blocks (SBBs) in the Enterprise Continuum. A well-designed service that delivers a standard business capability can be reused across multiple architecture projects — reducing cost and improving consistency.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>SOA in TOGAF is primarily addressed in <strong>Phase C — Application Architecture</strong>. It aligns with the Enterprise Continuum through reusable services as ABBs and SBBs. The exam may test whether you understand which phase SOA primarily applies to — the answer is Phase C, though its principles span the ADM.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">Business Transformation Readiness Assessment</h2></div>
+    <p>Even a technically perfect architecture will fail if the organisation is not ready to change. TOGAF's <span class="term">Business Transformation Readiness Assessment</span> provides a structured way to evaluate whether the enterprise has the organisational capacity to undertake and sustain an architecture-driven transformation.</p>
+    <div class="hl teal"><div class="hl-lbl">Purpose</div><p>The assessment evaluates the <strong>organisation's readiness</strong> to undergo transformation — identifying readiness factors, assessing current readiness levels, and defining actions needed to achieve sufficient readiness before transformation begins.</p></div>
+    <p>Readiness is assessed across multiple dimensions. Each dimension is scored and gaps identified. The resulting Readiness Assessment informs Phase E planning — work packages may include explicit readiness-building activities.</p>
+    <div class="readiness-grid">
+      <div class="readiness-card"><div class="readiness-title">Vision</div><div class="readiness-desc">Is there a clear, compelling, shared vision for the transformation? Do leaders and staff understand it?</div></div>
+      <div class="readiness-card"><div class="readiness-title">Desire and Will</div><div class="readiness-desc">Is there genuine desire and political will to make the transformation happen? Are key leaders committed?</div></div>
+      <div class="readiness-card"><div class="readiness-title">Need</div><div class="readiness-desc">Is there a recognised and urgent business need for transformation? Or are people comfortable with the status quo?</div></div>
+      <div class="readiness-card"><div class="readiness-title">Funding</div><div class="readiness-desc">Is there committed funding for the full transformation? Or is funding uncertain and fragmented by annual budget cycles?</div></div>
+      <div class="readiness-card"><div class="readiness-title">Ability</div><div class="readiness-desc">Does the organisation have the skills, capabilities, and capacity to actually deliver the transformation?</div></div>
+      <div class="readiness-card"><div class="readiness-title">Governance</div><div class="readiness-desc">Are there effective governance structures to manage the transformation — decisions, escalations, and accountability?</div></div>
+      <div class="readiness-card"><div class="readiness-title">Enterprise Capacity</div><div class="readiness-desc">Can the organisation sustain transformation while keeping the lights on? Is there sufficient slack capacity?</div></div>
+      <div class="readiness-card"><div class="readiness-title">HR Readiness</div><div class="readiness-desc">Are staffing, training, and change management plans in place? Will people be ready for new roles and processes?</div></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The Business Transformation Readiness Assessment is used in <strong>Phases A and E</strong>. In Phase A it informs the scope of the Architecture Vision. In Phase E it feeds into work package planning — readiness gaps become explicit work packages. Know the readiness factors: Vision, Desire, Need, Funding, Ability, Governance, Enterprise Capacity, HR Readiness.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">Risk Management in TOGAF</h2></div>
+    <p>Risk management is woven throughout the ADM — not confined to a single phase. TOGAF provides a structured approach to identifying, classifying, and mitigating risks at both the architecture level and the implementation level.</p>
+    <div class="hl amber"><div class="hl-lbl">Risk classification</div><p>TOGAF classifies risks across two dimensions: <strong>initial risk</strong> (before mitigation) and <strong>residual risk</strong> (after mitigation controls are applied). Both are assessed and documented. Residual risks that remain above acceptable thresholds require escalation to senior leadership.</p></div>
+    <div style="overflow-x:auto;margin:20px 0">
+      <table class="risk-table">
+        <thead><tr><th>Risk Category</th><th>Description</th><th>Typically addressed in</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Architecture Risk</strong></td><td>Risks arising from architectural decisions — technical debt, complexity, scalability gaps</td><td>Phases B, C, D</td></tr>
+          <tr><td><strong>Implementation Risk</strong></td><td>Risks in delivering work packages — schedule, cost, technical feasibility</td><td>Phases E, F, G</td></tr>
+          <tr><td><strong>Business Risk</strong></td><td>Risks to business operations during transformation — service disruption, capability gaps</td><td>Phases B, E, F</td></tr>
+          <tr><td><strong>Governance Risk</strong></td><td>Risks from inadequate oversight — non-conformance, scope creep, dispensation abuse</td><td>Phase G, H</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="hl green"><div class="hl-lbl">Risk mitigation approach</div><p>For each identified risk, TOGAF recommends four mitigation approaches: <strong>Avoid</strong> (change the plan to eliminate the risk), <strong>Transfer</strong> (shift the risk to another party — insurance, contracts), <strong>Mitigate</strong> (reduce likelihood or impact through controls), or <strong>Accept</strong> (formally acknowledge and monitor the risk). All accepted residual risks are documented in the Architecture Repository.</p></div>
+    <div class="hl coral"><div class="hl-lbl">Risk and the Governance Log</div><p>Risks — particularly those that are accepted or transferred — are recorded in the <strong>Governance Log</strong> within the Architecture Repository. This creates an audit trail and ensures that risk decisions are visible to the Architecture Board and senior leadership throughout the ADM cycle.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>TOGAF's four risk mitigation options are <strong>Avoid, Transfer, Mitigate, Accept</strong>. Know that risk is assessed as <strong>initial risk</strong> (before mitigation) and <strong>residual risk</strong> (after mitigation). Accepted residual risks are recorded in the <strong>Governance Log</strong>.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2 style="font-family:'Lora',serif;font-size:20px;color:var(--ink);margin-bottom:16px">Session summary</h2>
+    <div class="sum-grid">
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Three ADM iteration patterns</div><p class="sum-body">Architecture (full cycle), Transition (within E/F), Capability (simultaneous scoped cycles). Iteration is by design.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Security is cross-cutting</div><p class="sum-body">Security spans every phase — not just Phase D. Policies in B, data classification in C, platform security in D, compliance in G.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">SOA primarily in Phase C</div><p class="sum-body">Services as reusable ABBs/SBBs. Loose coupling and service contracts. Aligns with the Enterprise Continuum.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Readiness assessment (Phases A and E)</div><p class="sum-body">8 dimensions: Vision, Desire, Need, Funding, Ability, Governance, Enterprise Capacity, HR Readiness.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Risk: Avoid, Transfer, Mitigate, Accept</div><p class="sum-body">Initial risk vs residual risk. Accepted risks logged in the Governance Log. Risk spans all ADM phases.</p></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">Knowledge Check</div>
+    <div class="quiz-sub">5 questions · ADM Guidelines &amp; Techniques</div>
+    <div class="quiz-q" id="quiz-q1">
+      <div class="quiz-q-text">1. Which of the following best describes "Capability Iteration" in the ADM?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. Iterating within Phases E and F to plan multiple transition architectures</button>
+        <button class="quiz-opt" onclick="answer(1,'b')">B. Running the full ADM cycle repeatedly to maintain an ongoing architecture practice</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. Running multiple simultaneous or sequential ADM cycles at different scopes — e.g. enterprise and business-unit level</button>
+        <button class="quiz-opt" onclick="answer(1,'d')">D. Iterating within Phase B to refine business capability definitions</button>
+      </div>
+      <div class="quiz-feedback" id="fb1"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q2">
+      <div class="quiz-q-text">2. In TOGAF, security architecture is considered:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. Primarily a Phase D concern — addressed when designing the technology infrastructure</button>
+        <button class="quiz-opt" onclick="answer(2,'b')">B. A cross-cutting concern addressed in every ADM phase from A through H</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. A specialised sub-discipline handled outside the ADM by a dedicated security team</button>
+        <button class="quiz-opt" onclick="answer(2,'d')">D. A compliance activity primarily addressed during Phase G governance reviews</button>
+      </div>
+      <div class="quiz-feedback" id="fb2"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q3">
+      <div class="quiz-q-text">3. SOA (Service-Oriented Architecture) in TOGAF is primarily addressed in which phase?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. Phase B — Business Architecture</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. Phase D — Technology Architecture</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. Phase C — Application Architecture</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. Phase E — Opportunities and Solutions</button>
+      </div>
+      <div class="quiz-feedback" id="fb3"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q4">
+      <div class="quiz-q-text">4. The Business Transformation Readiness Assessment is primarily used in which two ADM phases?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. Phase B and Phase C</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. Phase F and Phase G</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. Phase A and Phase E</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. Phase H and the Preliminary Phase</button>
+      </div>
+      <div class="quiz-feedback" id="fb4"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q5">
+      <div class="quiz-q-text">5. TOGAF's four risk mitigation options are:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. Identify, Assess, Control, Report</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. Avoid, Transfer, Mitigate, Accept</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. Eliminate, Reduce, Share, Retain</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. Escalate, Delegate, Defer, Ignore</button>
+      </div>
+      <div class="quiz-feedback" id="fb5"></div>
+    </div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+</article>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+let sec=0;const tEl=document.getElementById("read-timer");const iv=setInterval(()=>{sec++;tEl.textContent=Math.floor(sec/60)+":"+(sec%60<10?"0":"")+sec%60;},1000);
+window.addEventListener("scroll",()=>{const d=document.documentElement;document.getElementById("progress-bar").style.width=Math.min(100,(d.scrollTop/(d.scrollHeight-d.clientHeight))*100)+"%";document.getElementById("scroll-top").classList.toggle("show",d.scrollTop>400);});
+function markDone(){clearInterval(iv);try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[12]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("done-btn");b.textContent="✓ Done!";b.classList.add("completed");}
+const ANS={1:'c',2:'b',3:'c',4:'c',5:'b'};
+const FB={
+  1:{c:"Correct! Capability Iteration means running multiple simultaneous or sequential ADM cycles at different scopes — for example, one enterprise-level cycle and separate cycles for specific business units or capabilities. Each feeds into the others through the Architecture Repository.",x:"Not quite. Capability Iteration runs multiple ADM cycles at different scopes simultaneously. Architecture Iteration repeats the full cycle. Transition Iteration iterates within Phases E and F."},
+  2:{b:"Correct! Security is a cross-cutting concern addressed in every ADM phase: stakeholder security concerns in Phase A, business security policies in Phase B, data classification in Phase C, platform security services in Phase D, and compliance reviews in Phase G.",x:"Not quite. Security is a cross-cutting concern addressed throughout the entire ADM — from Phase A (stakeholder security concerns) through Phase G (compliance reviews). It is not confined to Phase D or any single phase."},
+  3:{c:"Correct! SOA is primarily addressed in Phase C — Application Architecture — where applications are designed as reusable services with defined interfaces. SOA aligns with the Enterprise Continuum through services as ABBs and SBBs that can be reused across architecture projects.",x:"Not quite. SOA is primarily addressed in Phase C — Application Architecture. Services are application components designed with well-defined interfaces for reuse, which is an application architecture concern, not primarily business or technology."},
+  4:{c:"Correct! The Business Transformation Readiness Assessment is used in Phase A (to inform the scope of the Architecture Vision and understand constraints) and Phase E (where readiness gaps become explicit work packages in the implementation plan).",x:"Not quite. The Readiness Assessment is used in Phase A (to scope the Vision and identify constraints) and Phase E (where readiness gaps become work packages). It focuses on the organisation's ability to undertake and sustain transformation."},
+  5:{b:"Correct! TOGAF's four risk mitigation options are Avoid (eliminate the risk), Transfer (shift it to another party), Mitigate (reduce likelihood or impact), and Accept (formally acknowledge it). Accepted residual risks are recorded in the Governance Log.",x:"Not quite. TOGAF's four risk mitigation options are: Avoid, Transfer, Mitigate, and Accept. These are the standard responses to identified risks throughout the ADM cycle."}
+};
+let answered={},score=0;
+function answer(q,opt){if(answered[q])return;answered[q]=opt;const ok=opt===ANS[q];if(ok)score++;document.querySelectorAll(`#quiz-q${q} .quiz-opt`).forEach((b,i)=>{const o=['a','b','c','d'][i];b.classList.add(o===ANS[q]?"correct":o===opt&&!ok?"wrong":"reveal");});const fb=document.getElementById("fb"+q);fb.textContent=(ok?"✓ ":"✗ ")+(ok?FB[q][opt]:FB[q].x);fb.className="quiz-feedback show "+(ok?"ok":"no");if(Object.keys(answered).length===5){const msgs=["Keep going!","Getting there!","Good effort!","Strong result!","Perfect score! Week 3 complete! 🎉"];document.getElementById("quiz-score").textContent=`You scored ${score}/5. ${msgs[score-1]||msgs[0]}`;document.getElementById("quiz-score").classList.add("show");document.getElementById("quiz-reset").classList.add("show");if(score===5)markDone();}}
+function resetQuiz(){answered={};score=0;document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});document.getElementById("quiz-score").classList.remove("show");document.getElementById("quiz-reset").classList.remove("show");}
+</script>
+</body>
+</html>

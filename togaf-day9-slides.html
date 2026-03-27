@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 9 Slides — Phase G: Implementation Governance</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;--teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);--gold:#F0B429;--gold2:rgba(240,180,41,0.15);--slate:#94A3B8;--slate2:#64748B;--slate3:#334155;--white:#F8FAFC;--white2:#E2E8F0;--coral:#FB7185;--coral2:rgba(251,113,133,0.15);--blue:#60A5FA;--blue2:rgba(96,165,250,0.12);--purple:#A78BFA;--purple2:rgba(167,139,250,0.12);--green:#4ADE80;--green2:rgba(74,222,128,0.12);--amber:#FBBF24;--amber2:rgba(251,191,36,0.12)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:.06}
+.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;padding:0 24px;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;padding:0 32px;line-height:1.6;margin-bottom:48px}
+.start-meta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:56px}
+.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
+.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:transform .15s}
+.start-btn:active{transform:scale(0.97)}
+.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
+#deck{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column;display:none}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.slide.exit-left{animation:exitLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-right{animation:enterRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.exit-right{animation:exitRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-left{animation:enterLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes exitLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes enterRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes exitRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
+@keyframes enterLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}
+.slide-body::-webkit-scrollbar{display:none}
+.slide-title .slide-body,.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:32px 28px}
+.title-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
+.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:20px}
+.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
+.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
+.section-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
+.section-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.section-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
+.section-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
+.content-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.content-h{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:14px}
+.callout{border-radius:10px;padding:13px 15px;margin-bottom:11px}
+.callout.teal{background:var(--teal3);border-left:3px solid var(--teal)}.callout.gold{background:var(--gold2);border-left:3px solid var(--gold)}.callout.blue{background:var(--blue2);border-left:3px solid var(--blue)}.callout.purple{background:var(--purple2);border-left:3px solid var(--purple)}.callout.green{background:var(--green2);border-left:3px solid var(--green)}.callout.amber{background:var(--amber2);border-left:3px solid var(--amber)}
+.callout-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.callout.teal .callout-label{color:var(--teal)}.callout.gold .callout-label{color:var(--gold)}.callout.blue .callout-label{color:var(--blue)}.callout.purple .callout-label{color:var(--purple)}.callout.green .callout-label{color:var(--green)}.callout.amber .callout-label{color:var(--amber)}
+.callout p{font-size:13px;line-height:1.6;margin:0}
+.callout.teal p{color:rgba(45,212,191,.9)}.callout.gold p{color:rgba(240,180,41,.9)}.callout.blue p{color:rgba(96,165,250,.9)}.callout.purple p{color:rgba(167,139,250,.9)}.callout.green p{color:rgba(74,222,128,.9)}.callout.amber p{color:rgba(251,191,36,.9)}
+.bullet-list{display:flex;flex-direction:column;gap:8px;margin-bottom:11px}
+.bullet{display:flex;gap:11px;align-items:flex-start}
+.bullet-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
+.bullet-text{font-size:13px;color:var(--white2);line-height:1.55}
+.bullet-text strong{color:var(--white)}.bullet-text em{color:var(--teal);font-style:normal}
+.exam-bar{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:11px 13px;margin-bottom:11px;display:flex;gap:10px}
+.exam-star{font-size:15px;flex-shrink:0}.exam-text{font-size:12px;color:rgba(240,180,41,.9);line-height:1.6}
+.exam-text strong{color:var(--gold)}
+.def-list{display:flex;flex-direction:column;gap:7px;margin-bottom:11px}
+.def-item{background:var(--navy3);border-radius:7px;padding:9px 11px;border:1px solid rgba(255,255,255,.05)}
+.def-term{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:2px}
+.def-text-s{font-size:12px;color:var(--slate);line-height:1.45}
+.step-list{display:flex;flex-direction:column;gap:7px;margin-bottom:11px}
+.step-row{display:flex;gap:10px;align-items:flex-start}
+.step-num{width:24px;height:24px;border-radius:50%;background:var(--teal3);color:var(--teal);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-title{font-size:12px;font-weight:600;color:var(--white);margin-bottom:1px}
+.step-desc{font-size:11px;color:var(--slate);line-height:1.4}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+.compare-box{background:var(--navy3);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+.compare-head{padding:8px 11px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.compare-head.conf{background:var(--teal3);color:var(--teal)}.compare-head.comp{background:var(--blue2);color:var(--blue)}
+.compare-body{padding:8px 11px;font-size:12px;color:var(--slate);line-height:1.5}
+.level-list{display:flex;flex-direction:column;gap:6px;margin-bottom:11px}
+.level-row{background:var(--navy3);border-radius:7px;padding:8px 11px;border:1px solid rgba(255,255,255,.05);display:flex;gap:8px;align-items:flex-start}
+.level-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:8px;flex-shrink:0;white-space:nowrap}
+.level-desc{font-size:12px;color:var(--slate);line-height:1.4}
+.contract-list{display:flex;flex-direction:column;gap:5px;margin-bottom:11px}
+.contract-row{font-size:12px;color:var(--slate);display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.contract-row:last-child{border-bottom:none}
+.contract-row::before{content:'→';color:var(--teal);flex-shrink:0}
+.io-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+.io-box{background:var(--navy3);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+.io-hd{padding:7px 10px;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.io-hd.in{background:var(--blue2);color:var(--blue)}.io-hd.out{background:var(--teal3);color:var(--teal)}
+.io-ul{list-style:none;padding:7px 10px;display:flex;flex-direction:column;gap:3px}
+.io-ul li{font-size:11px;color:var(--slate);display:flex;gap:5px}
+.io-ul li::before{content:'·';color:var(--slate2);flex-shrink:0}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.sum-card{background:var(--navy3);border-radius:9px;padding:11px;border:1px solid rgba(255,255,255,.06)}
+.sum-num{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px;letter-spacing:1px}
+.sum-text{font-size:11px;color:var(--white2);line-height:1.5}
+.sum-text strong{color:var(--white)}
+#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
+#progress-fill{height:100%;background:var(--teal);transition:width .4s}
+#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
+.ctrl-btn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0;color:var(--white2)}
+.ctrl-btn:active{background:var(--navy4)}.ctrl-btn svg{width:16px;height:16px}
+.ctrl-btn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}
+.ctrl-btn.primary svg{width:18px;height:18px}
+.ctrl-btn:disabled{opacity:.3;cursor:not-allowed}
+.slide-counter{flex:1;text-align:center;font-size:12px;color:var(--slate2)}
+.slide-counter strong{color:var(--slate)}
+.voice-status{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
+.voice-dots{display:flex;gap:3px;align-items:center}
+.voice-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vdot 1.2s infinite}
+.voice-dot:nth-child(2){animation-delay:.2s}.voice-dot:nth-child(3){animation-delay:.4s}
+@keyframes vdot{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
+.speed-btn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
+.swipe-hint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+</style>
+</head>
+<body>
+<div id="start-overlay">
+  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="320" cy="80" r="180" fill="#4ADE80"/><circle cx="30" cy="380" r="130" fill="#2DD4BF"/><circle cx="350" cy="640" r="100" fill="#60A5FA"/></svg>
+  <div class="start-logo">TOGAF Foundation · Day 9</div>
+  <div class="start-title">Phase G:<br>Implementation Governance</div>
+  <p class="start-sub">20 slides with voiceover narration.<br>Week 3 begins — governance &amp; change.</p>
+  <div class="start-meta"><span class="start-pill">📊 20 slides</span><span class="start-pill">🎙 Narrated</span><span class="start-pill">⚖ Governance</span></div>
+  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Presentation</button>
+  <p class="start-note">Tap Start to enable voice · Swipe or use controls to navigate</p>
+</div>
+<div id="deck">
+  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
+  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
+  <div style="padding:2px 16px 0"><div class="voice-status" id="voice-status"></div><div class="swipe-hint">swipe left/right to navigate</div></div>
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+    <button class="ctrl-btn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
+    <button class="ctrl-btn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+    <div class="slide-counter"><strong id="slide-num">1</strong> / <span id="slide-total">20</span></div>
+    <button class="speed-btn" id="speed-btn" onclick="cycleSpeed()">1×</button>
+    <button class="ctrl-btn" id="btn-done" onclick="markDone()" title="Mark complete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+  </div>
+</div>
+<script>
+const SLIDES=[
+{type:"title",bg:"navy",
+html:`<div class="title-eyebrow">TOGAF Foundation · Day 9 of 20</div><h1 class="title-h">Phase G:<br>Implementation Governance</h1><div class="title-rule"></div><p class="title-sub">Week 3 starts with governance. Phase G is the architecture team's role during delivery — not building, but ensuring what gets built matches what was designed.</p><div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">⚖ Week 3</span></div>`,
+voice:`Welcome to Day 9 and Week 3. This week we shift into governance territory. Today is Phase G — Implementation Governance. After Phase F's approved plan, the delivery teams start building. Phase G is the architecture team's role during that period — not managing projects, but providing governance oversight to ensure what's being built actually matches what was designed. We'll cover Phase G's objective, Architecture Contracts, the conformance versus compliance distinction, the compliance review process, and the complete inputs and outputs. Let's begin.`},
+
+{type:"section",bg:"green",
+html:`<div class="section-num">01</div><div class="section-label">Section One</div><h2 class="section-h">Phase G Objective &amp; Role</h2><p class="section-desc">The architecture team transitions from designers to governance authorities.</p>`,
+voice:`Section one: the objective and role of Phase G. This is a fundamental change in what the architecture team does.`},
+
+{type:"content",
+html:`<div class="content-label">The governance shift</div><h2 class="content-h">What Phase G Does</h2>
+<div class="callout teal"><div class="callout-label">Objective</div><p>Phase G ensures that <strong>implementation projects deliver architecture conformance</strong> — what gets built matches the Target Architecture designed in Phases B–D and planned in E–F. It provides ongoing oversight throughout delivery.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Phases B–F:</strong> architects were designers and planners</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Phase G:</strong> architects become <em>governance authorities</em> — reviewing, checking, raising issues</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--coral)"></div><div class="bullet-text"><strong>NOT project management</strong> — that's the delivery team's job</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--coral)"></div><div class="bullet-text"><strong>NOT technical QA</strong> — that's testing and quality assurance</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Architecture conformance oversight</strong> — ensuring implementations stay true to the approved design</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Exam tip:</strong> Phase G is the first governance phase. It covers the <em>delivery period</em>. Phase H handles changes <em>after</em> delivery. Architecture Board plays the central role.</div></div>`,
+voice:`Phase G provides architecture conformance oversight throughout the delivery programme. In Phases B through F, the architecture team were designers and planners. In Phase G they become governance authorities — reviewing what delivery teams are building, checking it against the architecture contracts, and raising issues when implementations diverge from the approved design. Phase G is not project management — that's the delivery programme's job. It's not technical quality assurance either. It is specifically architecture conformance oversight. The Architecture Board plays the central governance role.`},
+
+{type:"section",bg:"green",
+html:`<div class="section-num">02</div><div class="section-label">Section Two</div><h2 class="section-h">Architecture Contracts</h2><p class="section-desc">The formal handshake between architecture team and delivery teams — drafted in Phase F, enforced in Phase G.</p>`,
+voice:`Section two: Architecture Contracts. These are the foundational tool of Phase G.`},
+
+{type:"content",
+html:`<div class="content-label">The contract tool</div><h2 class="content-h">What Architecture Contracts Contain</h2>
+<div class="callout green"><div class="callout-label">Definition</div><p>An <strong>Architecture Contract</strong> is a joint agreement between development partners and sponsors on the deliverables, quality, and fitness-for-purpose of an architecture. Drafted in Phase F, activated in Phase G.</p></div>
+<div class="contract-list">
+  <div class="contract-row">Scope of the work to be performed</div>
+  <div class="contract-row">Architecture requirements the deliverable must meet</div>
+  <div class="contract-row">Standards and guidelines that must be followed</div>
+  <div class="contract-row">Acceptance criteria — how conformance will be verified</div>
+  <div class="contract-row">Governance and reporting arrangements</div>
+  <div class="contract-row">Escalation procedures for non-conformances</div>
+  <div class="contract-row">Any approved dispensations from architecture requirements</div>
+</div>
+<div class="callout purple"><div class="callout-label">Two contract types</div><p><strong>Development Partner contracts</strong> — govern suppliers or internal teams implementing components. <strong>Business User contracts</strong> — govern business units that will operate the architecture.</p></div>`,
+voice:`An Architecture Contract is a joint agreement between development partners and sponsors on what gets delivered, its quality, and its fitness-for-purpose. Contracts are drafted in Phase F and activated in Phase G. They contain: the scope of the work, the architecture requirements the deliverable must meet, the standards and guidelines to follow, the acceptance criteria defining how conformance will be verified, governance and reporting arrangements, escalation procedures for non-conformances, and any approved dispensations. TOGAF identifies two contract types: Development Partner contracts governing teams implementing architecture components, and Business User contracts governing the business units that will operate the implemented architecture.`},
+
+{type:"content",
+html:`<div class="content-label">Contract enforcement</div><h2 class="content-h">Dispensations &amp; Non-Conformances</h2>
+<div class="callout amber"><div class="callout-label">When full conformance can't be achieved</div><p>When a delivery team cannot meet a contract requirement — due to technical constraints, cost, or changed circumstances — they submit a request for a <strong>dispensation</strong>: a formal exception approved by the Architecture Board.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Dispensation</strong> — formal, board-approved exception to a contract requirement. Documented in Architecture Repository.</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Non-conformance with dispensation</strong> — acceptable, governance record maintained</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--coral)"></div><div class="bullet-text"><strong>Non-conformance without dispensation</strong> — a governance issue requiring escalation and remediation</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Contracts drafted Phase F → enforced Phase G.</strong> A <strong>dispensation</strong> = formally approved exception when full conformance cannot be achieved.</div></div>`,
+voice:`When a delivery team can't meet a contract requirement, they submit a request for a dispensation — a formal exception approved by the Architecture Board. A dispensation is an accepted departure from the architecture requirement, documented in the Architecture Repository. Non-conformance with an approved dispensation is acceptable. Non-conformance without a dispensation is a governance issue requiring escalation. For the exam: contracts are drafted in Phase F and enforced in Phase G. A dispensation is a formally approved exception — not the same as ignoring the requirement.`},
+
+{type:"section",bg:"blue",
+html:`<div class="section-num">03</div><div class="section-label">Section Three</div><h2 class="section-h">Conformance vs Compliance</h2><p class="section-desc">Two terms that look similar but mean very different things. Getting them right matters.</p>`,
+voice:`Section three: the conformance versus compliance distinction. This is a classic TOGAF exam trap.`},
+
+{type:"content",
+html:`<div class="content-label">Critical distinction</div><h2 class="content-h">Two Different Checks</h2>
+<div class="compare-grid">
+  <div class="compare-box"><div class="compare-head conf">Architecture Conformance</div><div class="compare-body"><strong style="color:var(--teal)">Matching the architecture design.</strong><br><br>Does the implementation match the Architecture Definition Document and Architecture Contracts?<br><br>Checked by: architecture team / Architecture Board.</div></div>
+  <div class="compare-box"><div class="compare-head comp">Architecture Compliance</div><div class="compare-body"><strong style="color:var(--blue)">Meeting external standards.</strong><br><br>Does the implementation meet external regulations, legal requirements, and organisational policies?<br><br>Checked by: compliance function, legal, audit.</div></div>
+</div>
+<div class="callout teal"><div class="callout-label">Why it matters</div><p>An implementation can be architecturally <em>conformant</em> but not <em>compliant</em> — it matches the design but violates GDPR. Conversely, it can be <em>compliant</em> but <em>non-conformant</em> — it meets regulations but deviates from the architecture. <strong>Phase G checks conformance. Compliance is a separate organisational function.</strong></p></div>`,
+voice:`Here's the critical distinction. Architecture Conformance means matching the architecture design — does the implementation match the Architecture Definition Document and Architecture Contracts? This is checked by the architecture team and the Architecture Board. Architecture Compliance means meeting external standards — does the implementation meet external regulations, legal requirements, and organisational policies? This is checked by the compliance function, legal teams, and audit. An implementation can be conformant but not compliant — it matches the design but violates GDPR. It can also be compliant but non-conformant — it meets regulations but deviates from the architecture. Phase G checks conformance. Compliance is separate.`},
+
+{type:"content",
+html:`<div class="content-label">Conformance levels</div><h2 class="content-h">Degrees of Conformance</h2>
+<div class="level-list">
+  <div class="level-row"><span class="level-badge" style="background:var(--teal3);color:var(--teal)">Fully</span><span class="level-desc">Meets all architecture requirements. Ideal outcome.</span></div>
+  <div class="level-row"><span class="level-badge" style="background:var(--blue2);color:var(--blue)">Partially</span><span class="level-desc">Meets most requirements, with approved exceptions. Acceptable with documented dispensations.</span></div>
+  <div class="level-row"><span class="level-badge" style="background:var(--amber2);color:var(--amber)">Dispensation</span><span class="level-desc">Formally approved departure from architecture requirements. Architecture Board sign-off required.</span></div>
+  <div class="level-row"><span class="level-badge" style="background:var(--coral2);color:var(--coral)">Non-conformant</span><span class="level-desc">Departs from architecture without dispensation. Governance issue — must be escalated and resolved.</span></div>
+</div>
+<div class="callout gold"><div class="callout-label">Not applicable</div><p>Some requirements may be rated <strong>Not Applicable</strong> to a specific implementation — the Architecture Board must confirm this classification.</p></div>`,
+voice:`TOGAF recognises four degrees of architectural conformance. Fully conformant — the implementation meets all architecture requirements. This is the ideal. Partially conformant — meets most requirements with approved exceptions documented as dispensations. Non-conformant with dispensation — the Architecture Board has formally approved the departure. And non-conformant without dispensation — this is a governance issue that must be escalated and resolved. Some requirements may also be classified as Not Applicable to a specific implementation, but this must be confirmed by the Architecture Board.`},
+
+{type:"section",bg:"purple",
+html:`<div class="section-num">04</div><div class="section-label">Section Four</div><h2 class="section-h">Architecture Compliance Review</h2><p class="section-desc">The structured review process that checks implementations against architecture contracts.</p>`,
+voice:`Section four: the Architecture Compliance Review process. This is the primary Phase G mechanism for checking conformance.`},
+
+{type:"content",
+html:`<div class="content-label">Five-step process</div><h2 class="content-h">How Reviews Work</h2>
+<div class="callout purple"><div class="callout-label">Definition</div><p>A <strong>scrutiny of the compliance of a specific project against established architectural criteria</strong> — assessing conformance to the Architecture Contract and the Architecture Definition Document.</p></div>
+<div class="step-list">
+  <div class="step-row"><div class="step-num">1</div><div class="step-content"><div class="step-title">Schedule the review</div><div class="step-desc">At key delivery milestones defined in the Architecture Contract.</div></div></div>
+  <div class="step-row"><div class="step-num">2</div><div class="step-content"><div class="step-title">Prepare review materials</div><div class="step-desc">Delivery team provides design specs, test evidence, deviation logs. Architecture team prepares compliance checklist.</div></div></div>
+  <div class="step-row"><div class="step-num">3</div><div class="step-content"><div class="step-title">Conduct the review</div><div class="step-desc">Architecture team assesses implementation against Architecture Contract and Architecture Definition Document.</div></div></div>
+  <div class="step-row"><div class="step-num">4</div><div class="step-content"><div class="step-title">Document findings</div><div class="step-desc">Produce Compliance Assessment — rating each requirement conformant, partial, non-conformant, or N/A.</div></div></div>
+  <div class="step-row"><div class="step-num">5</div><div class="step-content"><div class="step-title">Escalate and resolve</div><div class="step-desc">Non-conformances → Architecture Board → remediation, dispensation, or sponsor decision.</div></div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">Primary Phase G activity = <strong>Architecture Compliance Review</strong>. Primary output = <strong>Compliance Assessment</strong>. Significant non-conformances → <strong>Phase H</strong> via Change Request.</div></div>`,
+voice:`The Architecture Compliance Review is the primary Phase G activity. It's a structured scrutiny of a project against established architectural criteria. Five steps. First: schedule the review at key delivery milestones defined in the contract. Second: prepare materials — the delivery team provides design specs and test evidence, the architecture team prepares the compliance checklist. Third: conduct the review, assessing the implementation against the Architecture Contract and Architecture Definition Document. Fourth: document findings in a Compliance Assessment, rating each requirement. Fifth: escalate non-conformances to the Architecture Board for decisions on remediation, dispensation, or escalation to the sponsor. For the exam: primary Phase G activity is the Architecture Compliance Review. Primary output is the Compliance Assessment. Significant non-conformances feed into Phase H via Change Requests.`},
+
+{type:"section",bg:"teal",
+html:`<div class="section-num">05</div><div class="section-label">Section Five</div><h2 class="section-h">Inputs, Outputs &amp; Phase G→H Link</h2><p class="section-desc">The complete picture and how Phase G connects to Phase H.</p>`,
+voice:`Section five: Phase G inputs, outputs, and the critical link to Phase H.`},
+
+{type:"content",
+html:`<div class="content-label">Complete picture</div><h2 class="content-h">IO &amp; Summary</h2>
+<div class="io-grid">
+  <div class="io-box"><div class="io-hd in">Key Inputs</div><ul class="io-ul"><li><strong style="color:var(--blue)">Migration Plan (Phase F) ★</strong></li><li><strong style="color:var(--blue)">Architecture Contracts (Phase F) ★</strong></li><li>Architecture Definition Document</li><li>Architecture Vision and Principles</li><li>Governance framework</li></ul></div>
+  <div class="io-box"><div class="io-hd out">Key Outputs</div><ul class="io-ul"><li><strong style="color:var(--teal)">Compliance Assessments ★</strong></li><li><strong style="color:var(--teal)">Change Requests (→ Phase H) ★</strong></li><li>Signed Architecture Contracts</li><li>Updated Architecture Repository</li><li>Architecture-compliant systems</li></ul></div>
+</div>
+<div class="callout amber"><div class="callout-label">Phase G → Phase H</div><p>When a compliance review finds a significant non-conformance or a delivery team proposes a change, Phase G raises a <strong>Change Request</strong> → feeds Phase H (Architecture Change Management) → which decides: update architecture, grant dispensation, or require remediation.</p></div>
+<div class="sum-grid">
+  <div class="sum-card"><div class="sum-num">01</div><div class="sum-text"><strong>Phase G = governance during delivery</strong> — architecture conformance oversight, not project management.</div></div>
+  <div class="sum-card"><div class="sum-num">02</div><div class="sum-text"><strong>Architecture Contracts</strong> — drafted Phase F, enforced Phase G. Dispensation = approved exception.</div></div>
+  <div class="sum-card"><div class="sum-num">03</div><div class="sum-text"><strong>Conformance ≠ Compliance</strong> — Phase G checks conformance. Compliance is external standards.</div></div>
+  <div class="sum-card"><div class="sum-num">04</div><div class="sum-text"><strong>Compliance Review → Assessment</strong> — non-conformances → Architecture Board → Change Request → Phase H.</div></div>
+</div>`,
+voice:`Here's the complete Phase G picture. Primary inputs: the Implementation and Migration Plan from Phase F and the Architecture Contracts drafted in Phase F. Primary outputs: Compliance Assessments — the formal records of each review — and Change Requests that feed into Phase H when non-conformances require architecture-level decisions. Phase G and Phase H work as a governance pair: Phase G monitors during delivery, Phase H responds to deviations. The key linkage is the Change Request — Phase G produces it, Phase H processes it. Four key takeaways: Phase G is governance during delivery. Architecture Contracts are drafted in Phase F and enforced in Phase G. Conformance is about matching the design; compliance is about external standards. And compliance reviews produce assessments, with non-conformances escalating to Phase H.`},
+
+{type:"title",bg:"end",
+html:`<div class="title-eyebrow">Day 9 Complete</div><h1 class="title-h" style="font-size:clamp(24px,6vw,40px)">Phase G — done.</h1><div class="title-rule"></div><p class="title-sub" style="margin-bottom:24px">Next up: <strong>Day 10 — Phase H: Architecture Change Management</strong>. What happens when the architecture needs to change during or after delivery?</p>
+<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+  <a href="togaf-day9.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Reading version · Take the quiz</a>
+  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 9 as done</button>
+</div>`,
+voice:`Day 9 complete. Phase G is the architecture team's governance role during delivery — checking that implementations conform to the approved architecture via Architecture Contracts and Compliance Reviews, and raising Change Requests when they don't. Take the quiz on the reading version. Day 10 is Phase H — Architecture Change Management — which handles what happens when the architecture itself needs to change in response to delivery discoveries, business evolution, or technology changes. See you there.`},
+];
+
+let cur=0,play=false,spdIdx=1,utt=null,tx=0,anim=false;
+const SPDS=[0.8,1,1.2,1.5];
+const wrap=document.getElementById("slides-wrap");
+document.getElementById("slide-total").textContent=SLIDES.length;
+function getBg(b){return{navy:"var(--navy2)",green:"linear-gradient(135deg,#0A1A10,#0D2218)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",coral:"linear-gradient(135deg,#1A0A0E,#2A0D15)",amber:"linear-gradient(135deg,#1A1000,#251800)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"}[b]||"var(--navy2)";}
+SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="s"+i;d.style.background=getBg(s.bg);d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
+function goTo(i,dir){if(anim||i<0||i>=SLIDES.length)return;anim=true;stopSp();const f=document.getElementById("s"+cur),t=document.getElementById("s"+i);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");anim=false;cur=i;upUI();if(play)spk();},420);}
+function nextSlide(){if(cur<SLIDES.length-1)goTo(cur+1,1);}
+function prevSlide(){if(cur>0)goTo(cur-1,-1);}
+function upUI(){document.getElementById("slide-num").textContent=cur+1;document.getElementById("progress-fill").style.width=((cur+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=cur===0;document.getElementById("btn-next").disabled=cur===SLIDES.length-1;}
+function spk(){stopSp();if(!("speechSynthesis"in window))return;const txt=SLIDES[cur].voice;if(!txt){if(play)setTimeout(nextSlide,800);return;}utt=new SpeechSynthesisUtterance(txt);utt.rate=SPDS[spdIdx];utt.lang="en-GB";const vs=speechSynthesis.getVoices();const p=vs.find(v=>v.lang.startsWith("en")&&(v.name.includes("Daniel")||v.name.includes("Samantha")||v.name.includes("Karen")||v.name.includes("Google UK")))||vs.find(v=>v.lang.startsWith("en"))||vs[0];if(p)utt.voice=p;utt.onstart=()=>setSt("speaking");utt.onend=()=>{setSt("");if(play&&cur<SLIDES.length-1)setTimeout(nextSlide,600);else if(cur===SLIDES.length-1){play=false;upPlay();}};utt.onerror=()=>setSt("");speechSynthesis.speak(utt);}
+function stopSp(){if("speechSynthesis"in window)speechSynthesis.cancel();utt=null;setSt("");}
+function togglePlay(){play=!play;upPlay();if(play)spk();else stopSp();}
+function upPlay(){document.getElementById("play-icon").innerHTML=play?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
+function setSt(s){const el=document.getElementById("voice-status");el.innerHTML=s==="speaking"?`<div class="voice-dots"><div class="voice-dot"></div><div class="voice-dot"></div><div class="voice-dot"></div></div><span>Narrating…</span>`:s||"";}
+function cycleSpeed(){spdIdx=(spdIdx+1)%SPDS.length;document.getElementById("speed-btn").textContent=SPDS[spdIdx]+"×";if(play){stopSp();setTimeout(spk,100);}}
+function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[9]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="var(--teal3)";b.style.borderColor="var(--teal)";b.querySelector("svg").style.stroke="var(--teal)";goTo(SLIDES.length-1,1);}
+document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";upUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{play=true;upPlay();spk();},400);}});
+wrap.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
+if("speechSynthesis"in window)speechSynthesis.onvoiceschanged=()=>{};
+</script>
+</body>
+</html>
