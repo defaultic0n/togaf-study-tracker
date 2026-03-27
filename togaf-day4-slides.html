@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 4 Slides — Phase B: Business Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;
+  --teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);
+  --gold:#F0B429;--gold2:rgba(240,180,41,0.15);
+  --slate:#94A3B8;--slate2:#64748B;--slate3:#334155;
+  --white:#F8FAFC;--white2:#E2E8F0;
+  --coral:#FB7185;--coral2:rgba(251,113,133,0.15);
+  --blue:#60A5FA;--blue2:rgba(96,165,250,0.12);
+  --purple:#A78BFA;--purple2:rgba(167,139,250,0.12);
+  --green:#4ADE80;--green2:rgba(74,222,128,0.12);
+  --amber:#FBBF24;--amber2:rgba(251,191,36,0.12);
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:0.06}
+.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:0.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;padding:0 24px;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;padding:0 32px;line-height:1.6;margin-bottom:48px}
+.start-meta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:56px}
+.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
+.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:transform .15s}
+.start-btn:active{transform:scale(0.97)}
+.start-btn svg{width:18px;height:18px}
+.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
+#deck{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.slide.exit-left{animation:exitLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-right{animation:enterRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.exit-right{animation:exitRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-left{animation:enterLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes exitLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes enterRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes exitRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
+@keyframes enterLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}
+.slide-body::-webkit-scrollbar{display:none}
+.slide-title .slide-body{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:32px 28px}
+.title-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
+.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:20px}
+.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
+.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
+.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:32px 28px}
+.section-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
+.section-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.section-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
+.section-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
+.content-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.content-h{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:16px}
+.callout{border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.callout.teal{background:var(--teal3);border-left:3px solid var(--teal)}
+.callout.gold{background:var(--gold2);border-left:3px solid var(--gold)}
+.callout.blue{background:var(--blue2);border-left:3px solid var(--blue)}
+.callout.purple{background:var(--purple2);border-left:3px solid var(--purple)}
+.callout.green{background:var(--green2);border-left:3px solid var(--green)}
+.callout.amber{background:var(--amber2);border-left:3px solid var(--amber)}
+.callout.coral{background:var(--coral2);border-left:3px solid var(--coral)}
+.callout-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.callout.teal .callout-label{color:var(--teal)}
+.callout.gold .callout-label{color:var(--gold)}
+.callout.blue .callout-label{color:var(--blue)}
+.callout.purple .callout-label{color:var(--purple)}
+.callout.green .callout-label{color:var(--green)}
+.callout.amber .callout-label{color:var(--amber)}
+.callout.coral .callout-label{color:var(--coral)}
+.callout p{font-size:14px;line-height:1.6;margin:0}
+.callout.teal p{color:rgba(45,212,191,.9)}
+.callout.gold p{color:rgba(240,180,41,.9)}
+.callout.blue p{color:rgba(96,165,250,.9)}
+.callout.purple p{color:rgba(167,139,250,.9)}
+.callout.green p{color:rgba(74,222,128,.9)}
+.callout.amber p{color:rgba(251,191,36,.9)}
+.callout.coral p{color:rgba(251,113,133,.9)}
+.bullet-list{display:flex;flex-direction:column;gap:9px;margin-bottom:14px}
+.bullet{display:flex;gap:12px;align-items:flex-start}
+.bullet-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
+.bullet-text{font-size:14px;color:var(--white2);line-height:1.55}
+.bullet-text strong{color:var(--white);font-weight:600}
+.bullet-text em{color:var(--teal);font-style:normal}
+.exam-bar{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;gap:10px}
+.exam-star{font-size:16px;flex-shrink:0}
+.exam-text{font-size:13px;color:rgba(240,180,41,.9);line-height:1.6}
+.exam-text strong{color:var(--gold)}
+.cap-card{background:var(--navy3);border-radius:10px;margin-bottom:10px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
+.cap-header{padding:9px 14px;font-size:12px;font-weight:700;color:var(--teal);background:var(--teal3)}
+.cap-body{padding:10px 14px;font-size:13px;color:var(--slate);line-height:1.55}
+.def-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.def-item{background:var(--navy3);border-radius:8px;padding:10px 12px;border:1px solid rgba(255,255,255,.05)}
+.def-term{font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px}
+.def-text-s{font-size:12px;color:var(--slate);line-height:1.5}
+.gap-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.gap-row{background:var(--navy3);border-radius:8px;padding:10px 12px;border:1px solid rgba(255,255,255,.05);display:flex;gap:10px;align-items:flex-start}
+.gap-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:12px;flex-shrink:0;white-space:nowrap}
+.gap-desc{font-size:12px;color:var(--slate);line-height:1.5}
+.art-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.art-card{background:var(--navy3);border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,.05);text-align:center}
+.art-icon{font-size:18px;margin-bottom:5px}
+.art-type{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.art-card.cat .art-type{color:var(--teal)}
+.art-card.mat .art-type{color:var(--blue)}
+.art-card.dia .art-type{color:var(--purple)}
+.art-name{font-size:11px;color:var(--slate);line-height:1.35}
+.io-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.io-box{background:var(--navy3);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+.io-header{padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase}
+.io-header.in{background:var(--blue2);color:var(--blue)}
+.io-header.out{background:var(--teal3);color:var(--teal)}
+.io-list{list-style:none;padding:8px 12px;display:flex;flex-direction:column;gap:3px}
+.io-list li{font-size:12px;color:var(--slate);display:flex;gap:5px}
+.io-list li::before{content:'·';color:var(--slate2);flex-shrink:0}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sum-card{background:var(--navy3);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,.06)}
+.sum-num{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:5px;letter-spacing:1px}
+.sum-text{font-size:12px;color:var(--white2);line-height:1.55}
+.sum-text strong{color:var(--white)}
+#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
+#progress-fill{height:100%;background:var(--teal);transition:width .4s cubic-bezier(.4,0,.2,1)}
+#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
+.ctrl-btn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0;color:var(--white2)}
+.ctrl-btn:active{background:var(--navy4)}
+.ctrl-btn svg{width:16px;height:16px}
+.ctrl-btn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}
+.ctrl-btn.primary svg{width:18px;height:18px}
+.ctrl-btn:disabled{opacity:.3;cursor:not-allowed}
+.slide-counter{flex:1;text-align:center;font-size:12px;color:var(--slate2)}
+.slide-counter strong{color:var(--slate)}
+.voice-status{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
+.voice-dots{display:flex;gap:3px;align-items:center}
+.voice-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vdot 1.2s infinite}
+.voice-dot:nth-child(2){animation-delay:.2s}
+.voice-dot:nth-child(3){animation-delay:.4s}
+@keyframes vdot{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
+.speed-btn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
+.swipe-hint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+</style>
+</head>
+<body>
+<div id="start-overlay">
+  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="350" cy="80" r="180" fill="#2DD4BF"/><circle cx="20" cy="400" r="120" fill="#60A5FA"/><circle cx="300" cy="600" r="100" fill="#4ADE80"/></svg>
+  <div class="start-logo">TOGAF Foundation · Day 4</div>
+  <div class="start-title">Phase B:<br>Business Architecture</div>
+  <p class="start-sub">20 slides with voiceover narration.<br>Approx. 30 minutes to complete.</p>
+  <div class="start-meta"><span class="start-pill">📊 20 slides</span><span class="start-pill">🎙 Voice narration</span><span class="start-pill">⏱ ~30 min</span></div>
+  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Presentation</button>
+  <p class="start-note">Tap Start to enable voice narration · Swipe or use controls to navigate</p>
+</div>
+<div id="deck">
+  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
+  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
+  <div style="padding:2px 16px 0"><div class="voice-status" id="voice-status"></div><div class="swipe-hint">swipe left/right to navigate</div></div>
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+    <button class="ctrl-btn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
+    <button class="ctrl-btn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+    <div class="slide-counter"><strong id="slide-num">1</strong> / <span id="slide-total">20</span></div>
+    <button class="speed-btn" id="speed-btn" onclick="cycleSpeed()">1×</button>
+    <button class="ctrl-btn" id="btn-done" onclick="markDone()" title="Mark complete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+  </div>
+</div>
+<script>
+const SLIDES=[
+{type:"title",bg:"navy",
+html:`<div class="title-eyebrow">TOGAF Foundation · Day 4 of 20</div><h1 class="title-h">Phase B:<br>Business Architecture</h1><div class="title-rule"></div><p class="title-sub">From high-level vision to detailed business analysis — capabilities, value streams, actors, gap analysis, and the artefacts that make it all concrete.</p><div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">⭐ Exam-ready</span></div>`,
+voice:`Welcome to Day 4 — the last session of Week 1. Today we cover Phase B: Business Architecture. This is where we move from the high-level vision of Phase A into the detailed analysis of how the business actually operates. We'll cover the definition and scope of Business Architecture, business capabilities and value streams, the organisation map and actors, the baseline-to-target gap analysis pattern, and the three types of architecture artefacts. Let's go.`},
+
+{type:"section",bg:"teal",
+html:`<div class="section-num">01</div><div class="section-label">Section One</div><h2 class="section-h">Business Architecture — Definition &amp; Scope</h2><p class="section-desc">What Phase B is, why it comes first among the detailed phases, and what it sets out to achieve.</p>`,
+voice:`Section one: Business Architecture — definition and scope. Phase B is the first of the three detailed architecture phases: B for Business, C for Information Systems, and D for Technology.`},
+
+{type:"content",bg:"",
+html:`<div class="content-label">Phase B defined</div><h2 class="content-h">What Phase B Does</h2>
+<div class="callout teal"><div class="callout-label">TOGAF definition</div><p>Business Architecture describes <strong>how an enterprise is structured to achieve its goals</strong> — covering strategy, governance, organisation structure, and key business processes. It is the "B" in BDAT.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>First of the three detailed phases</strong> — B (Business), C (Information Systems), D (Technology)</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Develops <em>both</em> the <strong>Baseline</strong> (current state) and <strong>Target</strong> (future state) Business Architecture</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Performs <strong>Gap Analysis</strong> — identifies what must change to move from baseline to target</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Scope comes directly from the <strong>Architecture Vision produced in Phase A</strong></div></div>
+</div>`,
+voice:`Phase B develops a comprehensive view of the business — documenting how it currently works as the baseline, and how it needs to work in the future as the target. It then performs a gap analysis to identify what must change. The scope of Phase B comes directly from the Architecture Vision produced in Phase A. Phase B must be done before Phase C — you can't design information systems before you understand the business they're meant to support.`},
+
+{type:"content",bg:"",
+html:`<div class="content-label">Four domains</div><h2 class="content-h">Business Architecture Covers</h2>
+<div class="def-list">
+  <div class="def-item"><div class="def-term">Business Strategy</div><div class="def-text-s">The organisation's direction and goals — what it's trying to achieve and why. Architecture must align to and support this.</div></div>
+  <div class="def-item"><div class="def-term">Governance</div><div class="def-text-s">Policies, controls, and decision-making structures — compliance, accountability, and oversight.</div></div>
+  <div class="def-item"><div class="def-term">Organisation Structure</div><div class="def-text-s">How the enterprise divides into units, departments, and roles. Who is accountable for what.</div></div>
+  <div class="def-item"><div class="def-term">Key Business Processes</div><div class="def-text-s">End-to-end activities that deliver value — from customer order to fulfilment. Connect capabilities to outcomes.</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Exam tip:</strong> Phase B = Business Architecture only. Not Information Systems (Phase C), not Technology (Phase D). When asked which phase addresses business capabilities or processes, always answer Phase B.</div></div>`,
+voice:`Business Architecture covers four areas. Business Strategy — the organisation's direction and goals. Governance — the policies, controls, and decision-making structures. Organisation Structure — how the enterprise is divided into units, departments, and roles. And Key Business Processes — the end-to-end activities that deliver value. For the exam: when you see a question about business capabilities, value streams, or organisation structure, the answer is Phase B — not Phase C or D.`},
+
+{type:"section",bg:"blue",
+html:`<div class="section-num">02</div><div class="section-label">Section Two</div><h2 class="section-h">Business Capabilities &amp; Value Streams</h2><p class="section-desc">The two primary modelling tools of Phase B — what the business can do and how it delivers value to customers.</p>`,
+voice:`Section two: Business Capabilities and Value Streams. These are the two most important modelling tools introduced in Phase B, and they are frequently tested in the exam.`},
+
+{type:"content",bg:"",
+html:`<div class="content-label">Core concept</div><h2 class="content-h">Business Capabilities</h2>
+<div class="cap-card"><div class="cap-header">Business Capability — Definition</div><div class="cap-body">The <strong>ability of an enterprise to perform a particular kind of work, deliver a specific outcome, or produce a specific result</strong>. Describes <em>what</em> the business can do — independent of how it does it.</div></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot" style="background:var(--teal)"></div><div class="bullet-text"><strong>Stable over time</strong> — don't change with process or technology changes</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--teal)"></div><div class="bullet-text"><strong>Delivery-independent</strong> — same capability can be performed by people, processes, or systems</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--teal)"></div><div class="bullet-text">Used to <strong>assess maturity</strong> — current level vs required level</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--teal)"></div><div class="bullet-text">Provide a <strong>common language</strong> between business and IT</div></div>
+</div>
+<div class="callout teal"><div class="callout-label">Examples</div><p>Customer Management · Order Fulfilment · Risk Assessment · Financial Reporting · Product Development · Regulatory Compliance</p></div>`,
+voice:`A business capability is the ability of an enterprise to perform a particular kind of work or deliver a specific outcome. Crucially, it describes what the business can do — independent of how it does it. Capabilities are stable over time. They don't change when processes or technologies change underneath them. The capability "Customer Management" exists whether the business uses a CRM system or paper files. Capabilities are used to assess maturity — comparing the current capability level against what the target architecture requires. They provide a common language between business and IT.`},
+
+{type:"content",bg:"",
+html:`<div class="content-label">Core concept</div><h2 class="content-h">Value Streams</h2>
+<div class="cap-card"><div class="cap-header">Value Stream — Definition</div><div class="cap-body">An <strong>end-to-end collection of activities that create an overall result for a customer, stakeholder, or end user</strong>. Focuses on <em>value delivered</em> — not on the activities performed to deliver it.</div></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text">Show how <strong>multiple capabilities combine</strong> to deliver value to customers</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Cross organisational boundaries</strong> — involve multiple departments</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text">Help identify <strong>where gaps or inefficiencies</strong> cause value loss</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text">Link capabilities to <strong>business outcomes</strong></div></div>
+</div>
+<div class="callout blue"><div class="callout-label">Example: Prospect to Customer</div><p>Involves Marketing, Sales, Legal, Finance, and Operations capabilities — all contributing to a single value stream delivering a new customer relationship.</p></div>`,
+voice:`A value stream is an end-to-end collection of activities that create an overall result for a customer or stakeholder. Unlike capabilities — which describe what the business can do — value streams show how multiple capabilities combine to deliver value. The "Prospect to Customer" value stream, for example, involves Marketing, Sales, Legal, Finance, and Operations — all contributing to the outcome of gaining a new customer. Value streams cross organisational boundaries and help identify where gaps or inefficiencies cause value to be lost before it reaches the customer.`},
+
+{type:"content",bg:"",
+html:`<div class="content-label">Critical distinction</div><h2 class="content-h">Capabilities vs Value Streams vs Processes</h2>
+<div class="def-list">
+  <div class="def-item"><div class="def-term">Capabilities</div><div class="def-text-s"><strong>What</strong> the business can do. Stable, outcome-focused, delivery-independent. E.g. "Customer Management"</div></div>
+  <div class="def-item"><div class="def-term">Value Streams</div><div class="def-text-s"><strong>How value flows</strong> to a customer across multiple capabilities. Cross-functional, customer-outcome-focused. E.g. "Prospect to Customer"</div></div>
+  <div class="def-item"><div class="def-term">Processes</div><div class="def-text-s"><strong>How</strong> a capability is executed step-by-step. Specific activities, sequence, and decisions. E.g. "Customer Onboarding Process"</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Exam tip:</strong> Capabilities = <em>what</em> (stable, outcome). Value Streams = <em>how value flows</em> (cross-functional, customer). Processes = <em>how tasks execute</em> (specific steps). The exam tests these three-way distinctions.</div></div>`,
+voice:`Three important concepts, clearly distinguished. Capabilities describe what the business can do — stable, outcome-focused, delivery-independent. Value streams describe how value flows to a customer across multiple capabilities — cross-functional and customer-focused. Processes describe how a capability is executed step-by-step — specific activities in sequence. The exam tests these distinctions. If you see "what the business can do", think capability. "How value flows to customer", think value stream. "Specific steps and activities", think process.`},
+
+{type:"section",bg:"purple",
+html:`<div class="section-num">03</div><div class="section-label">Section Three</div><h2 class="section-h">Organisation Map &amp; Actors</h2><p class="section-desc">Who does the work — and where — is as important as what work is done.</p>`,
+voice:`Section three: the Organisation Map and Actors. Business Architecture isn't just about what the enterprise does — it's also about who does it and where.`},
+
+{type:"content",bg:"",
+html:`<div class="content-label">Who does the work</div><h2 class="content-h">Actors and Roles</h2>
+<div class="def-list">
+  <div class="def-item"><div class="def-term">Actor</div><div class="def-text-s">An individual or thing that initiates or participates in activities. Can be a person, system, or organisation. One actor can perform multiple roles in different contexts.</div></div>
+  <div class="def-item"><div class="def-term">Role</div><div class="def-text-s">The specific function or responsibility performed by an actor in a given context. Roles are more stable than actors — "Customer Service Representative" exists even if the person changes.</div></div>
+  <div class="def-item"><div class="def-term">Business Unit</div><div class="def-text-s">An identifiable organisational entity responsible for specific capabilities — a division, subsidiary, or partner organisation.</div></div>
+  <div class="def-item"><div class="def-term">Location</div><div class="def-text-s">Where activities take place — physical locations, geographic regions, or virtual environments. Affects architecture design and deployment.</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Exam tip:</strong> Actor = the individual or thing. Role = the function performed in context. One actor, multiple roles. This distinction appears in Phase B content metamodel questions.</div></div>`,
+voice:`Phase B must document who does the work. An Actor is an individual or thing that participates in activities — a person, a system, or an organisation. A Role is the specific function performed by an actor in a given context. The important distinction: one actor can perform multiple roles, and the same role can be performed by different actors. Roles are more stable than actors — if the person in the role changes, the role itself remains. Business Units are identifiable entities responsible for capabilities. And Location captures where activities take place, which affects how the architecture is designed.`},
+
+{type:"content",bg:"",
+html:`<div class="content-label">Organisation map</div><h2 class="content-h">Mapping the Enterprise</h2>
+<div class="callout purple"><div class="callout-label">Organisation Map</div><p>A diagram showing the structure of the enterprise — its business units, departments, and their relationships. Provides the organisational context within which capabilities are performed.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Shows <strong>hierarchy and reporting lines</strong> within the enterprise</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Identifies <strong>which units are responsible</strong> for which capabilities</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Includes <strong>external parties</strong> — partners, suppliers, regulators — where relevant</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Basis for <strong>RACI analysis</strong> — who is Responsible, Accountable, Consulted, Informed for each function</div></div>
+</div>
+<div class="callout amber"><div class="callout-label">Why it matters for Phase C/D</div><p>Actor-role-location data from Phase B directly shapes which <strong>applications are needed</strong> (Phase C) and where <strong>infrastructure must be deployed</strong> (Phase D). Get Phase B wrong and Phases C and D will be misaligned.</p></div>`,
+voice:`The Organisation Map is a diagram showing the structure of the enterprise — business units, departments, and their relationships. It provides the organisational context for capability delivery. It shows hierarchy and reporting lines, identifies which units are responsible for which capabilities, and includes external parties like partners, suppliers, and regulators where relevant. It also forms the basis for RACI analysis — mapping who is Responsible, Accountable, Consulted, and Informed for each business function. And critically: the actor, role, and location data from Phase B directly shapes which applications are needed in Phase C and where infrastructure must be deployed in Phase D.`},
+
+{type:"section",bg:"green",
+html:`<div class="section-num">04</div><div class="section-label">Section Four</div><h2 class="section-h">Baseline → Target → Gap</h2><p class="section-desc">The fundamental work pattern of Phase B — and of all three detailed architecture phases.</p>`,
+voice:`Section four: the Baseline, Target, and Gap Analysis pattern. This is the core work pattern of Phase B — and it repeats in exactly the same way in Phases C and D.`},
+
+{type:"content",bg:"",
+html:`<div class="content-label">The three-step pattern</div><h2 class="content-h">How Phase B Works</h2>
+<div class="callout teal"><div class="callout-label">The pattern</div><p><strong>Step 1</strong> — Develop Baseline Architecture (current state). <strong>Step 2</strong> — Develop Target Architecture (future state, aligned to Vision). <strong>Step 3</strong> — Perform Gap Analysis (what needs to change, retain, or retire).</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Baseline</strong> — how things work today. Documents existing capabilities, org structure, processes. "As-is".</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--teal)"></div><div class="bullet-text"><strong>Target</strong> — how things should work after transformation. Aligned to Architecture Vision. "To-be".</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--gold)"></div><div class="bullet-text"><strong>Gap Analysis</strong> — the delta between baseline and target. Gaps become implementation work items.</div></div>
+</div>
+<div class="callout amber"><div class="callout-label">Where gaps go</div><p>Gaps identified in Phase B (and C and D) are <strong>consolidated in Phase E</strong> — Opportunities and Solutions — to define the projects needed. This is tested frequently.</p></div>`,
+voice:`Here's the three-step work pattern. Step one: develop the Baseline Architecture — document how things work today. Step two: develop the Target Architecture — define how things should work in the future, aligned to the Architecture Vision from Phase A. Step three: perform the Gap Analysis — identify the delta between baseline and target. What capabilities need to be added? What can be retained? What should be retired? The gaps identified in Phase B — and later in Phases C and D — are consolidated in Phase E, Opportunities and Solutions, to define the projects needed. This is a very frequent exam topic.`},
+
+{type:"content",bg:"",
+html:`<div class="content-label">Gap categories</div><h2 class="content-h">Types of Gaps</h2>
+<div class="gap-list">
+  <div class="gap-row"><span class="gap-badge" style="background:var(--coral2);color:var(--coral)">Capability Gap</span><span class="gap-desc">Needed in target but doesn't exist in baseline. E.g. real-time analytics capability needed but none exists today.</span></div>
+  <div class="gap-row"><span class="gap-badge" style="background:var(--blue2);color:var(--blue)">Capability Surplus</span><span class="gap-desc">Exists in baseline but not needed in target — candidate for retirement. E.g. manual paper reporting to be replaced.</span></div>
+  <div class="gap-row"><span class="gap-badge" style="background:var(--amber2);color:var(--amber)">Maturity Gap</span><span class="gap-desc">Capability exists but at insufficient maturity. E.g. Customer Management exists but is informal and inconsistent.</span></div>
+  <div class="gap-row"><span class="gap-badge" style="background:var(--purple2);color:var(--purple)">Location Gap</span><span class="gap-desc">Capability exists at some locations but not all where needed. E.g. Risk Assessment at HQ but not at regional offices.</span></div>
+</div>
+<div class="callout green"><div class="callout-label">Transition architectures</div><p>When the gap is too large to close in one step, <strong>Transition Architectures</strong> define intermediate stable states — planned formally in Phases E and F.</p></div>`,
+voice:`Gaps come in four flavours. A Capability Gap is when the target needs a capability that doesn't exist in the baseline — for example, needing real-time analytics but having none today. A Capability Surplus is when something in the baseline isn't needed in the target — a candidate for retirement, like a manual paper-based process being replaced by automation. A Maturity Gap is when the capability exists but isn't good enough — Customer Management exists but is informal and inconsistent. And a Location Gap is when the capability exists at some locations but not all where it's needed. When the total gap is too large to close in one step, Transition Architectures are defined — intermediate stable states planned in Phases E and F.`},
+
+{type:"section",bg:"coral",
+html:`<div class="section-num">05</div><div class="section-label">Section Five</div><h2 class="section-h">Catalogues, Matrices &amp; Diagrams</h2><p class="section-desc">The three artefact types used across all three detailed phases — B, C, and D.</p>`,
+voice:`Section five: Catalogues, Matrices, and Diagrams. These are the three types of artefacts that TOGAF uses to document architecture across Phases B, C, and D.`},
+
+{type:"content",bg:"",
+html:`<div class="content-label">Three artefact types</div><h2 class="content-h">How Architecture is Documented</h2>
+<div class="callout teal"><div class="callout-label">The three types</div><p><strong>Catalogues</strong> are lists of things. <strong>Matrices</strong> show relationships between things. <strong>Diagrams</strong> visualise things spatially. Together they give a complete multi-dimensional picture.</p></div>
+<div class="art-grid">
+  <div class="art-card cat"><div class="art-icon">📋</div><div class="art-type">Catalogue</div><div class="art-name">Organisation / Actor Catalogue</div></div>
+  <div class="art-card cat"><div class="art-icon">📋</div><div class="art-type">Catalogue</div><div class="art-name">Driver / Goal / Objective Catalogue</div></div>
+  <div class="art-card cat"><div class="art-icon">📋</div><div class="art-type">Catalogue</div><div class="art-name">Role / Actor Catalogue</div></div>
+  <div class="art-card mat"><div class="art-icon">⊞</div><div class="art-type">Matrix</div><div class="art-name">Business Interaction Matrix</div></div>
+  <div class="art-card mat"><div class="art-icon">⊞</div><div class="art-type">Matrix</div><div class="art-name">Actor / Role Matrix</div></div>
+  <div class="art-card mat"><div class="art-icon">⊞</div><div class="art-type">Matrix</div><div class="art-name">Capability Assessment Matrix</div></div>
+  <div class="art-card dia"><div class="art-icon">🗺</div><div class="art-type">Diagram</div><div class="art-name">Organisation Decomposition</div></div>
+  <div class="art-card dia"><div class="art-icon">🗺</div><div class="art-type">Diagram</div><div class="art-name">Business Footprint Diagram</div></div>
+  <div class="art-card dia"><div class="art-icon">🗺</div><div class="art-type">Diagram</div><div class="art-name">Use Case Diagram</div></div>
+</div>`,
+voice:`TOGAF organises architecture artefacts into three types across all the detailed phases. Catalogues are lists of things — like the Organisation Catalogue listing all business units, or the Role/Actor Catalogue. Matrices show relationships between things — the Business Interaction Matrix shows which business units interact with each other, and the Actor/Role Matrix shows which actors perform which roles. Diagrams visualise things spatially — the Organisation Decomposition Diagram shows the hierarchy, the Business Footprint Diagram shows where capabilities are deployed across locations, and Use Case Diagrams show actor interactions. These three types — catalogue, matrix, diagram — apply consistently in Phases B, C, and D.`},
+
+{type:"content",bg:"",
+html:`<div class="content-label">Phase B IO summary</div><h2 class="content-h">Inputs &amp; Outputs</h2>
+<div class="io-grid">
+  <div class="io-box"><div class="io-header in">Key Inputs</div><ul class="io-list">
+    <li><strong style="color:var(--blue)">Architecture Vision (Phase A) ★</strong></li>
+    <li>Statement of Architecture Work</li>
+    <li>Architecture Principles</li>
+    <li>Architecture Repository</li>
+    <li>Business strategy documents</li>
+    <li>Existing Business Architecture</li>
+  </ul></div>
+  <div class="io-box"><div class="io-header out">Key Outputs</div><ul class="io-list">
+    <li><strong style="color:var(--teal)">Baseline Business Architecture ★</strong></li>
+    <li><strong style="color:var(--teal)">Target Business Architecture ★</strong></li>
+    <li><strong style="color:var(--teal)">Gap Analysis results ★</strong></li>
+    <li>B/C/D artefacts (catalogues, matrices, diagrams)</li>
+    <li>Updated Architecture Repository</li>
+    <li>Architecture Definition Document (B chapter)</li>
+  </ul></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Primary input:</strong> Architecture Vision from Phase A. <strong>Primary outputs:</strong> Baseline + Target Business Architecture + Gap Analysis. Gaps feed Phase E.</div></div>`,
+voice:`Here is the complete input-output picture for Phase B. The primary input is the Architecture Vision from Phase A — this is what scopes and guides all Phase B work. Other inputs include the Statement of Architecture Work, Architecture Principles, Architecture Repository, business strategy documents, and any existing Business Architecture. The primary outputs are: the Baseline Business Architecture, the Target Business Architecture, and the Gap Analysis results — all three starred because they're the most tested. The gap analysis results then feed directly into Phase E. The Architecture Definition Document begins being populated with a Business Architecture chapter.`},
+
+{type:"content",bg:"",
+html:`<div class="content-label">Week 1 complete — session summary</div><h2 class="content-h">Key Takeaways — Day 4</h2>
+<div class="sum-grid">
+  <div class="sum-card"><div class="sum-num">01</div><div class="sum-text"><strong>Phase B = Business Architecture</strong> — first detailed phase. Strategy, governance, org structure, processes.</div></div>
+  <div class="sum-card"><div class="sum-num">02</div><div class="sum-text"><strong>Capabilities = what</strong> — stable, outcome-focused, delivery-independent. Used to assess maturity.</div></div>
+  <div class="sum-card"><div class="sum-num">03</div><div class="sum-text"><strong>Value Streams = how value flows</strong> — cross-functional, customer-outcome focused. Multiple capabilities combine.</div></div>
+  <div class="sum-card"><div class="sum-num">04</div><div class="sum-text"><strong>Actor vs Role</strong> — Actor is the individual/thing; Role is the function in context. One actor, multiple roles.</div></div>
+  <div class="sum-card"><div class="sum-num">05</div><div class="sum-text"><strong>Baseline → Target → Gap</strong> — core pattern, repeated in B, C, D. Gaps consolidate in Phase E.</div></div>
+  <div class="sum-card"><div class="sum-num">06</div><div class="sum-text"><strong>Three artefact types</strong> — Catalogues (lists), Matrices (relationships), Diagrams (spatial). Apply across B, C, D.</div></div>
+</div>`,
+voice:`Six takeaways closing out Week 1. One: Phase B is Business Architecture — the first of three detailed phases, covering strategy, governance, organisation structure, and processes. Two: capabilities describe what the business can do — stable, outcome-focused, delivery-independent. Three: value streams show how value flows to customers across multiple capabilities — cross-functional and customer-outcome focused. Four: actors are individuals or things, roles are functions in context — one actor can perform multiple roles. Five: the baseline, target, gap pattern is the core work in Phase B, and it repeats in C and D, with gaps consolidating in Phase E. Six: the three artefact types are catalogues (lists), matrices (relationships), and diagrams (spatial views) — used consistently across B, C, and D.`},
+
+{type:"title",bg:"end",
+html:`<div class="title-eyebrow">Day 4 Complete · Week 1 Done!</div><h1 class="title-h" style="font-size:clamp(24px,6vw,40px)">Phase B — done.<br>Week 1 — done! 🎉</h1><div class="title-rule"></div><p class="title-sub" style="margin-bottom:24px">Next up: <strong>Day 5 (Week 2) — Phase C: Information Systems Architecture</strong>. You'll cover Data and Application architectures together.</p>
+<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+  <a href="togaf-day4.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Open reading version · Take the quiz
+  </a>
+  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 4 as done
+  </button>
+</div>`,
+voice:`Congratulations — Day 4 is complete, and that means Week 1 is done! You've covered TOGAF Overview, the ADM and Preliminary Phase, Phase A Architecture Vision, and now Phase B Business Architecture. That's the entire foundation of the framework. Take the reading version quiz for Day 4 to cement what you've learned. Week 2 starts with Day 5 — Phase C: Information Systems Architecture, where we combine Data and Application architecture into a single phase. Great work this week — see you in Week 2.`},
+];
+
+let current=0,isPlaying=false,speedIdx=1,utterance=null,touchStartX=0,animating=false;
+const SPEEDS=[0.8,1,1.2,1.5];
+const wrap=document.getElementById("slides-wrap");
+document.getElementById("slide-total").textContent=SLIDES.length;
+function getBg(b){return{navy:"var(--navy2)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",green:"linear-gradient(135deg,#0A1A10,#0D2218)",coral:"linear-gradient(135deg,#1A0A0E,#2A0D15)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"}[b]||"var(--navy2)";}
+SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="slide-"+i;d.style.background=getBg(s.bg);d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
+function goTo(idx,dir){if(animating||idx<0||idx>=SLIDES.length)return;animating=true;stopSpeech();const f=document.getElementById("slide-"+current),t=document.getElementById("slide-"+idx);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");animating=false;current=idx;updateUI();if(isPlaying)speakCurrent();},420);}
+function nextSlide(){if(current<SLIDES.length-1)goTo(current+1,1);}
+function prevSlide(){if(current>0)goTo(current-1,-1);}
+function updateUI(){document.getElementById("slide-num").textContent=current+1;document.getElementById("progress-fill").style.width=((current+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=current===0;document.getElementById("btn-next").disabled=current===SLIDES.length-1;}
+function speakCurrent(){stopSpeech();if(!("speechSynthesis"in window)){setVoiceStatus("Voice not supported");return;}const text=SLIDES[current].voice;if(!text){if(isPlaying)setTimeout(nextSlide,800);return;}utterance=new SpeechSynthesisUtterance(text);utterance.rate=SPEEDS[speedIdx];utterance.pitch=1;utterance.lang="en-GB";const v=speechSynthesis.getVoices();const p=v.find(x=>x.lang.startsWith("en")&&(x.name.includes("Daniel")||x.name.includes("Samantha")||x.name.includes("Karen")||x.name.includes("Google UK")||x.name.includes("Alex")))||v.find(x=>x.lang.startsWith("en"))||v[0];if(p)utterance.voice=p;utterance.onstart=()=>setVoiceStatus("speaking");utterance.onend=()=>{setVoiceStatus("");if(isPlaying&&current<SLIDES.length-1)setTimeout(nextSlide,600);else if(current===SLIDES.length-1){isPlaying=false;updatePlayBtn();}};utterance.onerror=()=>setVoiceStatus("");speechSynthesis.speak(utterance);}
+function stopSpeech(){if("speechSynthesis"in window)speechSynthesis.cancel();utterance=null;setVoiceStatus("");}
+function togglePlay(){isPlaying=!isPlaying;updatePlayBtn();if(isPlaying)speakCurrent();else stopSpeech();}
+function updatePlayBtn(){document.getElementById("play-icon").innerHTML=isPlaying?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
+function setVoiceStatus(s){const el=document.getElementById("voice-status");el.innerHTML=s==="speaking"?`<div class="voice-dots"><div class="voice-dot"></div><div class="voice-dot"></div><div class="voice-dot"></div></div><span>Narrating…</span>`:s||"";}
+function cycleSpeed(){speedIdx=(speedIdx+1)%SPEEDS.length;document.getElementById("speed-btn").textContent=SPEEDS[speedIdx]+"×";if(isPlaying){stopSpeech();setTimeout(speakCurrent,100);}}
+function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[4]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="var(--teal3)";b.style.borderColor="var(--teal)";b.querySelector("svg").style.stroke="var(--teal)";goTo(SLIDES.length-1,1);}
+document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";updateUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{isPlaying=true;updatePlayBtn();speakCurrent();},400);}});
+wrap.addEventListener("touchstart",e=>{touchStartX=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-touchStartX;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
+if("speechSynthesis"in window)speechSynthesis.onvoiceschanged=()=>{};
+document.getElementById("deck").style.display="none";
+</script>
+</body>
+</html>

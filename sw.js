@@ -1,4 +1,4 @@
-const CACHE = "togaf-v4";
+const CACHE = "togaf-v5";
 const ASSETS = [
   "/",
   "/index.html",
@@ -7,6 +7,10 @@ const ASSETS = [
   "/togaf-day1-slides.html",
   "/togaf-day2.html",
   "/togaf-day2-slides.html",
+  "/togaf-day3.html",
+  "/togaf-day3-slides.html",
+  "/togaf-day4.html",
+  "/togaf-day4-slides.html",
   "https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap",
   "https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap"
 ];
