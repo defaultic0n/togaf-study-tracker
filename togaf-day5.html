@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 5 — Phase C: Information Systems Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAF7;--ink:#1A1A18;--ink2:#4A4A42;--ink3:#8A8A80;--teal:#0D6E5E;--teal-light:#E6F4F1;--teal-mid:#1A9B86;--amber:#92530A;--amber-light:#FDF3E3;--blue:#1A4A7A;--blue-light:#E8F0F8;--purple:#4A2A7A;--purple-light:#F0EAF8;--green:#1A5A2A;--green-light:#E8F4E8;--coral:#8A2A2A;--coral-light:#F8EAEA;--rule:#E0DFD8;--surface:#FFFFFF;--reading-max:680px}
+html{background:var(--bg);scroll-behavior:smooth}
+body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100;transition:width 0.1s}
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}
+.nav-day{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink3)}
+.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer}
+.done-btn.completed{background:#2EAA8A}
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}
+.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}
+.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px;transition:color 0.15s}
+.toc-list a:hover{color:var(--teal)}
+.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+.section{margin-bottom:48px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+p{margin-bottom:16px;color:var(--ink2)}
+p strong{color:var(--ink);font-weight:600}
+.hl{border-radius:10px;padding:16px 18px;margin:20px 0}
+.hl.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}
+.hl.amber{background:var(--amber-light);border-left:3px solid #D4860E}
+.hl.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}
+.hl.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}
+.hl.green{background:var(--green-light);border-left:3px solid #2A7A3A}
+.hl.coral{background:var(--coral-light);border-left:3px solid #C84A4A}
+.hl-lbl{font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px}
+.hl.teal .hl-lbl{color:var(--teal)}.hl.amber .hl-lbl{color:var(--amber)}.hl.blue .hl-lbl{color:var(--blue)}.hl.purple .hl-lbl{color:var(--purple)}.hl.green .hl-lbl{color:var(--green)}.hl.coral .hl-lbl{color:var(--coral)}
+.hl p{margin-bottom:0;font-size:15px;line-height:1.65}
+.hl.teal p{color:var(--teal)}.hl.amber p{color:var(--amber)}.hl.blue p{color:var(--blue)}.hl.purple p{color:var(--purple)}.hl.green p{color:var(--green)}.hl.coral p{color:var(--coral)}
+.def-grid{display:grid;gap:10px;margin:20px 0}
+.def-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.def-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.def-text{font-size:14px;color:var(--ink2);line-height:1.6;margin:0}
+.term{font-weight:600;color:var(--teal);border-bottom:1px dotted var(--teal-mid)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.col-box{background:var(--surface);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.col-head{padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:0.7px;text-transform:uppercase}
+.col-head.data{background:var(--blue-light);color:var(--blue)}
+.col-head.app{background:var(--purple-light);color:var(--purple)}
+.col-head.in{background:var(--blue-light);color:var(--blue)}
+.col-head.out{background:var(--teal-light);color:var(--teal)}
+.col-list{list-style:none;padding:10px 14px;display:flex;flex-direction:column;gap:5px}
+.col-list li{font-size:13px;color:var(--ink2);line-height:1.5;display:flex;gap:6px;align-items:flex-start}
+.col-list li::before{content:'·';color:var(--ink3);flex-shrink:0}
+.art-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+.art-table th{background:var(--teal-light);color:var(--teal);font-weight:600;padding:9px 12px;text-align:left;border:1px solid var(--rule)}
+.art-table td{padding:8px 12px;border:1px solid var(--rule);color:var(--ink2);vertical-align:top;line-height:1.5}
+.art-table tr:nth-child(even) td{background:#F7F6F3}
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+.sum-grid{display:grid;gap:10px;margin-top:32px}
+.sum-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.sum-icon{font-size:18px;flex-shrink:0}
+.sum-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.sum-body{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}
+.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}
+.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}
+.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}
+.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}
+.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}
+.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}
+.quiz-reset.show{display:block}
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav class="top-nav">
+  <div class="nav-left"><span class="nav-day">Day 5 · Week 2</span><span class="nav-title">Phase C: Information Systems Architecture</span></div>
+  <div class="nav-right">
+    <div class="timer-badge">⏱ <span id="read-timer">0:00</span></div>
+    <button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-label">Study Session · Day 5 of 20</div>
+  <h1 class="hero-title">Phase C:<br>Information Systems Architecture</h1>
+  <div class="hero-meta">
+    <span class="meta-pill">📖 ~30 min read</span>
+    <span class="meta-pill">5 topics</span>
+    <span class="meta-pill">5 quiz questions</span>
+    <span class="meta-pill">ADM Phase C</span>
+  </div>
+  <p class="hero-intro">Phase C is a single ADM phase that covers two architecture sub-domains — Data and Application. Today you'll learn exactly what each covers, how they interrelate, and the specific artefacts produced to document them.</p>
+</header>
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>Phase C Overview — Two Sub-Domains</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Data Architecture</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>Application Architecture</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Application Interaction Matrix &amp; Data Dissemination</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Phase C Inputs, Steps &amp; Outputs</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>Knowledge Check</a></li>
+  </ol>
+</nav>
+<article class="article">
+
+  <section class="section" id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">Phase C Overview — Two Sub-Domains</h2></div>
+    <div class="hl teal"><div class="hl-lbl">Objective</div><p>Phase C develops the <strong>Information Systems Architecture</strong>, which describes how data and applications support the Business Architecture developed in Phase B. It covers two sub-domains — Data Architecture and Application Architecture — as a single combined phase.</p></div>
+    <p>Phase C is the second of the three detailed architecture phases (B → C → D). After defining the business in Phase B, Phase C answers the question: <em>what information systems are needed to support that business?</em> This means designing the data assets the business needs and the applications that create, manage, and use that data.</p>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-head data">Data Architecture</div>
+        <ul class="col-list">
+          <li>Data entities, their structure and relationships</li>
+          <li>Logical and physical data components</li>
+          <li>Data quality, ownership, governance</li>
+          <li>How data flows across the enterprise</li>
+          <li>Data lifecycle management</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-head app">Application Architecture</div>
+        <ul class="col-list">
+          <li>Logical and physical application components</li>
+          <li>How applications interact with each other</li>
+          <li>Which applications support which business functions</li>
+          <li>Application integration patterns</li>
+          <li>Application portfolio rationalisation</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hl amber"><div class="hl-lbl">Why two sub-domains in one phase?</div><p>Data and Application are closely coupled — you cannot sensibly design applications without knowing what data they manage, and you cannot design data architecture without knowing which applications will consume it. TOGAF keeps them together to ensure they are designed in tandem, not in isolation.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Phase C covers <strong>both Data and Application architecture</strong> — not just one of them. The exam sometimes presents Phase C as covering only Application architecture. That is incorrect. Both sub-domains are addressed in Phase C.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">Data Architecture</h2></div>
+    <div class="hl blue"><div class="hl-lbl">Definition</div><p>Data Architecture defines the structure of an organisation's <strong>logical and physical data assets</strong> and the data management resources. It answers: what data exists, how it is structured, where it lives, who owns it, and how it flows through the enterprise.</p></div>
+    <p>Data Architecture is often the most overlooked of the four BDAT domains — yet it is foundational. Applications are built to manage data. Technology infrastructure exists to store and transmit data. Getting the data architecture right is what makes the other three domains coherent.</p>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Data Entity</div><p class="def-text">A thing the enterprise needs to store information about. Examples: Customer, Product, Order, Employee, Invoice. Entities are defined at a logical level — independent of how they are stored physically.</p></div>
+      <div class="def-item"><div class="def-term">Logical Data Component</div><p class="def-text">A grouping of data entities that belong together conceptually. E.g. "Customer Profile" is a logical data component containing Customer, Address, Contact, and Preference entities.</p></div>
+      <div class="def-item"><div class="def-term">Physical Data Component</div><p class="def-text">The actual implementation of a logical data component — a specific database, data store, or data service. Physical components are technology-specific; logical components are not.</p></div>
+      <div class="def-item"><div class="def-term">Data Owner</div><p class="def-text">The business role responsible for a data entity or component — accountable for its accuracy, quality, and appropriate use. Defined in the Business Architecture (Phase B) but operationalised here.</p></div>
+      <div class="def-item"><div class="def-term">Data Lifecycle</div><p class="def-text">The stages data passes through from creation to archival or deletion — Creation, Storage, Use, Sharing, Archival, Deletion. Data Architecture defines policies for each stage.</p></div>
+    </div>
+    <div class="hl green"><div class="hl-lbl">Data Architecture artefacts (Phase C — Data)</div><p>Key artefacts include: <strong>Data Entity / Data Component Catalogue</strong> (list of all data entities and components), <strong>Data Entity / Business Function Matrix</strong> (which business functions create, read, update, delete which data entities — a CRUD matrix), and the <strong>Data Dissemination Diagram</strong> (how data flows between applications and organisations).</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Know the distinction between <strong>logical</strong> (technology-independent, conceptual) and <strong>physical</strong> (technology-specific, implementation) for both data and application components. This logical/physical distinction runs through Phases C and D and is frequently tested.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">Application Architecture</h2></div>
+    <div class="hl purple"><div class="hl-lbl">Definition</div><p>Application Architecture defines the individual <strong>logical and physical application components</strong> and their interactions. It describes how applications are structured, how they interact with each other, and how they support the business functions defined in Phase B.</p></div>
+    <p>Application Architecture is not about selecting specific software products — that is a procurement decision. It is about defining the <strong>logical application landscape</strong>: what capabilities applications must provide, how they should be grouped, and how they should communicate.</p>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Logical Application Component</div><p class="def-text">A self-contained encapsulation of application functionality — defined at a conceptual level, independent of technology choices. E.g. "Customer Relationship Management", "Order Management System", "Reporting Engine".</p></div>
+      <div class="def-item"><div class="def-term">Physical Application Component</div><p class="def-text">A specific technology implementation of a logical component. E.g. "Salesforce" implements the CRM logical component. Physical components are technology-specific.</p></div>
+      <div class="def-item"><div class="def-term">Application Platform</div><p class="def-text">The shared technical foundation that application components run on — including middleware, integration services, authentication, and messaging infrastructure.</p></div>
+      <div class="def-item"><div class="def-term">Application Interface</div><p class="def-text">The defined point of interaction between application components — APIs, message queues, data feeds, file transfers. Interfaces are critical for integration architecture.</p></div>
+    </div>
+    <div class="hl teal"><div class="hl-lbl">Application portfolio rationalisation</div><p>Phase C is also where <strong>application portfolio rationalisation</strong> happens — identifying duplicate applications, legacy applications that should be retired, gaps where no application exists, and consolidation opportunities. This is a key input to Phase E (Opportunities &amp; Solutions).</p></div>
+    <div class="hl amber"><div class="hl-lbl">Application Architecture artefacts</div><p>Key artefacts include: <strong>Application Portfolio Catalogue</strong> (list of all applications), <strong>Application / Function Matrix</strong> (which applications support which business functions), <strong>Application Interaction Diagram</strong> (how applications communicate), and <strong>Application Communication Diagram</strong> (the flows of information between applications).</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Application Architecture defines <strong>logical components first</strong> — then physical. Don't select specific products in Phase C; that comes later. The logical-then-physical approach applies to both data and application architecture.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">Application Interaction Matrix &amp; Data Dissemination</h2></div>
+    <p>Two artefacts from Phase C are particularly important for the exam: the <span class="term">Application Interaction Matrix</span> and the <span class="term">Data Dissemination Diagram</span>. Both capture how information moves across the enterprise.</p>
+    <div class="hl blue"><div class="hl-lbl">Application Interaction Matrix</div><p>A matrix that maps <strong>applications against each other</strong> to show which applications interact, the nature of those interactions (send data, receive data, both), and the data exchanged. It is the application-level equivalent of the Business Interaction Matrix from Phase B.</p></div>
+    <div class="art-table-wrap" style="overflow-x:auto;margin:20px 0">
+      <table class="art-table">
+        <thead><tr><th>Artefact</th><th>Type</th><th>What it Shows</th><th>Used For</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Application Interaction Matrix</strong></td><td>Matrix</td><td>Which applications communicate and what data they exchange</td><td>Identifying integration complexity and redundancy</td></tr>
+          <tr><td><strong>Data Dissemination Diagram</strong></td><td>Diagram</td><td>How data flows from source to consumer across applications and organisations</td><td>Data governance and lineage analysis</td></tr>
+          <tr><td><strong>Application / Function Matrix</strong></td><td>Matrix</td><td>Which applications support which business functions from Phase B</td><td>Identifying gaps and duplicates in application support</td></tr>
+          <tr><td><strong>Data Entity / Function Matrix</strong></td><td>Matrix</td><td>Which business functions Create, Read, Update, Delete (CRUD) which data entities</td><td>Data ownership and access design</td></tr>
+          <tr><td><strong>Application Communication Diagram</strong></td><td>Diagram</td><td>Logical view of how applications communicate — protocols, interfaces, message flows</td><td>Integration architecture design</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="hl green"><div class="hl-lbl">Data Dissemination Diagram</div><p>This diagram traces how a specific data entity flows from its <strong>authoritative source</strong> (the system that creates and owns it) through the various applications and systems that consume it. It makes data lineage visible — essential for data governance, compliance, and designing data integration.</p></div>
+    <div class="hl purple"><div class="hl-lbl">How Phase C artefacts connect to Phase B</div><p>The <strong>Application / Function Matrix</strong> maps applications (Phase C) directly back to business functions (Phase B). The <strong>Data Entity / Business Function Matrix</strong> shows which Phase B business functions create or consume which Phase C data entities. These linkages ensure the information systems architecture stays grounded in the business architecture it is meant to support.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The <strong>Application Interaction Matrix</strong> and <strong>Data Dissemination Diagram</strong> are the two most tested Phase C artefacts. Know what each shows: the matrix maps application-to-application interactions; the diagram traces data flows from source to consumer.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">Phase C Inputs, Steps &amp; Outputs</h2></div>
+    <p>Like all ADM phases, Phase C follows the baseline → target → gap analysis pattern. It does this twice — once for Data Architecture and once for Application Architecture — before producing its outputs.</p>
+    <div class="hl teal"><div class="hl-lbl">Phase C steps</div><p>1. Select reference models, viewpoints, and tools. 2. Develop Baseline Data Architecture. 3. Develop Target Data Architecture. 4. Perform Data Architecture Gap Analysis. 5. Develop Baseline Application Architecture. 6. Develop Target Application Architecture. 7. Perform Application Architecture Gap Analysis. 8. Define candidate Roadmap components. 9. Resolve impacts across the Architecture Landscape. 10. Conduct formal stakeholder review. 11. Finalise the Information Systems Architecture.</p></div>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-head in">Key Inputs</div>
+        <ul class="col-list">
+          <li>Architecture Vision (Phase A)</li>
+          <li>Business Architecture (Phase B) ★</li>
+          <li>Business Interaction Matrix (Phase B)</li>
+          <li>Architecture Principles</li>
+          <li>Architecture Repository</li>
+          <li>Relevant industry data models</li>
+          <li>Existing IS documentation</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-head out">Key Outputs</div>
+        <ul class="col-list">
+          <li>Baseline IS Architecture (Data + App) ★</li>
+          <li>Target IS Architecture (Data + App) ★</li>
+          <li>IS Architecture Gap Analysis ★</li>
+          <li>Application Interaction Matrix</li>
+          <li>Data Dissemination Diagram</li>
+          <li>Architecture Definition Document (C chapter)</li>
+          <li>Updated Architecture Repository</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hl amber"><div class="hl-lbl">Phase B feeds Phase C</div><p>The Business Architecture from Phase B is the primary input to Phase C. Specifically: the <strong>Business Interaction Matrix</strong> identifies which business units interact — this directly shapes which applications need to integrate. The <strong>Actor / Role Matrix</strong> identifies who needs to access what — shaping application access and authorisation design.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Phase C follows the same <strong>baseline → target → gap</strong> pattern as Phase B — but does it twice: once for Data, once for Application. The gaps feed Phase E alongside the Phase B gaps. The Business Architecture (Phase B) is the critical input that scopes all Phase C work.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2 style="font-family:'Lora',serif;font-size:20px;color:var(--ink);margin-bottom:16px">Session summary</h2>
+    <div class="sum-grid">
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Phase C = Data + Application together</div><p class="sum-body">A single phase covering two sub-domains. Both are done in Phase C — not separated.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Logical before physical</div><p class="sum-body">Both data and application architectures define logical components first, then physical implementations. Technology-independent design comes first.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Application Interaction Matrix</div><p class="sum-body">Maps which applications communicate and what data they exchange. Key integration planning artefact.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Data Dissemination Diagram</div><p class="sum-body">Traces data flows from authoritative source through all consuming systems. Key data governance artefact.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Baseline → Target → Gap × 2</div><p class="sum-body">Phase C runs the gap analysis pattern twice — once for Data, once for Application. Both feed Phase E.</p></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">Knowledge Check</div>
+    <div class="quiz-sub">5 questions · Phase C: Information Systems Architecture</div>
+    <div class="quiz-q" id="quiz-q1">
+      <div class="quiz-q-text">1. Phase C covers which two architecture sub-domains?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. Business Architecture and Application Architecture</button>
+        <button class="quiz-opt" onclick="answer(1,'b')">B. Data Architecture and Application Architecture</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. Data Architecture and Technology Architecture</button>
+        <button class="quiz-opt" onclick="answer(1,'d')">D. Application Architecture and Technology Architecture</button>
+      </div>
+      <div class="quiz-feedback" id="fb1"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q2">
+      <div class="quiz-q-text">2. A Logical Application Component differs from a Physical Application Component in that it:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. Only exists in the target architecture, not the baseline</button>
+        <button class="quiz-opt" onclick="answer(2,'b')">B. Is defined at a conceptual level, independent of specific technology choices</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. Is documented in Phase D rather than Phase C</button>
+        <button class="quiz-opt" onclick="answer(2,'d')">D. Represents a purchased software package rather than custom-built software</button>
+      </div>
+      <div class="quiz-feedback" id="fb2"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q3">
+      <div class="quiz-q-text">3. The Data Dissemination Diagram primarily shows:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. Which business units interact with each other</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. How applications communicate and their interface types</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. How data flows from its authoritative source through all consuming applications</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. The technology infrastructure supporting data storage</button>
+      </div>
+      <div class="quiz-feedback" id="fb3"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q4">
+      <div class="quiz-q-text">4. Which Phase B output is the primary input that scopes Phase C work?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. The Architecture Principles document</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. The Request for Architecture Work</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. The Business Architecture (including Business Interaction Matrix)</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. The Statement of Architecture Work</button>
+      </div>
+      <div class="quiz-feedback" id="fb4"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q5">
+      <div class="quiz-q-text">5. How many times does Phase C perform the baseline → target → gap analysis pattern?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. Once — for the combined Information Systems Architecture</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. Twice — once for Data Architecture and once for Application Architecture</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. Three times — for Data, Application, and Integration Architecture</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. Four times — once for each BDAT domain</button>
+      </div>
+      <div class="quiz-feedback" id="fb5"></div>
+    </div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+</article>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+let sec=0;const tEl=document.getElementById("read-timer");const iv=setInterval(()=>{sec++;tEl.textContent=Math.floor(sec/60)+":"+(sec%60<10?"0":"")+sec%60;},1000);
+window.addEventListener("scroll",()=>{const d=document.documentElement;document.getElementById("progress-bar").style.width=Math.min(100,(d.scrollTop/(d.scrollHeight-d.clientHeight))*100)+"%";document.getElementById("scroll-top").classList.toggle("show",d.scrollTop>400);});
+function markDone(){clearInterval(iv);try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[5]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("done-btn");b.textContent="✓ Done!";b.classList.add("completed");}
+const ANS={1:'b',2:'b',3:'c',4:'c',5:'b'};
+const FB={
+  1:{b:"Correct! Phase C covers both Data Architecture and Application Architecture as a single combined phase. They are addressed together because they are tightly coupled — you can't design applications without knowing what data they manage.",x:"Not quite. Phase C covers Data Architecture and Application Architecture together. Business is Phase B; Technology is Phase D."},
+  2:{b:"Correct! A logical application component is technology-independent — it defines what the application should do conceptually. Physical components specify the actual technology products and implementations.",x:"Not quite. Logical components are technology-independent conceptual definitions; physical components are specific technology implementations."},
+  3:{c:"Correct! The Data Dissemination Diagram traces how data flows from its authoritative source system through all the applications and systems that consume it — making data lineage visible for governance and compliance.",x:"Not quite. The Data Dissemination Diagram traces how data flows from its authoritative source through all consuming systems — it shows data lineage, not application communications or infrastructure."},
+  4:{c:"Correct! The Business Architecture from Phase B — including the Business Interaction Matrix showing which business units interact — is the critical input to Phase C. It determines what information systems are needed and how they must integrate.",x:"Not quite. The Business Architecture from Phase B (especially the Business Interaction Matrix) is the primary scoping input for Phase C. The principles and SoAW are inputs but not the primary scoping driver."},
+  5:{b:"Correct! Phase C performs the baseline → target → gap analysis pattern twice — once for Data Architecture and once for Application Architecture. Both sets of gaps then feed into Phase E alongside the Phase B gaps.",x:"Not quite. Phase C performs the gap analysis pattern twice — once for Data Architecture, then again for Application Architecture. Not once, not three times."}
+};
+let answered={},score=0;
+function answer(q,opt){if(answered[q])return;answered[q]=opt;const ok=opt===ANS[q];if(ok)score++;document.querySelectorAll(`#quiz-q${q} .quiz-opt`).forEach((b,i)=>{const o=['a','b','c','d'][i];b.classList.add(o===ANS[q]?"correct":o===opt&&!ok?"wrong":"reveal");});const fb=document.getElementById("fb"+q);fb.textContent=(ok?"✓ ":"✗ ")+(ok?FB[q][opt]:FB[q].x);fb.className="quiz-feedback show "+(ok?"ok":"no");if(Object.keys(answered).length===5){const msgs=["Keep going — re-read and try again.","Getting there — review the sections you missed.","Good effort!","Strong result — almost there!","Perfect score! Ready for Day 6."];document.getElementById("quiz-score").textContent=`You scored ${score}/5. ${msgs[score-1]||msgs[0]}`;document.getElementById("quiz-score").classList.add("show");document.getElementById("quiz-reset").classList.add("show");if(score===5)markDone();}}
+function resetQuiz(){answered={};score=0;document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});document.getElementById("quiz-score").classList.remove("show");document.getElementById("quiz-reset").classList.remove("show");}
+</script>
+</body>
+</html>

@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 7 Slides — Phase E: Opportunities &amp; Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;--teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);--gold:#F0B429;--gold2:rgba(240,180,41,0.15);--slate:#94A3B8;--slate2:#64748B;--slate3:#334155;--white:#F8FAFC;--white2:#E2E8F0;--coral:#FB7185;--coral2:rgba(251,113,133,0.15);--blue:#60A5FA;--blue2:rgba(96,165,250,0.12);--purple:#A78BFA;--purple2:rgba(167,139,250,0.12);--green:#4ADE80;--green2:rgba(74,222,128,0.12);--amber:#FBBF24;--amber2:rgba(251,191,36,0.12)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:0.06}
+.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;padding:0 24px;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;padding:0 32px;line-height:1.6;margin-bottom:48px}
+.start-meta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:56px}
+.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
+.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:transform .15s}
+.start-btn:active{transform:scale(0.97)}
+.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
+#deck{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column;display:none}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.slide.exit-left{animation:exitLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-right{animation:enterRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.exit-right{animation:exitRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-left{animation:enterLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes exitLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes enterRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes exitRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
+@keyframes enterLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}
+.slide-body::-webkit-scrollbar{display:none}
+.slide-title .slide-body,.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:32px 28px}
+.title-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
+.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:20px}
+.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
+.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
+.section-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
+.section-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.section-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
+.section-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
+.content-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.content-h{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:14px}
+.callout{border-radius:10px;padding:13px 15px;margin-bottom:11px}
+.callout.teal{background:var(--teal3);border-left:3px solid var(--teal)}.callout.gold{background:var(--gold2);border-left:3px solid var(--gold)}.callout.blue{background:var(--blue2);border-left:3px solid var(--blue)}.callout.purple{background:var(--purple2);border-left:3px solid var(--purple)}.callout.green{background:var(--green2);border-left:3px solid var(--green)}.callout.amber{background:var(--amber2);border-left:3px solid var(--amber)}.callout.coral{background:var(--coral2);border-left:3px solid var(--coral)}
+.callout-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.callout.teal .callout-label{color:var(--teal)}.callout.gold .callout-label{color:var(--gold)}.callout.blue .callout-label{color:var(--blue)}.callout.purple .callout-label{color:var(--purple)}.callout.green .callout-label{color:var(--green)}.callout.amber .callout-label{color:var(--amber)}.callout.coral .callout-label{color:var(--coral)}
+.callout p{font-size:13px;line-height:1.6;margin:0}
+.callout.teal p{color:rgba(45,212,191,.9)}.callout.gold p{color:rgba(240,180,41,.9)}.callout.blue p{color:rgba(96,165,250,.9)}.callout.purple p{color:rgba(167,139,250,.9)}.callout.green p{color:rgba(74,222,128,.9)}.callout.amber p{color:rgba(251,191,36,.9)}.callout.coral p{color:rgba(251,113,133,.9)}
+.bullet-list{display:flex;flex-direction:column;gap:8px;margin-bottom:11px}
+.bullet{display:flex;gap:11px;align-items:flex-start}
+.bullet-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
+.bullet-text{font-size:13px;color:var(--white2);line-height:1.55}
+.bullet-text strong{color:var(--white)}.bullet-text em{color:var(--teal);font-style:normal}
+.exam-bar{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:11px 13px;margin-bottom:11px;display:flex;gap:10px}
+.exam-star{font-size:15px;flex-shrink:0}.exam-text{font-size:12px;color:rgba(240,180,41,.9);line-height:1.6}
+.exam-text strong{color:var(--gold)}
+.trans-flow{display:flex;align-items:center;gap:4px;margin-bottom:11px;flex-wrap:nowrap;overflow-x:auto}
+.trans-box{padding:8px 10px;border-radius:8px;text-align:center;font-size:11px;font-weight:600;border:2px solid;flex:1;min-width:60px}
+.trans-box.bl{background:rgba(251,113,133,.12);border-color:var(--coral);color:var(--coral)}
+.trans-box.t1{background:var(--amber2);border-color:var(--amber);color:var(--amber)}
+.trans-box.t2{background:var(--blue2);border-color:var(--blue);color:var(--blue)}
+.trans-box.tg{background:var(--teal3);border-color:var(--teal);color:var(--teal)}
+.trans-arrow{color:var(--slate2);font-size:14px;flex-shrink:0}
+.def-list{display:flex;flex-direction:column;gap:7px;margin-bottom:11px}
+.def-item{background:var(--navy3);border-radius:7px;padding:9px 11px;border:1px solid rgba(255,255,255,.05)}
+.def-term{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:2px}
+.def-text{font-size:12px;color:var(--slate);line-height:1.45}
+.wp-card{background:var(--navy3);border-radius:9px;margin-bottom:9px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+.wp-head{padding:8px 12px;background:var(--green2);font-size:12px;font-weight:700;color:var(--green)}
+.wp-body{padding:8px 12px;display:flex;flex-direction:column;gap:3px}
+.wp-row{font-size:12px;color:var(--slate);display:flex;gap:6px}
+.wp-row::before{content:'→';color:var(--teal);flex-shrink:0}
+.crit-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.crit-card{background:var(--navy3);border-radius:7px;padding:9px 11px;border:1px solid rgba(255,255,255,.05)}
+.crit-name{font-size:11px;font-weight:700;color:var(--teal);margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
+.crit-desc{font-size:11px;color:var(--slate);line-height:1.4}
+.io-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+.io-box{background:var(--navy3);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+.io-hd{padding:7px 10px;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.io-hd.in{background:var(--blue2);color:var(--blue)}.io-hd.out{background:var(--teal3);color:var(--teal)}
+.io-ul{list-style:none;padding:7px 10px;display:flex;flex-direction:column;gap:3px}
+.io-ul li{font-size:11px;color:var(--slate);display:flex;gap:5px}
+.io-ul li::before{content:'·';color:var(--slate2);flex-shrink:0}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.sum-card{background:var(--navy3);border-radius:9px;padding:11px;border:1px solid rgba(255,255,255,.06)}
+.sum-num{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px;letter-spacing:1px}
+.sum-text{font-size:11px;color:var(--white2);line-height:1.5}
+.sum-text strong{color:var(--white)}
+#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
+#progress-fill{height:100%;background:var(--teal);transition:width .4s}
+#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
+.ctrl-btn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0;color:var(--white2)}
+.ctrl-btn:active{background:var(--navy4)}.ctrl-btn svg{width:16px;height:16px}
+.ctrl-btn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}
+.ctrl-btn.primary svg{width:18px;height:18px}
+.ctrl-btn:disabled{opacity:.3;cursor:not-allowed}
+.slide-counter{flex:1;text-align:center;font-size:12px;color:var(--slate2)}
+.slide-counter strong{color:var(--slate)}
+.voice-status{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
+.voice-dots{display:flex;gap:3px;align-items:center}
+.voice-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vdot 1.2s infinite}
+.voice-dot:nth-child(2){animation-delay:.2s}.voice-dot:nth-child(3){animation-delay:.4s}
+@keyframes vdot{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
+.speed-btn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
+.swipe-hint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+</style>
+</head>
+<body>
+<div id="start-overlay">
+  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="50" cy="100" r="200" fill="#4ADE80"/><circle cx="380" cy="450" r="140" fill="#2DD4BF"/><circle cx="200" cy="650" r="110" fill="#A78BFA"/></svg>
+  <div class="start-logo">TOGAF Foundation · Day 7</div>
+  <div class="start-title">Phase E:<br>Opportunities &amp; Solutions</div>
+  <p class="start-sub">20 slides with voiceover narration.<br>Approx. 30 minutes to complete.</p>
+  <div class="start-meta"><span class="start-pill">📊 20 slides</span><span class="start-pill">🎙 Narrated</span><span class="start-pill">⏱ ~30 min</span></div>
+  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Presentation</button>
+  <p class="start-note">Tap Start to enable voice · Swipe or use controls to navigate</p>
+</div>
+<div id="deck">
+  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
+  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
+  <div style="padding:2px 16px 0"><div class="voice-status" id="voice-status"></div><div class="swipe-hint">swipe left/right to navigate</div></div>
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+    <button class="ctrl-btn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
+    <button class="ctrl-btn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+    <div class="slide-counter"><strong id="slide-num">1</strong> / <span id="slide-total">20</span></div>
+    <button class="speed-btn" id="speed-btn" onclick="cycleSpeed()">1×</button>
+    <button class="ctrl-btn" id="btn-done" onclick="markDone()" title="Mark complete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+  </div>
+</div>
+<script>
+const SLIDES=[
+{type:"title",bg:"navy",
+html:`<div class="title-eyebrow">TOGAF Foundation · Day 7 of 20</div><h1 class="title-h">Phase E:<br>Opportunities &amp; Solutions</h1><div class="title-rule"></div><p class="title-sub">The pivot from architecture design to delivery planning — consolidating all gaps into work packages, transition architectures, and the first Architecture Roadmap.</p><div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">⭐ Key pivot phase</span></div>`,
+voice:`Welcome to Day 7. Today is Phase E — Opportunities and Solutions. This is the most important pivot in the entire ADM: the shift from architecture design to delivery planning. Phases B, C, and D asked what the architecture should look like. Phase E asks how we actually get there. We'll cover the pivot from design to delivery, transition architectures, work packages and projects, the consolidated gap analysis, and solution selection criteria with the Phase E outputs. Let's go.`},
+
+{type:"section",bg:"green",
+html:`<div class="section-num">01</div><div class="section-label">Section One</div><h2 class="section-h">Design to Delivery — The Pivot</h2><p class="section-desc">Why Phase E represents a fundamental shift in what the architecture team does.</p>`,
+voice:`Section one: the pivot from design to delivery. Phase E is unlike any of the phases we've studied so far.`},
+
+{type:"content",
+html:`<div class="content-label">What changes in Phase E</div><h2 class="content-h">The Fundamental Shift</h2>
+<div class="callout teal"><div class="callout-label">Phase E objective</div><p>Phase E <strong>identifies the preferred combination of work packages, transition architectures, and projects</strong> to deliver the Target Architecture. It turns three phases of gap analysis into a concrete, actionable delivery roadmap.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot" style="background:var(--coral)"></div><div class="bullet-text"><strong>Phases B, C, D</strong> asked: <em>"What should the architecture look like?"</em> — design work</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--teal)"></div><div class="bullet-text"><strong>Phase E</strong> asks: <em>"How do we get there?"</em> — delivery planning</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>First appearance of the Architecture Roadmap</strong> — the time-sequenced view of all delivery work</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Architects <strong>hand over to delivery organisations</strong> — projects and programmes take over</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>ABBs mapped to SBBs</strong> for the first time — technology-independent specs become real products</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Exam tip:</strong> The Architecture Roadmap is <strong>first produced in Phase E</strong> — not Phase A, B, C, or D. If asked which phase first creates the roadmap, always answer Phase E.</div></div>`,
+voice:`Phase E represents a fundamental shift. Phases B, C, and D were design phases — they asked what the architecture should look like. Phase E is the first delivery planning phase — it asks how we get there. In Phase E, the Architecture Roadmap is produced for the first time. Architecture Building Blocks — the technology-independent components defined in B, C, and D — are mapped to Solution Building Blocks, which are specific products and technologies. And the architecture team begins handing over to the delivery organisations that will actually implement the work. This is the exam's most-tested Phase E fact: the Architecture Roadmap is first produced in Phase E.`},
+
+{type:"section",bg:"teal",
+html:`<div class="section-num">02</div><div class="section-label">Section Two</div><h2 class="section-h">Transition Architectures</h2><p class="section-desc">How the enterprise moves from baseline to target in coherent, manageable steps.</p>`,
+voice:`Section two: Transition Architectures. When the gap between baseline and target is too large to close in one step, we define intermediate states.`},
+
+{type:"content",
+html:`<div class="content-label">Intermediate stable states</div><h2 class="content-h">What a Transition Architecture Is</h2>
+<div class="callout teal"><div class="callout-label">Definition</div><p>A <strong>Transition Architecture</strong> is a formally defined intermediate architecture state — a coherent, stable configuration of the enterprise at a point between baseline and target. Each one delivers real business value.</p></div>
+<div class="trans-flow">
+  <div class="trans-box bl">Baseline<div style="font-size:9px;font-weight:400;margin-top:2px">Current state</div></div>
+  <span class="trans-arrow">→</span>
+  <div class="trans-box t1">TA 1<div style="font-size:9px;font-weight:400;margin-top:2px">~12 months</div></div>
+  <span class="trans-arrow">→</span>
+  <div class="trans-box t2">TA 2<div style="font-size:9px;font-weight:400;margin-top:2px">~24 months</div></div>
+  <span class="trans-arrow">→</span>
+  <div class="trans-box tg">Target<div style="font-size:9px;font-weight:400;margin-top:2px">Future state</div></div>
+</div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Reduces risk</strong> — smaller, more manageable changes rather than one massive transformation</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Delivers incremental value</strong> — each TA delivers real capability improvements to the business</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Allows course correction</strong> — can pause and adjust the plan between each transition</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Maintains continuity</strong> — every transition state is coherent and stable, not a half-finished system</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">A Transition Architecture is <strong>not the Target Architecture</strong> — it is an intermediate state on the way to it. Defined in Phase E, sequenced into the Architecture Roadmap.</div></div>`,
+voice:`A Transition Architecture is a formally defined intermediate architecture state — a coherent, stable configuration of the enterprise between the baseline and target. Picture four boxes: the Baseline Architecture on the left, two Transition Architectures in the middle at 12 and 24 months, and the Target Architecture on the right. Transition Architectures are important for four reasons. They reduce risk by breaking a large transformation into smaller manageable steps. They deliver incremental business value — the enterprise improves with every transition even if the full target is years away. They allow course correction between transitions if priorities change. And they maintain operational continuity — every state is coherent, never a half-finished mess. For the exam: a Transition Architecture is not the same as the Target Architecture. It's an intermediate state.`},
+
+{type:"section",bg:"purple",
+html:`<div class="section-num">03</div><div class="section-label">Section Three</div><h2 class="section-h">Work Packages &amp; Projects</h2><p class="section-desc">Organising the delivery work into manageable, dependency-aware units.</p>`,
+voice:`Section three: Work Packages and Implementation Projects. Phase E organises all the delivery work into discrete, manageable units.`},
+
+{type:"content",
+html:`<div class="content-label">Delivery units</div><h2 class="content-h">Work Packages Defined</h2>
+<div class="callout purple"><div class="callout-label">Definition</div><p>A <strong>Work Package</strong> is a group of related activities required to implement a portion of the architecture. Each defines what needs doing, what it delivers, what it depends on, and how long it takes.</p></div>
+<div class="wp-card">
+  <div class="wp-head">📦 Typical Work Package Contents</div>
+  <div class="wp-body">
+    <div class="wp-row">Name and description of the implementation work</div>
+    <div class="wp-row">Architecture building blocks to be implemented</div>
+    <div class="wp-row">Business value delivered when complete</div>
+    <div class="wp-row">Dependencies on other work packages</div>
+    <div class="wp-row">Estimated effort, cost, and duration</div>
+    <div class="wp-row">Risks and stakeholders affected</div>
+  </div>
+</div>
+<div class="callout green"><div class="callout-label">Work Packages → Projects → Programmes</div><p>Work packages are grouped into <strong>implementation projects</strong>. Related projects form a <strong>programme</strong>. All are sequenced onto the Architecture Roadmap.</p></div>`,
+voice:`A Work Package is a group of related activities needed to implement a portion of the architecture. It defines what needs to be done, what it delivers, what other work packages it depends on, how long it will take, and what it costs. Work packages are grouped into implementation projects — formal project management structures with assigned resources, budgets, and governance. Related projects may be grouped into programmes. All of these are then sequenced onto the Architecture Roadmap produced in Phase E and detailed further in Phase F.`},
+
+{type:"content",
+html:`<div class="content-label">Project sequencing</div><h2 class="content-h">Project Context Diagram</h2>
+<div class="callout blue"><div class="callout-label">Project Context Diagram</div><p>A key Phase E artefact showing the <strong>dependencies between implementation projects</strong> and their relationships to the transition architectures. Makes delivery sequencing visible for portfolio planning.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Reveals which projects must complete</strong> before others can begin</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Shows which projects <strong>contribute to each Transition Architecture</strong></div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Used for <strong>portfolio planning and stakeholder communication</strong></div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Enables <strong>resource and budget planning</strong> across the transformation</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">Work packages are <strong>defined in Phase E</strong> and <strong>prioritised and detailed in Phase F</strong>. The Project Context Diagram is a Phase E artefact. Never confuse what Phase E creates versus what Phase F refines.</div></div>`,
+voice:`The Project Context Diagram is a key Phase E artefact. It shows the dependencies between implementation projects — which projects must complete before others can begin — and how projects contribute to each Transition Architecture. It's used for portfolio planning and stakeholder communication, and it makes the delivery sequencing visible so resources and budgets can be planned across the full transformation. For the exam: work packages are defined in Phase E and then prioritised and detailed in Phase F. The Project Context Diagram is a Phase E output, not a Phase F output.`},
+
+{type:"section",bg:"blue",
+html:`<div class="section-num">04</div><div class="section-label">Section Four</div><h2 class="section-h">Consolidated Gap Analysis</h2><p class="section-desc">Bringing together all gaps from Phases B, C, and D to reveal cross-domain dependencies.</p>`,
+voice:`Section four: Consolidated Gap Analysis. This is where all the individual gap analyses from Phases B, C, and D come together for the first time.`},
+
+{type:"content",
+html:`<div class="content-label">Why consolidation matters</div><h2 class="content-h">All Gaps Together</h2>
+<div class="callout blue"><div class="callout-label">The consolidation</div><p>Phase E brings all individual gap analyses from <strong>Phases B, C, and D</strong> together into a single view. Cross-domain dependencies become visible — a Business gap (B) may depend on an Application gap (C) being closed first.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot" style="background:var(--green)"></div><div class="bullet-text"><strong>Phase B gaps</strong> — business capabilities, org structure, process gaps</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Phase C gaps</strong> — data and application gaps</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--amber)"></div><div class="bullet-text"><strong>Phase D gaps</strong> — technology and infrastructure gaps</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--teal)"></div><div class="bullet-text"><strong>Consolidated view</strong> reveals sequencing — often technology (D) gaps must close before application (C) then business (B)</div></div>
+</div>
+<div class="callout purple"><div class="callout-label">ABB → SBB mapping</div><p>Each gap links to an <strong>Architecture Building Block</strong> (technology-independent). Phase E maps each ABB to candidate <strong>Solution Building Blocks</strong> — specific products. This is the first time real implementation options are identified.</p></div>`,
+voice:`The Consolidated Gap Analysis brings all gaps from Phases B, C, and D together for the first time. Phase B gaps cover business capabilities, organisation structure, and processes. Phase C gaps cover data and applications. Phase D gaps cover technology and infrastructure. When viewed together, cross-domain dependencies become visible. Often, technology gaps from Phase D must be closed first — you can't deploy new applications without the infrastructure. Then application gaps from Phase C can be addressed. Then business capability gaps from Phase B. This sequencing is only possible with the consolidated view. Phase E also maps Architecture Building Blocks — the technology-independent components from B, C, D — to candidate Solution Building Blocks, specific products, for the first time.`},
+
+{type:"section",bg:"coral",
+html:`<div class="section-num">05</div><div class="section-label">Section Five</div><h2 class="section-h">Solution Selection &amp; Phase E Outputs</h2><p class="section-desc">How solutions are evaluated and what Phase E hands over to Phase F.</p>`,
+voice:`Section five: solution selection criteria and the Phase E outputs — what this phase hands over to Phase F.`},
+
+{type:"content",
+html:`<div class="content-label">Selection criteria</div><h2 class="content-h">How Solutions Are Evaluated</h2>
+<div class="crit-grid">
+  <div class="crit-card"><div class="crit-name">Fitness for Purpose</div><div class="crit-desc">Does it actually close the gap and deliver the required capability?</div></div>
+  <div class="crit-card"><div class="crit-name">Alignment to Principles</div><div class="crit-desc">Does it comply with Architecture Principles from the Preliminary Phase?</div></div>
+  <div class="crit-card"><div class="crit-name">Cost and Value</div><div class="crit-desc">Is cost proportionate to business value? What is the total cost of ownership?</div></div>
+  <div class="crit-card"><div class="crit-name">Risk and Feasibility</div><div class="crit-desc">Is it technically and organisationally achievable? What risks does it introduce?</div></div>
+  <div class="crit-card"><div class="crit-name">Vendor Viability</div><div class="crit-desc">Is the vendor long-term viable? Does it align to technology standards?</div></div>
+  <div class="crit-card"><div class="crit-name">Reuse Potential</div><div class="crit-desc">Can this solution serve multiple areas? Maximising reuse reduces total cost.</div></div>
+</div>`,
+voice:`Phase E establishes criteria for evaluating and selecting solutions. Fitness for purpose — does the solution actually close the identified gap? Alignment to Architecture Principles — does it comply with what was established in the Preliminary Phase? Cost and value — is the cost proportionate to the business value delivered? Risk and feasibility — is it achievable technically and organisationally? Vendor viability — is the vendor long-term supported and aligned to technology standards? And reuse potential — can this solution serve multiple business areas, reducing total cost? These criteria bring rigour to solution selection and prevent purely politically-driven choices.`},
+
+{type:"content",
+html:`<div class="content-label">IO summary</div><h2 class="content-h">Phase E Inputs &amp; Outputs</h2>
+<div class="io-grid">
+  <div class="io-box"><div class="io-hd in">Key Inputs</div><ul class="io-ul"><li><strong style="color:var(--blue)">Architecture Definition Doc (B+C+D) ★</strong></li><li><strong style="color:var(--blue)">Gap Analysis results (B, C, D) ★</strong></li><li>Architecture Vision</li><li>Architecture Principles</li><li>Architecture Repository + Enterprise Continuum</li></ul></div>
+  <div class="io-box"><div class="io-hd out">Key Outputs</div><ul class="io-ul"><li><strong style="color:var(--teal)">Architecture Roadmap (initial) ★</strong></li><li><strong style="color:var(--teal)">Transition Architecture definitions ★</strong></li><li><strong style="color:var(--teal)">Work Package definitions ★</strong></li><li>Implementation &amp; Migration Plan (initial)</li><li>Project Context Diagram</li></ul></div>
+</div>
+<div class="sum-grid">
+  <div class="sum-card"><div class="sum-num">01</div><div class="sum-text"><strong>Phase E = design to delivery pivot</strong> — first delivery planning phase in the ADM.</div></div>
+  <div class="sum-card"><div class="sum-num">02</div><div class="sum-text"><strong>Transition Architectures</strong> = intermediate stable states between baseline and target.</div></div>
+  <div class="sum-card"><div class="sum-num">03</div><div class="sum-text"><strong>Work Packages → Projects → Roadmap</strong> — delivery organised in discrete, dependency-aware units.</div></div>
+  <div class="sum-card"><div class="sum-num">04</div><div class="sum-text"><strong>Architecture Roadmap first appears here</strong> — Phase F refines and details it.</div></div>
+</div>`,
+voice:`Here's the complete Phase E picture. Primary inputs: the Architecture Definition Document from Phases B, C, and D, and the Gap Analysis results from all three phases. Primary outputs: the initial Architecture Roadmap — first appearance in the ADM — the Transition Architecture definitions, the Work Package definitions, the initial Implementation and Migration Plan, and the Project Context Diagram. Four key takeaways: Phase E is the design-to-delivery pivot. Transition Architectures are intermediate stable states between baseline and target. Work packages are organised into projects and sequenced onto the roadmap. And the Architecture Roadmap is first produced here — Phase F refines and details it into the definitive Migration Plan.`},
+
+{type:"title",bg:"end",
+html:`<div class="title-eyebrow">Day 7 Complete</div><h1 class="title-h" style="font-size:clamp(24px,6vw,40px)">Phase E — done.</h1><div class="title-rule"></div><p class="title-sub" style="margin-bottom:24px">Next up: <strong>Day 8 — Phase F: Migration Planning</strong>. Phase F takes everything Phase E defined and turns it into a detailed, costed, prioritised implementation plan.</p>
+<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+  <a href="togaf-day7.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Open reading version · Take the quiz</a>
+  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 7 as done</button>
+</div>`,
+voice:`Day 7 complete. Phase E is the pivot point of the entire ADM — where architecture design hands over to delivery planning. The Architecture Roadmap is born here, transition architectures give the journey its milestones, and work packages translate gaps into concrete projects. Take the quiz on the reading version to cement all of this. Day 8 is Phase F — Migration Planning — where Phase E's initial plan gets detailed, costed, prioritised, and signed off. See you there.`},
+];
+
+let cur=0,play=false,spdIdx=1,utt=null,tx=0,anim=false;
+const SPDS=[0.8,1,1.2,1.5];
+const wrap=document.getElementById("slides-wrap");
+document.getElementById("slide-total").textContent=SLIDES.length;
+function getBg(b){return{navy:"var(--navy2)",green:"linear-gradient(135deg,#0A1A10,#0D2218)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",coral:"linear-gradient(135deg,#1A0A0E,#2A0D15)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"}[b]||"var(--navy2)";}
+SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="s"+i;d.style.background=getBg(s.bg);d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
+function goTo(i,dir){if(anim||i<0||i>=SLIDES.length)return;anim=true;stopSp();const f=document.getElementById("s"+cur),t=document.getElementById("s"+i);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");anim=false;cur=i;upUI();if(play)spk();},420);}
+function nextSlide(){if(cur<SLIDES.length-1)goTo(cur+1,1);}
+function prevSlide(){if(cur>0)goTo(cur-1,-1);}
+function upUI(){document.getElementById("slide-num").textContent=cur+1;document.getElementById("progress-fill").style.width=((cur+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=cur===0;document.getElementById("btn-next").disabled=cur===SLIDES.length-1;}
+function spk(){stopSp();if(!("speechSynthesis"in window))return;const txt=SLIDES[cur].voice;if(!txt){if(play)setTimeout(nextSlide,800);return;}utt=new SpeechSynthesisUtterance(txt);utt.rate=SPDS[spdIdx];utt.lang="en-GB";const vs=speechSynthesis.getVoices();const p=vs.find(v=>v.lang.startsWith("en")&&(v.name.includes("Daniel")||v.name.includes("Samantha")||v.name.includes("Karen")||v.name.includes("Google UK")))||vs.find(v=>v.lang.startsWith("en"))||vs[0];if(p)utt.voice=p;utt.onstart=()=>setSt("speaking");utt.onend=()=>{setSt("");if(play&&cur<SLIDES.length-1)setTimeout(nextSlide,600);else if(cur===SLIDES.length-1){play=false;upPlay();}};utt.onerror=()=>setSt("");speechSynthesis.speak(utt);}
+function stopSp(){if("speechSynthesis"in window)speechSynthesis.cancel();utt=null;setSt("");}
+function togglePlay(){play=!play;upPlay();if(play)spk();else stopSp();}
+function upPlay(){document.getElementById("play-icon").innerHTML=play?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
+function setSt(s){const el=document.getElementById("voice-status");el.innerHTML=s==="speaking"?`<div class="voice-dots"><div class="voice-dot"></div><div class="voice-dot"></div><div class="voice-dot"></div></div><span>Narrating…</span>`:s||"";}
+function cycleSpeed(){spdIdx=(spdIdx+1)%SPDS.length;document.getElementById("speed-btn").textContent=SPDS[spdIdx]+"×";if(play){stopSp();setTimeout(spk,100);}}
+function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[7]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="var(--teal3)";b.style.borderColor="var(--teal)";b.querySelector("svg").style.stroke="var(--teal)";goTo(SLIDES.length-1,1);}
+document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";upUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{play=true;upPlay();spk();},400);}});
+wrap.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
+if("speechSynthesis"in window)speechSynthesis.onvoiceschanged=()=>{};
+</script>
+</body>
+</html>

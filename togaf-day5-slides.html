@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 5 Slides — Phase C: Information Systems Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;--teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);--gold:#F0B429;--gold2:rgba(240,180,41,0.15);--slate:#94A3B8;--slate2:#64748B;--slate3:#334155;--white:#F8FAFC;--white2:#E2E8F0;--coral:#FB7185;--coral2:rgba(251,113,133,0.15);--blue:#60A5FA;--blue2:rgba(96,165,250,0.12);--purple:#A78BFA;--purple2:rgba(167,139,250,0.12);--green:#4ADE80;--green2:rgba(74,222,128,0.12);--amber:#FBBF24;--amber2:rgba(251,191,36,0.12)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:0.06}
+.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:0.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;padding:0 24px;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;padding:0 32px;line-height:1.6;margin-bottom:48px}
+.start-meta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:56px}
+.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
+.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:transform .15s}
+.start-btn:active{transform:scale(0.97)}
+.start-btn svg{width:18px;height:18px}
+.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
+#deck{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.slide.exit-left{animation:exitLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-right{animation:enterRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.exit-right{animation:exitRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-left{animation:enterLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes exitLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes enterRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes exitRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
+@keyframes enterLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}
+.slide-body::-webkit-scrollbar{display:none}
+.slide-title .slide-body,.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:32px 28px}
+.title-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
+.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:20px}
+.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
+.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
+.section-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
+.section-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.section-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
+.section-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
+.content-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.content-h{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:16px}
+.callout{border-radius:10px;padding:14px 16px;margin-bottom:12px}
+.callout.teal{background:var(--teal3);border-left:3px solid var(--teal)}
+.callout.gold{background:var(--gold2);border-left:3px solid var(--gold)}
+.callout.blue{background:var(--blue2);border-left:3px solid var(--blue)}
+.callout.purple{background:var(--purple2);border-left:3px solid var(--purple)}
+.callout.green{background:var(--green2);border-left:3px solid var(--green)}
+.callout.amber{background:var(--amber2);border-left:3px solid var(--amber)}
+.callout-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.callout.teal .callout-label{color:var(--teal)}.callout.gold .callout-label{color:var(--gold)}.callout.blue .callout-label{color:var(--blue)}.callout.purple .callout-label{color:var(--purple)}.callout.green .callout-label{color:var(--green)}.callout.amber .callout-label{color:var(--amber)}
+.callout p{font-size:14px;line-height:1.6;margin:0}
+.callout.teal p{color:rgba(45,212,191,.9)}.callout.gold p{color:rgba(240,180,41,.9)}.callout.blue p{color:rgba(96,165,250,.9)}.callout.purple p{color:rgba(167,139,250,.9)}.callout.green p{color:rgba(74,222,128,.9)}.callout.amber p{color:rgba(251,191,36,.9)}
+.bullet-list{display:flex;flex-direction:column;gap:9px;margin-bottom:12px}
+.bullet{display:flex;gap:12px;align-items:flex-start}
+.bullet-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
+.bullet-text{font-size:14px;color:var(--white2);line-height:1.55}
+.bullet-text strong{color:var(--white)}.bullet-text em{color:var(--teal);font-style:normal}
+.exam-bar{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:12px 14px;margin-bottom:12px;display:flex;gap:10px}
+.exam-star{font-size:16px;flex-shrink:0}
+.exam-text{font-size:13px;color:rgba(240,180,41,.9);line-height:1.6}
+.exam-text strong{color:var(--gold)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.col-box{background:var(--navy3);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+.col-head{padding:7px 10px;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.col-head.data{background:var(--blue2);color:var(--blue)}.col-head.app{background:var(--purple2);color:var(--purple)}.col-head.inp{background:var(--blue2);color:var(--blue)}.col-head.out{background:var(--teal3);color:var(--teal)}
+.col-list{list-style:none;padding:8px 10px;display:flex;flex-direction:column;gap:3px}
+.col-list li{font-size:12px;color:var(--slate);display:flex;gap:5px;line-height:1.45}
+.col-list li::before{content:'·';color:var(--slate2);flex-shrink:0}
+.def-list{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.def-item{background:var(--navy3);border-radius:7px;padding:10px 12px;border:1px solid rgba(255,255,255,.05)}
+.def-term{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:3px}
+.def-text{font-size:12px;color:var(--slate);line-height:1.5}
+.art-row{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:var(--navy3);border-radius:7px;border:1px solid rgba(255,255,255,.05);margin-bottom:6px}
+.art-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;flex-shrink:0;margin-top:2px;white-space:nowrap}
+.art-info{flex:1}
+.art-name{font-size:12px;font-weight:600;color:var(--white);margin-bottom:2px}
+.art-desc{font-size:11px;color:var(--slate);line-height:1.45}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sum-card{background:var(--navy3);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,.06)}
+.sum-num{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:5px;letter-spacing:1px}
+.sum-text{font-size:12px;color:var(--white2);line-height:1.55}
+.sum-text strong{color:var(--white)}
+#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
+#progress-fill{height:100%;background:var(--teal);transition:width .4s cubic-bezier(.4,0,.2,1)}
+#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
+.ctrl-btn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0;color:var(--white2)}
+.ctrl-btn:active{background:var(--navy4)}
+.ctrl-btn svg{width:16px;height:16px}
+.ctrl-btn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}
+.ctrl-btn.primary svg{width:18px;height:18px}
+.ctrl-btn:disabled{opacity:.3;cursor:not-allowed}
+.slide-counter{flex:1;text-align:center;font-size:12px;color:var(--slate2)}
+.slide-counter strong{color:var(--slate)}
+.voice-status{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
+.voice-dots{display:flex;gap:3px;align-items:center}
+.voice-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vdot 1.2s infinite}
+.voice-dot:nth-child(2){animation-delay:.2s}.voice-dot:nth-child(3){animation-delay:.4s}
+@keyframes vdot{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
+.speed-btn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
+.swipe-hint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+</style>
+</head>
+<body>
+<div id="start-overlay">
+  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="350" cy="80" r="180" fill="#60A5FA"/><circle cx="20" cy="400" r="120" fill="#A78BFA"/><circle cx="300" cy="600" r="100" fill="#2DD4BF"/></svg>
+  <div class="start-logo">TOGAF Foundation · Day 5</div>
+  <div class="start-title">Phase C:<br>Information Systems Architecture</div>
+  <p class="start-sub">20 slides with voiceover narration.<br>Approx. 30 minutes to complete.</p>
+  <div class="start-meta"><span class="start-pill">📊 20 slides</span><span class="start-pill">🎙 Narrated</span><span class="start-pill">⏱ ~30 min</span></div>
+  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Presentation</button>
+  <p class="start-note">Tap Start to enable voice · Swipe or use controls to navigate</p>
+</div>
+<div id="deck">
+  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
+  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
+  <div style="padding:2px 16px 0"><div class="voice-status" id="voice-status"></div><div class="swipe-hint">swipe left/right to navigate</div></div>
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+    <button class="ctrl-btn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
+    <button class="ctrl-btn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+    <div class="slide-counter"><strong id="slide-num">1</strong> / <span id="slide-total">20</span></div>
+    <button class="speed-btn" id="speed-btn" onclick="cycleSpeed()">1×</button>
+    <button class="ctrl-btn" id="btn-done" onclick="markDone()" title="Mark complete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+  </div>
+</div>
+<script>
+const SLIDES=[
+{type:"title",bg:"navy",
+html:`<div class="title-eyebrow">TOGAF Foundation · Day 5 of 20</div><h1 class="title-h">Phase C:<br>Information Systems Architecture</h1><div class="title-rule"></div><p class="title-sub">A single phase that covers two sub-domains — Data and Application — and produces the information system blueprint that supports the business.</p><div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">⭐ Week 2</span></div>`,
+voice:`Welcome to Day 5 and Week 2. Today is Phase C — Information Systems Architecture. This is the second of the three detailed phases and it's unusual because it covers two sub-domains at once: Data Architecture and Application Architecture. We'll cover why they're combined, what each sub-domain contains, the key artefacts including the Application Interaction Matrix and Data Dissemination Diagram, and the complete inputs and outputs. Let's go.`},
+
+{type:"section",bg:"blue",
+html:`<div class="section-num">01</div><div class="section-label">Section One</div><h2 class="section-h">Phase C — Two Sub-Domains</h2><p class="section-desc">Why Data and Application architecture are handled together in a single ADM phase.</p>`,
+voice:`Section one: Phase C overview. The first thing to understand is why Phase C covers two things instead of one.`},
+
+{type:"content",
+html:`<div class="content-label">The combined phase</div><h2 class="content-h">Data + Application Together</h2>
+<div class="callout teal"><div class="callout-label">Objective</div><p>Phase C develops the <strong>Information Systems Architecture</strong> — describing how data and applications support the Business Architecture. Both sub-domains are addressed in a single phase because they are tightly coupled.</p></div>
+<div class="two-col">
+  <div class="col-box"><div class="col-head data">Data Architecture</div><ul class="col-list"><li>Data entities and structure</li><li>Logical and physical data components</li><li>Data quality and ownership</li><li>Data flows across the enterprise</li><li>Data lifecycle management</li></ul></div>
+  <div class="col-box"><div class="col-head app">Application Architecture</div><ul class="col-list"><li>Logical and physical app components</li><li>How applications interact</li><li>Application portfolio rationalisation</li><li>Integration patterns and interfaces</li><li>App support for business functions</li></ul></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Exam trap:</strong> Phase C covers <strong>both</strong> Data and Application — not just Application. Both sub-domains are addressed here.</div></div>`,
+voice:`Phase C develops the Information Systems Architecture — how data and applications support the business. It combines Data and Application architecture because they're tightly coupled. You can't design applications without knowing what data they manage, and you can't design a data architecture without knowing which applications will consume it. Data Architecture covers entities, structure, quality, ownership, and data flows. Application Architecture covers logical and physical components, how applications interact, portfolio rationalisation, and integration patterns. The exam trap here is assuming Phase C only covers Application architecture — it covers both.`},
+
+{type:"section",bg:"blue",
+html:`<div class="section-num">02</div><div class="section-label">Section Two</div><h2 class="section-h">Data Architecture</h2><p class="section-desc">What data exists, how it's structured, where it lives, who owns it, and how it flows.</p>`,
+voice:`Section two: Data Architecture. This is often underestimated but it's the foundation everything else rests on.`},
+
+{type:"content",
+html:`<div class="content-label">Data concepts</div><h2 class="content-h">Key Data Architecture Elements</h2>
+<div class="def-list">
+  <div class="def-item"><div class="def-term">Data Entity</div><div class="def-text">A thing the enterprise needs information about. Examples: Customer, Product, Order, Invoice. Defined at logical level — independent of storage.</div></div>
+  <div class="def-item"><div class="def-term">Logical Data Component</div><div class="def-text">A conceptual grouping of related data entities. E.g. "Customer Profile" groups Customer, Address, Contact, Preference entities.</div></div>
+  <div class="def-item"><div class="def-term">Physical Data Component</div><div class="def-text">The actual implementation — a specific database or data store. Technology-specific, unlike logical components.</div></div>
+  <div class="def-item"><div class="def-term">Data Owner</div><div class="def-text">Business role accountable for data accuracy, quality, and appropriate use. Defined in Phase B, operationalised here.</div></div>
+</div>
+<div class="callout teal"><div class="callout-label">The logical/physical distinction</div><p>Logical = technology-independent, conceptual. Physical = technology-specific, implementation. <strong>Design logical first, then physical.</strong> This applies to both data and application components throughout Phase C.</p></div>`,
+voice:`Data Architecture has four key elements. Data Entities are the things the enterprise needs information about — Customer, Product, Order, Invoice. These are defined at a logical level, independent of how they're stored. Logical Data Components group related entities together conceptually — a Customer Profile groups Customer, Address, Contact, and Preference entities. Physical Data Components are the actual implementations — a specific database or data store. And Data Owners are business roles accountable for data quality. The critical principle throughout Phase C is: logical before physical. Design the technology-independent logical architecture first, then determine the physical implementation.`},
+
+{type:"content",
+html:`<div class="content-label">Data artefacts</div><h2 class="content-h">Phase C Data Artefacts</h2>
+<div class="art-row"><span class="art-badge" style="background:var(--teal3);color:var(--teal)">Catalogue</span><div class="art-info"><div class="art-name">Data Entity / Data Component Catalogue</div><div class="art-desc">Complete list of all data entities and logical/physical data components in the architecture.</div></div></div>
+<div class="art-row"><span class="art-badge" style="background:var(--blue2);color:var(--blue)">Matrix</span><div class="art-info"><div class="art-name">Data Entity / Business Function Matrix</div><div class="art-desc">CRUD matrix — shows which business functions Create, Read, Update, Delete which data entities.</div></div></div>
+<div class="art-row"><span class="art-badge" style="background:var(--purple2);color:var(--purple)">Diagram</span><div class="art-info"><div class="art-name">Data Dissemination Diagram</div><div class="art-desc">How data flows from its authoritative source through all consuming applications and organisations.</div></div></div>
+<div class="art-row"><span class="art-badge" style="background:var(--purple2);color:var(--purple)">Diagram</span><div class="art-info"><div class="art-name">Data Security Diagram</div><div class="art-desc">Access restrictions and security classifications applied to data entities and components.</div></div></div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">The <strong>Data Dissemination Diagram</strong> is the most frequently tested data artefact. It traces data flow from source to all consumers — essential for data governance and lineage.</div></div>`,
+voice:`The key data artefacts in Phase C are: the Data Entity / Data Component Catalogue — a complete list of all data entities and components. The Data Entity / Business Function Matrix — a CRUD matrix showing which business functions Create, Read, Update, and Delete which data entities. The Data Dissemination Diagram — showing how data flows from its authoritative source through all consuming systems. And the Data Security Diagram — showing access restrictions and classifications. The Data Dissemination Diagram is the most exam-tested of these. It traces data lineage — critical for governance and compliance.`},
+
+{type:"section",bg:"purple",
+html:`<div class="section-num">03</div><div class="section-label">Section Three</div><h2 class="section-h">Application Architecture</h2><p class="section-desc">Defining what applications are needed, what they do, and how they work together.</p>`,
+voice:`Section three: Application Architecture. This sub-domain defines the application landscape needed to support the business.`},
+
+{type:"content",
+html:`<div class="content-label">Application concepts</div><h2 class="content-h">Key Application Architecture Elements</h2>
+<div class="def-list">
+  <div class="def-item"><div class="def-term">Logical Application Component</div><div class="def-text">A self-contained encapsulation of application functionality — technology-independent. E.g. "CRM", "Order Management", "Reporting Engine".</div></div>
+  <div class="def-item"><div class="def-term">Physical Application Component</div><div class="def-text">The specific technology implementation. E.g. "Salesforce" implements the CRM logical component. Technology-specific.</div></div>
+  <div class="def-item"><div class="def-term">Application Platform</div><div class="def-text">Shared technical foundation — middleware, integration services, authentication, messaging. Applications run on top of this platform.</div></div>
+  <div class="def-item"><div class="def-term">Application Interface</div><div class="def-text">The defined interaction point between components — APIs, message queues, data feeds. Critical for integration design.</div></div>
+</div>
+<div class="callout amber"><div class="callout-label">Portfolio rationalisation</div><p>Phase C identifies <strong>duplicates</strong> (two apps doing the same thing), <strong>gaps</strong> (no app supporting a business function), and <strong>retirement candidates</strong> (legacy apps). This feeds Phase E.</p></div>`,
+voice:`Application Architecture has four key elements. Logical Application Components are technology-independent definitions of what applications should do — CRM, Order Management, Reporting Engine. Physical Application Components are the specific products that implement those logical components — Salesforce implements CRM. The Application Platform is the shared technical foundation — middleware, integration, authentication — that all applications run on. And Application Interfaces are the defined interaction points between components — APIs, message queues, data feeds. Phase C also drives application portfolio rationalisation: identifying duplicates, gaps, and retirement candidates. All of this feeds into Phase E.`},
+
+{type:"content",
+html:`<div class="content-label">Application artefacts</div><h2 class="content-h">Phase C Application Artefacts</h2>
+<div class="art-row"><span class="art-badge" style="background:var(--teal3);color:var(--teal)">Catalogue</span><div class="art-info"><div class="art-name">Application Portfolio Catalogue</div><div class="art-desc">Complete list of all logical and physical application components in the enterprise.</div></div></div>
+<div class="art-row"><span class="art-badge" style="background:var(--blue2);color:var(--blue)">Matrix</span><div class="art-info"><div class="art-name">Application Interaction Matrix</div><div class="art-desc">Maps application-to-application communications — which apps talk to which, and what data they exchange.</div></div></div>
+<div class="art-row"><span class="art-badge" style="background:var(--blue2);color:var(--blue)">Matrix</span><div class="art-info"><div class="art-name">Application / Function Matrix</div><div class="art-desc">Links applications to the business functions (from Phase B) they support — identifies gaps and duplicates.</div></div></div>
+<div class="art-row"><span class="art-badge" style="background:var(--purple2);color:var(--purple)">Diagram</span><div class="art-info"><div class="art-name">Application Communication Diagram</div><div class="art-desc">Logical view of information flows between applications — protocols, interfaces, and message patterns.</div></div></div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">The <strong>Application Interaction Matrix</strong> and <strong>Application / Function Matrix</strong> are the most tested. Know what each shows: interaction (app-to-app), function (app-to-business).</div></div>`,
+voice:`The key application artefacts are: the Application Portfolio Catalogue — a complete list of all application components. The Application Interaction Matrix — mapping which applications talk to which and what data they exchange. The Application / Function Matrix — linking applications to the Phase B business functions they support, revealing gaps and duplicates. And the Application Communication Diagram — a logical view of how information flows between applications. For the exam: the Application Interaction Matrix shows app-to-app communications, while the Application / Function Matrix links apps back to Phase B business functions.`},
+
+{type:"section",bg:"teal",
+html:`<div class="section-num">04</div><div class="section-label">Section Four</div><h2 class="section-h">Application Interaction Matrix &amp; Data Dissemination</h2><p class="section-desc">The two most exam-tested Phase C artefacts in detail.</p>`,
+voice:`Section four: the two most frequently tested Phase C artefacts — the Application Interaction Matrix and the Data Dissemination Diagram.`},
+
+{type:"content",
+html:`<div class="content-label">Two critical artefacts</div><h2 class="content-h">What Each Shows</h2>
+<div class="callout blue"><div class="callout-label">Application Interaction Matrix</div><p>Maps <strong>applications against each other</strong> — shows which applications interact, the nature of those interactions (send/receive/bidirectional), and the data exchanged. Reveals integration complexity and opportunities for rationalisation.</p></div>
+<div class="callout purple"><div class="callout-label">Data Dissemination Diagram</div><p>Traces a <strong>data entity's journey</strong> from its authoritative source (the system that creates and owns it) through every application and organisation that consumes it. Makes data lineage visible for governance and compliance.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Both artefacts connect Phase C (applications/data) back to <strong>Phase B</strong> (business functions and units)</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">The Application / Function Matrix uses <strong>Phase B business functions</strong> as its rows</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Data owners identified in <strong>Phase B</strong> determine authoritative sources in the dissemination diagram</div></div>
+</div>`,
+voice:`The Application Interaction Matrix maps applications against each other — showing which applications interact, whether interactions are one-way or bidirectional, and what data is exchanged. It reveals integration complexity and opportunities for simplification. The Data Dissemination Diagram traces a specific data entity's journey from its authoritative source through every system that consumes it. It makes data lineage visible — critical for compliance and data governance. Both artefacts connect Phase C work back to Phase B. The Application Function Matrix uses Phase B business functions as its rows. Data owners from Phase B determine which system is the authoritative source.`},
+
+{type:"section",bg:"green",
+html:`<div class="section-num">05</div><div class="section-label">Section Five</div><h2 class="section-h">Phase C — Inputs, Steps &amp; Outputs</h2><p class="section-desc">The complete picture: what goes in, what happens, and what comes out.</p>`,
+voice:`Section five: Phase C inputs, steps, and outputs. Pure exam content.`},
+
+{type:"content",
+html:`<div class="content-label">The complete picture</div><h2 class="content-h">Phase C IO &amp; Summary</h2>
+<div class="two-col">
+  <div class="col-box"><div class="col-head inp">Key Inputs</div><ul class="col-list"><li><strong style="color:var(--blue)">Business Architecture (Phase B) ★</strong></li><li>Architecture Vision (Phase A)</li><li>Business Interaction Matrix</li><li>Architecture Principles</li><li>Architecture Repository</li><li>Existing IS documentation</li></ul></div>
+  <div class="col-box"><div class="col-head out">Key Outputs</div><ul class="col-list"><li><strong style="color:var(--teal)">Baseline IS Architecture ★</strong></li><li><strong style="color:var(--teal)">Target IS Architecture ★</strong></li><li><strong style="color:var(--teal)">IS Gap Analysis ★</strong></li><li>Application Interaction Matrix</li><li>Data Dissemination Diagram</li><li>Architecture Definition Doc (C)</li></ul></div>
+</div>
+<div class="callout amber"><div class="callout-label">Gap analysis × 2</div><p>Phase C runs baseline → target → gap <strong>twice</strong> — once for Data Architecture, once for Application Architecture. Both sets of gaps feed Phase E alongside the Phase B gaps.</p></div>
+<div class="sum-grid">
+  <div class="sum-card"><div class="sum-num">01</div><div class="sum-text"><strong>Phase C = Data + Application</strong> — both sub-domains in one phase.</div></div>
+  <div class="sum-card"><div class="sum-num">02</div><div class="sum-text"><strong>Logical before physical</strong> — technology-independent design first, always.</div></div>
+  <div class="sum-card"><div class="sum-num">03</div><div class="sum-text"><strong>App Interaction Matrix</strong> — app-to-app communications and data exchanged.</div></div>
+  <div class="sum-card"><div class="sum-num">04</div><div class="sum-text"><strong>Data Dissemination Diagram</strong> — data lineage from source to all consumers.</div></div>
+</div>`,
+voice:`Here's the complete Phase C picture. Primary input: the Business Architecture from Phase B — this is what scopes all Phase C work. Key outputs: Baseline IS Architecture, Target IS Architecture, and IS Gap Analysis results — all starred. The gap analysis runs twice: once for data, once for applications. Both result sets feed Phase E. Four key takeaways: Phase C covers Data and Application together. Logical architecture is defined before physical. The Application Interaction Matrix maps app-to-app communications. The Data Dissemination Diagram traces data lineage from source to consumers.`},
+
+{type:"title",bg:"end",
+html:`<div class="title-eyebrow">Day 5 Complete</div><h1 class="title-h" style="font-size:clamp(24px,6vw,40px)">Phase C — done.</h1><div class="title-rule"></div><p class="title-sub" style="margin-bottom:24px">Next up: <strong>Day 6 — Phase D: Technology Architecture</strong>. You'll learn how the technology layer supports the data and applications you've designed today.</p>
+<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+  <a href="togaf-day5.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Open reading version · Take the quiz</a>
+  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 5 as done</button>
+</div>`,
+voice:`Day 5 is complete. You've covered Phase C — Information Systems Architecture — including both Data and Application sub-domains, the key artefacts, and how they connect back to Phase B. Take the reading version quiz before moving on. Day 6 covers Phase D — Technology Architecture — where you'll design the infrastructure layer that supports all the applications and data you've defined today. See you there.`},
+];
+
+let cur=0,play=false,spdIdx=1,utt=null,tx=0,anim=false;
+const SPDS=[0.8,1,1.2,1.5];
+const wrap=document.getElementById("slides-wrap");
+document.getElementById("slide-total").textContent=SLIDES.length;
+function bg(b){return{navy:"var(--navy2)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",green:"linear-gradient(135deg,#0A1A10,#0D2218)",coral:"linear-gradient(135deg,#1A0A0E,#2A0D15)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"}[b]||"var(--navy2)";}
+SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="s"+i;d.style.background=bg(s.bg);d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
+function goTo(i,dir){if(anim||i<0||i>=SLIDES.length)return;anim=true;stopSp();const f=document.getElementById("s"+cur),t=document.getElementById("s"+i);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");anim=false;cur=i;upUI();if(play)spk();},420);}
+function nextSlide(){if(cur<SLIDES.length-1)goTo(cur+1,1);}
+function prevSlide(){if(cur>0)goTo(cur-1,-1);}
+function upUI(){document.getElementById("slide-num").textContent=cur+1;document.getElementById("progress-fill").style.width=((cur+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=cur===0;document.getElementById("btn-next").disabled=cur===SLIDES.length-1;}
+function spk(){stopSp();if(!("speechSynthesis"in window))return;const txt=SLIDES[cur].voice;if(!txt){if(play)setTimeout(nextSlide,800);return;}utt=new SpeechSynthesisUtterance(txt);utt.rate=SPDS[spdIdx];utt.lang="en-GB";const vs=speechSynthesis.getVoices();const p=vs.find(v=>v.lang.startsWith("en")&&(v.name.includes("Daniel")||v.name.includes("Samantha")||v.name.includes("Karen")||v.name.includes("Google UK")))||vs.find(v=>v.lang.startsWith("en"))||vs[0];if(p)utt.voice=p;utt.onstart=()=>setSt("speaking");utt.onend=()=>{setSt("");if(play&&cur<SLIDES.length-1)setTimeout(nextSlide,600);else if(cur===SLIDES.length-1){play=false;upPlay();}};utt.onerror=()=>setSt("");speechSynthesis.speak(utt);}
+function stopSp(){if("speechSynthesis"in window)speechSynthesis.cancel();utt=null;setSt("");}
+function togglePlay(){play=!play;upPlay();if(play)spk();else stopSp();}
+function upPlay(){document.getElementById("play-icon").innerHTML=play?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
+function setSt(s){const el=document.getElementById("voice-status");el.innerHTML=s==="speaking"?`<div class="voice-dots"><div class="voice-dot"></div><div class="voice-dot"></div><div class="voice-dot"></div></div><span>Narrating…</span>`:s||"";}
+function cycleSpeed(){spdIdx=(spdIdx+1)%SPDS.length;document.getElementById("speed-btn").textContent=SPDS[spdIdx]+"×";if(play){stopSp();setTimeout(spk,100);}}
+function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[5]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="var(--teal3)";b.style.borderColor="var(--teal)";b.querySelector("svg").style.stroke="var(--teal)";goTo(SLIDES.length-1,1);}
+document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";upUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{play=true;upPlay();spk();},400);}});
+wrap.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
+if("speechSynthesis"in window)speechSynthesis.onvoiceschanged=()=>{};
+document.getElementById("deck").style.display="none";
+</script>
+</body>
+</html>

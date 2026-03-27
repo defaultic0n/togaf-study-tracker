@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 6 Slides — Phase D: Technology Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;--teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);--gold:#F0B429;--gold2:rgba(240,180,41,0.15);--slate:#94A3B8;--slate2:#64748B;--slate3:#334155;--white:#F8FAFC;--white2:#E2E8F0;--coral:#FB7185;--coral2:rgba(251,113,133,0.15);--blue:#60A5FA;--blue2:rgba(96,165,250,0.12);--purple:#A78BFA;--purple2:rgba(167,139,250,0.12);--green:#4ADE80;--green2:rgba(74,222,128,0.12);--amber:#FBBF24;--amber2:rgba(251,191,36,0.12)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:0.06}
+.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:0.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;padding:0 24px;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;padding:0 32px;line-height:1.6;margin-bottom:48px}
+.start-meta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:56px}
+.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
+.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:transform .15s}
+.start-btn:active{transform:scale(0.97)}
+.start-btn svg{width:18px;height:18px}
+.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
+#deck{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.slide.exit-left{animation:exitLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-right{animation:enterRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.exit-right{animation:exitRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-left{animation:enterLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes exitLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes enterRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes exitRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
+@keyframes enterLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}
+.slide-body::-webkit-scrollbar{display:none}
+.slide-title .slide-body,.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:32px 28px}
+.title-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
+.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:20px}
+.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
+.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
+.section-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
+.section-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.section-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
+.section-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
+.content-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.content-h{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:14px}
+.callout{border-radius:10px;padding:13px 15px;margin-bottom:11px}
+.callout.teal{background:var(--teal3);border-left:3px solid var(--teal)}.callout.gold{background:var(--gold2);border-left:3px solid var(--gold)}.callout.blue{background:var(--blue2);border-left:3px solid var(--blue)}.callout.purple{background:var(--purple2);border-left:3px solid var(--purple)}.callout.green{background:var(--green2);border-left:3px solid var(--green)}.callout.amber{background:var(--amber2);border-left:3px solid var(--amber)}
+.callout-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.callout.teal .callout-label{color:var(--teal)}.callout.gold .callout-label{color:var(--gold)}.callout.blue .callout-label{color:var(--blue)}.callout.purple .callout-label{color:var(--purple)}.callout.green .callout-label{color:var(--green)}.callout.amber .callout-label{color:var(--amber)}
+.callout p{font-size:13px;line-height:1.6;margin:0}
+.callout.teal p{color:rgba(45,212,191,.9)}.callout.gold p{color:rgba(240,180,41,.9)}.callout.blue p{color:rgba(96,165,250,.9)}.callout.purple p{color:rgba(167,139,250,.9)}.callout.green p{color:rgba(74,222,128,.9)}.callout.amber p{color:rgba(251,191,36,.9)}
+.bullet-list{display:flex;flex-direction:column;gap:8px;margin-bottom:11px}
+.bullet{display:flex;gap:11px;align-items:flex-start}
+.bullet-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
+.bullet-text{font-size:13px;color:var(--white2);line-height:1.55}
+.bullet-text strong{color:var(--white)}.bullet-text em{color:var(--teal);font-style:normal}
+.exam-bar{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:11px 13px;margin-bottom:11px;display:flex;gap:10px}
+.exam-star{font-size:15px;flex-shrink:0}
+.exam-text{font-size:12px;color:rgba(240,180,41,.9);line-height:1.6}
+.exam-text strong{color:var(--gold)}
+.layer-stack{display:flex;flex-direction:column;gap:0;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.08);margin-bottom:11px}
+.layer{padding:9px 13px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,.05)}
+.layer:last-child{border-bottom:none}
+.layer-icon{font-size:16px;width:26px;text-align:center;flex-shrink:0}
+.layer-name{font-size:12px;font-weight:600;color:var(--white);margin-bottom:1px}
+.layer-desc{font-size:11px;color:var(--slate);line-height:1.4}
+.layer.b{background:rgba(74,222,128,.06)}.layer.d{background:rgba(96,165,250,.06)}.layer.a{background:rgba(167,139,250,.06)}.layer.t{background:var(--teal3)}
+.def-list{display:flex;flex-direction:column;gap:7px;margin-bottom:11px}
+.def-item{background:var(--navy3);border-radius:7px;padding:9px 11px;border:1px solid rgba(255,255,255,.05)}
+.def-term{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:2px}
+.def-text{font-size:12px;color:var(--slate);line-height:1.45}
+.svc-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.svc-card{background:var(--navy3);border-radius:7px;padding:9px 11px;border:1px solid rgba(255,255,255,.05)}
+.svc-name{font-size:11px;font-weight:700;color:var(--teal);margin-bottom:3px}
+.svc-desc{font-size:11px;color:var(--slate);line-height:1.4}
+.art-row{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:var(--navy3);border-radius:7px;border:1px solid rgba(255,255,255,.05);margin-bottom:5px}
+.art-badge{font-size:9px;font-weight:700;padding:2px 6px;border-radius:8px;flex-shrink:0;margin-top:2px;white-space:nowrap}
+.art-name-s{font-size:12px;font-weight:600;color:var(--white);margin-bottom:2px}
+.art-desc-s{font-size:11px;color:var(--slate);line-height:1.4}
+.io-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+.io-box{background:var(--navy3);border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+.io-header{padding:7px 10px;font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.io-header.in{background:var(--blue2);color:var(--blue)}.io-header.out{background:var(--teal3);color:var(--teal)}
+.io-list{list-style:none;padding:7px 10px;display:flex;flex-direction:column;gap:3px}
+.io-list li{font-size:11px;color:var(--slate);display:flex;gap:5px}
+.io-list li::before{content:'·';color:var(--slate2);flex-shrink:0}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.sum-card{background:var(--navy3);border-radius:9px;padding:11px;border:1px solid rgba(255,255,255,.06)}
+.sum-num{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px;letter-spacing:1px}
+.sum-text{font-size:11px;color:var(--white2);line-height:1.5}
+.sum-text strong{color:var(--white)}
+#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
+#progress-fill{height:100%;background:var(--teal);transition:width .4s cubic-bezier(.4,0,.2,1)}
+#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
+.ctrl-btn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0;color:var(--white2)}
+.ctrl-btn:active{background:var(--navy4)}
+.ctrl-btn svg{width:16px;height:16px}
+.ctrl-btn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}
+.ctrl-btn.primary svg{width:18px;height:18px}
+.ctrl-btn:disabled{opacity:.3;cursor:not-allowed}
+.slide-counter{flex:1;text-align:center;font-size:12px;color:var(--slate2)}
+.slide-counter strong{color:var(--slate)}
+.voice-status{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
+.voice-dots{display:flex;gap:3px;align-items:center}
+.voice-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vdot 1.2s infinite}
+.voice-dot:nth-child(2){animation-delay:.2s}.voice-dot:nth-child(3){animation-delay:.4s}
+@keyframes vdot{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
+.speed-btn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
+.swipe-hint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+</style>
+</head>
+<body>
+<div id="start-overlay">
+  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="350" cy="80" r="180" fill="#FBBF24"/><circle cx="20" cy="400" r="120" fill="#2DD4BF"/><circle cx="300" cy="600" r="100" fill="#60A5FA"/></svg>
+  <div class="start-logo">TOGAF Foundation · Day 6</div>
+  <div class="start-title">Phase D:<br>Technology Architecture</div>
+  <p class="start-sub">20 slides with voiceover narration. Approx. 30 minutes.</p>
+  <div class="start-meta"><span class="start-pill">📊 20 slides</span><span class="start-pill">🎙 Narrated</span><span class="start-pill">⏱ ~30 min</span></div>
+  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Presentation</button>
+  <p class="start-note">Tap Start to enable voice · Swipe or use controls to navigate</p>
+</div>
+<div id="deck">
+  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
+  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
+  <div style="padding:2px 16px 0"><div class="voice-status" id="voice-status"></div><div class="swipe-hint">swipe left/right to navigate</div></div>
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+    <button class="ctrl-btn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
+    <button class="ctrl-btn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+    <div class="slide-counter"><strong id="slide-num">1</strong> / <span id="slide-total">20</span></div>
+    <button class="speed-btn" id="speed-btn" onclick="cycleSpeed()">1×</button>
+    <button class="ctrl-btn" id="btn-done" onclick="markDone()" title="Mark complete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+  </div>
+</div>
+<script>
+const SLIDES=[
+{type:"title",bg:"navy",
+html:`<div class="title-eyebrow">TOGAF Foundation · Day 6 of 20</div><h1 class="title-h">Phase D:<br>Technology Architecture</h1><div class="title-rule"></div><p class="title-sub">The last of the three detailed phases — defining the technology infrastructure that makes business, data, and applications actually work.</p><div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">⭐ Week 2</span></div>`,
+voice:`Welcome to Day 6. Today is Phase D — Technology Architecture, the T in BDAT. This is the final detailed architecture phase before we move into delivery planning in Phases E and F. We'll cover the BDAT stack and where Phase D fits, technology components and standards, the Application Platform service taxonomy, the key artefacts including the Technology Portfolio Catalogue and Environments diagram, and the complete inputs and outputs. Let's go.`},
+
+{type:"section",bg:"amber",
+html:`<div class="section-num">01</div><div class="section-label">Section One</div><h2 class="section-h">Phase D Overview</h2><p class="section-desc">The technology layer — and why it's designed last in the BDAT sequence.</p>`,
+voice:`Section one: Phase D overview. The most important thing to understand is where Phase D sits in the BDAT stack and why technology is always designed last.`},
+
+{type:"content",
+html:`<div class="content-label">The BDAT stack</div><h2 class="content-h">Technology — Always Designed Last</h2>
+<div class="layer-stack">
+  <div class="layer b"><span class="layer-icon">🏢</span><div><div class="layer-name">Phase B — Business</div><div class="layer-desc">Strategy, capabilities, value streams, org structure</div></div></div>
+  <div class="layer d"><span class="layer-icon">🗄</span><div><div class="layer-name">Phase C — Data</div><div class="layer-desc">Entities, data components, data flows, data governance</div></div></div>
+  <div class="layer a"><span class="layer-icon">📱</span><div><div class="layer-name">Phase C — Application</div><div class="layer-desc">Logical/physical apps, integration, portfolio</div></div></div>
+  <div class="layer t"><span class="layer-icon">⚙️</span><div><div class="layer-name">Phase D — Technology ← TODAY</div><div class="layer-desc">Infrastructure, platforms, networks, standards</div></div></div>
+</div>
+<div class="callout teal"><div class="callout-label">Why top-down?</div><p>Technology serves the business — not the other way around. TOGAF designs business strategy first (B), then information systems (C), then the technology to run them (D). <strong>Technology choices are always driven by what the business and applications need.</strong></p></div>`,
+voice:`Here's the BDAT stack. Business Architecture is designed first in Phase B — strategy, capabilities, value streams. Then Phase C designs the Data Architecture and Application Architecture. Finally, Phase D designs the Technology Architecture — the infrastructure that makes everything else run. The reason technology is always designed last is fundamental: technology should serve the business, not constrain it. By designing business and information systems first, we ensure technology choices are driven by what the business actually needs.`},
+
+{type:"section",bg:"amber",
+html:`<div class="section-num">02</div><div class="section-label">Section Two</div><h2 class="section-h">Technology Components &amp; Standards</h2><p class="section-desc">What goes into the technology layer and how standards govern what can be selected.</p>`,
+voice:`Section two: Technology Components and Standards. Phase D identifies and categorises all the technology infrastructure elements needed to support the application and data layers.`},
+
+{type:"content",
+html:`<div class="content-label">What technology architecture contains</div><h2 class="content-h">Components and Standards</h2>
+<div class="def-list">
+  <div class="def-item"><div class="def-term">Logical Technology Component</div><div class="def-text">Technology capability defined independently of products. E.g. "Relational Database Management Service" — what is needed, not which product.</div></div>
+  <div class="def-item"><div class="def-term">Physical Technology Component</div><div class="def-text">Specific technology product. E.g. "Oracle Database 21c" implements the logical RDBMS component. Technology-specific.</div></div>
+  <div class="def-item"><div class="def-term">Technology Standards</div><div class="def-text">Approved technology products, versions, configurations. Stored in the Standards Library. Constrain physical component selection — must use approved products.</div></div>
+  <div class="def-item"><div class="def-term">Technology Portfolio</div><div class="def-text">Complete inventory of all technology components — hardware, software, middleware, cloud services — both baseline (current) and target (future).</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">Same <strong>logical / physical distinction</strong> as Phase C. Logical = technology-independent. Physical = specific products. <strong>Standards constrain</strong> which physical products can be chosen.</div></div>`,
+voice:`Technology Architecture contains four key elements. Logical Technology Components define what is needed without specifying products — "Relational Database Management Service" is a logical component. Physical Technology Components are the specific products that implement them — Oracle Database 21c is a physical component. Technology Standards are the approved products, versions, and configurations stored in the Standards Library of the Architecture Repository. And the Technology Portfolio is the complete inventory of all technology components, baseline and target. The same logical-to-physical design approach applies here as in Phase C — design logical first, then select physical products that comply with standards.`},
+
+{type:"section",bg:"teal",
+html:`<div class="section-num">03</div><div class="section-label">Section Three</div><h2 class="section-h">Platform Services &amp; Application Platform</h2><p class="section-desc">The shared infrastructure services that all applications depend on.</p>`,
+voice:`Section three: Platform Services and the Application Platform. This is a key TOGAF concept — the shared technical foundation that all application components run on.`},
+
+{type:"content",
+html:`<div class="content-label">The platform taxonomy</div><h2 class="content-h">Application Platform Services</h2>
+<div class="callout teal"><div class="callout-label">Application Platform</div><p>The <strong>complete set of technology services</strong> required to run application components. Phase D must define and design this platform in its entirety.</p></div>
+<div class="svc-grid">
+  <div class="svc-card"><div class="svc-name">Data Interchange</div><div class="svc-desc">APIs, messaging, queuing, event streaming — connecting applications</div></div>
+  <div class="svc-card"><div class="svc-name">Data Management</div><div class="svc-desc">Databases, caching, storage — persisting and retrieving data</div></div>
+  <div class="svc-card"><div class="svc-name">Security Services</div><div class="svc-desc">Authentication, authorisation, encryption, audit logging</div></div>
+  <div class="svc-card"><div class="svc-name">OS Services</div><div class="svc-desc">Process management, file systems, scheduling, memory</div></div>
+  <div class="svc-card"><div class="svc-name">Network Services</div><div class="svc-desc">Connectivity, routing, load balancing, DNS, firewall</div></div>
+  <div class="svc-card"><div class="svc-name">Location &amp; Directory</div><div class="svc-desc">Identity directories, service registries, service discovery</div></div>
+</div>
+<div class="callout amber"><div class="callout-label">Cloud and hybrid</div><p>Modern platforms span on-premise, private cloud, and public cloud (IaaS, PaaS, SaaS). Phase D models this hybrid reality — where data resides, how apps communicate across boundaries, and compliance constraints per location.</p></div>`,
+voice:`The Application Platform is the complete set of technology services required to run application components. TOGAF organises it into six service categories. Data Interchange Services — APIs, messaging, queuing — connect applications to each other. Data Management Services — databases, caching, storage — persist and retrieve data. Security Services — authentication, authorisation, encryption — provide the security fabric. Operating System Services provide the fundamental compute layer. Network Services provide connectivity and routing. And Location and Directory Services handle identity and service discovery. In modern enterprises, this platform typically spans on-premise infrastructure and public cloud. Phase D must model this hybrid reality.`},
+
+{type:"section",bg:"purple",
+html:`<div class="section-num">04</div><div class="section-label">Section Four</div><h2 class="section-h">Phase D Artefacts</h2><p class="section-desc">Catalogues, matrices, and diagrams — the artefacts that document the technology architecture.</p>`,
+voice:`Section four: Phase D artefacts. The same three types apply as in Phase B and C — catalogues, matrices, and diagrams — but now at the technology level.`},
+
+{type:"content",
+html:`<div class="content-label">Key artefacts</div><h2 class="content-h">Documenting Technology Architecture</h2>
+<div class="art-row"><span class="art-badge" style="background:var(--teal3);color:var(--teal)">Catalogue</span><div><div class="art-name-s">Technology Portfolio Catalogue</div><div class="art-desc-s">Complete inventory of all technology components — hardware, software, middleware, cloud — baseline and target.</div></div></div>
+<div class="art-row"><span class="art-badge" style="background:var(--teal3);color:var(--teal)">Catalogue</span><div><div class="art-name-s">Technology Standards Catalogue</div><div class="art-desc-s">Approved technology products, versions, and configurations.</div></div></div>
+<div class="art-row"><span class="art-badge" style="background:var(--blue2);color:var(--blue)">Matrix</span><div><div class="art-name-s">Application / Technology Matrix ★</div><div class="art-desc-s">Maps Phase C applications to Phase D technology components. The C-to-D dependency bridge.</div></div></div>
+<div class="art-row"><span class="art-badge" style="background:var(--purple2);color:var(--purple)">Diagram</span><div><div class="art-name-s">Environments and Locations Diagram ★</div><div class="art-desc-s">Where technology components are deployed — data centres, cloud regions, offices, DR sites.</div></div></div>
+<div class="art-row"><span class="art-badge" style="background:var(--purple2);color:var(--purple)">Diagram</span><div><div class="art-name-s">Platform Decomposition Diagram</div><div class="art-desc-s">Hierarchical breakdown of the Application Platform into its service layers.</div></div></div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>App / Technology Matrix</strong> links Phase C to Phase D. <strong>Environments and Locations</strong> shows where everything runs. Both are exam favourites.</div></div>`,
+voice:`The key Phase D artefacts are: the Technology Portfolio Catalogue — the complete inventory of all technology components. The Technology Standards Catalogue — approved products and versions. The Application / Technology Matrix — starred because it's the bridge between Phase C applications and their Phase D technology dependencies. The Environments and Locations Diagram — also starred — showing where all technology components are deployed across data centres, cloud regions, offices, and disaster recovery sites. And the Platform Decomposition Diagram, showing the hierarchical breakdown of the Application Platform. For the exam: the Application / Technology Matrix and the Environments and Locations Diagram are the most tested.`},
+
+{type:"section",bg:"coral",
+html:`<div class="section-num">05</div><div class="section-label">Section Five</div><h2 class="section-h">Inputs, Outputs &amp; What Comes Next</h2><p class="section-desc">The complete picture and the transition to Phases E and F delivery planning.</p>`,
+voice:`Section five: Phase D inputs, outputs, and the transition to delivery planning.`},
+
+{type:"content",
+html:`<div class="content-label">IO and summary</div><h2 class="content-h">Phase D Complete Picture</h2>
+<div class="io-grid">
+  <div class="io-box"><div class="io-header in">Key Inputs</div><ul class="io-list"><li><strong style="color:var(--blue)">IS Architecture (Phase C) ★</strong></li><li>Architecture Vision (Phase A)</li><li>Architecture Principles</li><li>Architecture Repository + Standards Library</li><li>Existing Technology docs</li><li>IT strategy and tech roadmap</li></ul></div>
+  <div class="io-box"><div class="io-header out">Key Outputs</div><ul class="io-list"><li><strong style="color:var(--teal)">Baseline Tech Architecture ★</strong></li><li><strong style="color:var(--teal)">Target Tech Architecture ★</strong></li><li><strong style="color:var(--teal)">Technology Gap Analysis ★</strong></li><li>Technology Portfolio Catalogue</li><li>Environments &amp; Locations Diagram</li><li>Architecture Definition Doc (D)</li></ul></div>
+</div>
+<div class="callout amber"><div class="callout-label">Transition to Phase E</div><p>Phase D completes the architecture. All gaps from B + C + D are consolidated in <strong>Phase E — Opportunities and Solutions</strong>, which plans the projects needed to close them. Phase D is the last design phase; E and F are delivery planning.</p></div>
+<div class="sum-grid">
+  <div class="sum-card"><div class="sum-num">01</div><div class="sum-text"><strong>Phase D = Technology</strong> — the T in BDAT, designed last. Infrastructure serving business.</div></div>
+  <div class="sum-card"><div class="sum-num">02</div><div class="sum-text"><strong>Logical then physical</strong> — same as Phase C. Standards constrain product choices.</div></div>
+  <div class="sum-card"><div class="sum-num">03</div><div class="sum-text"><strong>Application Platform</strong> — 6 service categories all applications depend on.</div></div>
+  <div class="sum-card"><div class="sum-num">04</div><div class="sum-text"><strong>App/Tech Matrix</strong> — the Phase C to Phase D dependency bridge.</div></div>
+</div>`,
+voice:`Here's the complete Phase D picture. Primary input: the Information Systems Architecture from Phase C — this scopes all the technology needed. Key outputs: Baseline Technology Architecture, Target Technology Architecture, and Technology Gap Analysis. The Architecture Definition Document now has chapters for Business, Information Systems, and Technology — all three detailed phases are complete. After Phase D, all gaps from Phases B, C, and D are consolidated in Phase E — Opportunities and Solutions — which plans the projects needed to close them. Phase D is the last design phase. Phases E and F are delivery planning. Four key takeaways: Technology is designed last because it serves the business. Logical before physical, standards constrain choices. The Application Platform has six service categories. And the Application / Technology Matrix is the critical bridge between Phase C and Phase D.`},
+
+{type:"title",bg:"end",
+html:`<div class="title-eyebrow">Day 6 Complete</div><h1 class="title-h" style="font-size:clamp(24px,6vw,40px)">Phase D — done.</h1><div class="title-rule"></div><p class="title-sub" style="margin-bottom:24px">Next up: <strong>Day 7 — Phase E: Opportunities &amp; Solutions</strong>. The architecture design is complete — now we plan how to deliver it.</p>
+<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+  <a href="togaf-day6.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Open reading version · Take the quiz</a>
+  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 6 as done</button>
+</div>`,
+voice:`Day 6 is complete. Phase D done — the BDAT architecture stack is now fully designed. Take the quiz on the reading version to lock in your learning. Day 7 is a significant turning point: Phase E — Opportunities and Solutions. This is where the architecture shifts from design to delivery planning, consolidating all the gaps from Phases B, C, and D into a coherent implementation roadmap. See you there.`},
+];
+
+let cur=0,play=false,spdIdx=1,utt=null,tx=0,anim=false;
+const SPDS=[0.8,1,1.2,1.5];
+const wrap=document.getElementById("slides-wrap");
+document.getElementById("slide-total").textContent=SLIDES.length;
+function bg(b){return{navy:"var(--navy2)",amber:"linear-gradient(135deg,#1A1000,#251800)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",green:"linear-gradient(135deg,#0A1A10,#0D2218)",coral:"linear-gradient(135deg,#1A0A0E,#2A0D15)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"}[b]||"var(--navy2)";}
+SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="s"+i;d.style.background=bg(s.bg);d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
+function goTo(i,dir){if(anim||i<0||i>=SLIDES.length)return;anim=true;stopSp();const f=document.getElementById("s"+cur),t=document.getElementById("s"+i);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");anim=false;cur=i;upUI();if(play)spk();},420);}
+function nextSlide(){if(cur<SLIDES.length-1)goTo(cur+1,1);}
+function prevSlide(){if(cur>0)goTo(cur-1,-1);}
+function upUI(){document.getElementById("slide-num").textContent=cur+1;document.getElementById("progress-fill").style.width=((cur+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=cur===0;document.getElementById("btn-next").disabled=cur===SLIDES.length-1;}
+function spk(){stopSp();if(!("speechSynthesis"in window))return;const txt=SLIDES[cur].voice;if(!txt){if(play)setTimeout(nextSlide,800);return;}utt=new SpeechSynthesisUtterance(txt);utt.rate=SPDS[spdIdx];utt.lang="en-GB";const vs=speechSynthesis.getVoices();const p=vs.find(v=>v.lang.startsWith("en")&&(v.name.includes("Daniel")||v.name.includes("Samantha")||v.name.includes("Karen")||v.name.includes("Google UK")))||vs.find(v=>v.lang.startsWith("en"))||vs[0];if(p)utt.voice=p;utt.onstart=()=>setSt("speaking");utt.onend=()=>{setSt("");if(play&&cur<SLIDES.length-1)setTimeout(nextSlide,600);else if(cur===SLIDES.length-1){play=false;upPlay();}};utt.onerror=()=>setSt("");speechSynthesis.speak(utt);}
+function stopSp(){if("speechSynthesis"in window)speechSynthesis.cancel();utt=null;setSt("");}
+function togglePlay(){play=!play;upPlay();if(play)spk();else stopSp();}
+function upPlay(){document.getElementById("play-icon").innerHTML=play?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
+function setSt(s){const el=document.getElementById("voice-status");el.innerHTML=s==="speaking"?`<div class="voice-dots"><div class="voice-dot"></div><div class="voice-dot"></div><div class="voice-dot"></div></div><span>Narrating…</span>`:s||"";}
+function cycleSpeed(){spdIdx=(spdIdx+1)%SPDS.length;document.getElementById("speed-btn").textContent=SPDS[spdIdx]+"×";if(play){stopSp();setTimeout(spk,100);}}
+function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[6]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="var(--teal3)";b.style.borderColor="var(--teal)";b.querySelector("svg").style.stroke="var(--teal)";goTo(SLIDES.length-1,1);}
+document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";upUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{play=true;upPlay();spk();},400);}});
+wrap.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
+if("speechSynthesis"in window)speechSynthesis.onvoiceschanged=()=>{};
+document.getElementById("deck").style.display="none";
+</script>
+</body>
+</html>

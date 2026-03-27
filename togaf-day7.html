@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 7 — Phase E: Opportunities &amp; Solutions</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAF7;--ink:#1A1A18;--ink2:#4A4A42;--ink3:#8A8A80;--teal:#0D6E5E;--teal-light:#E6F4F1;--teal-mid:#1A9B86;--amber:#92530A;--amber-light:#FDF3E3;--blue:#1A4A7A;--blue-light:#E8F0F8;--purple:#4A2A7A;--purple-light:#F0EAF8;--green:#1A5A2A;--green-light:#E8F4E8;--coral:#8A2A2A;--coral-light:#F8EAEA;--rule:#E0DFD8;--surface:#FFFFFF;--reading-max:680px}
+html{background:var(--bg);scroll-behavior:smooth}
+body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100;transition:width 0.1s}
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}
+.nav-day{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink3)}
+.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer}
+.done-btn.completed{background:#2EAA8A}
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}
+.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}
+.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px;transition:color 0.15s}
+.toc-list a:hover{color:var(--teal)}
+.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+.section{margin-bottom:48px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+p{margin-bottom:16px;color:var(--ink2)}
+p strong{color:var(--ink);font-weight:600}
+.hl{border-radius:10px;padding:16px 18px;margin:20px 0}
+.hl.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}
+.hl.amber{background:var(--amber-light);border-left:3px solid #D4860E}
+.hl.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}
+.hl.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}
+.hl.green{background:var(--green-light);border-left:3px solid #2A7A3A}
+.hl.coral{background:var(--coral-light);border-left:3px solid #C84A4A}
+.hl-lbl{font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px}
+.hl.teal .hl-lbl{color:var(--teal)}.hl.amber .hl-lbl{color:var(--amber)}.hl.blue .hl-lbl{color:var(--blue)}.hl.purple .hl-lbl{color:var(--purple)}.hl.green .hl-lbl{color:var(--green)}.hl.coral .hl-lbl{color:var(--coral)}
+.hl p{margin-bottom:0;font-size:15px;line-height:1.65}
+.hl.teal p{color:var(--teal)}.hl.amber p{color:var(--amber)}.hl.blue p{color:var(--blue)}.hl.purple p{color:var(--purple)}.hl.green p{color:var(--green)}.hl.coral p{color:var(--coral)}
+.def-grid{display:grid;gap:10px;margin:20px 0}
+.def-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.def-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.def-text{font-size:14px;color:var(--ink2);line-height:1.6;margin:0}
+.term{font-weight:600;color:var(--teal);border-bottom:1px dotted var(--teal-mid)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.col-box{background:var(--surface);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.col-head{padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:0.7px;text-transform:uppercase}
+.col-head.in{background:var(--blue-light);color:var(--blue)}.col-head.out{background:var(--teal-light);color:var(--teal)}
+.col-list{list-style:none;padding:10px 14px;display:flex;flex-direction:column;gap:5px}
+.col-list li{font-size:13px;color:var(--ink2);line-height:1.5;display:flex;gap:6px;align-items:flex-start}
+.col-list li::before{content:'·';color:var(--ink3);flex-shrink:0}
+.transition-diagram{margin:20px 0;display:flex;flex-direction:column;gap:8px}
+.trans-row{display:flex;align-items:center;gap:10px}
+.trans-box{flex:1;padding:10px 14px;border-radius:8px;text-align:center;font-size:13px;font-weight:600;border:2px solid}
+.trans-box.baseline{background:var(--coral-light);border-color:#C84A4A;color:var(--coral)}
+.trans-box.trans1{background:var(--amber-light);border-color:#D4860E;color:var(--amber)}
+.trans-box.trans2{background:var(--blue-light);border-color:#2A6DB5;color:var(--blue)}
+.trans-box.target{background:var(--teal-light);border-color:var(--teal-mid);color:var(--teal)}
+.trans-arrow{font-size:18px;color:var(--ink3);flex-shrink:0}
+.trans-label{font-size:11px;color:var(--ink3);text-align:center;margin-top:2px}
+.work-pkg{background:var(--surface);border:1px solid var(--rule);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.work-pkg-head{padding:10px 14px;background:var(--green-light);font-size:13px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:8px}
+.work-pkg-body{padding:10px 14px;font-size:13px;color:var(--ink2);line-height:1.6}
+.work-pkg-body ul{list-style:none;display:flex;flex-direction:column;gap:3px}
+.work-pkg-body ul li{display:flex;gap:6px}
+.work-pkg-body ul li::before{content:'→';color:var(--teal);flex-shrink:0}
+.criteria-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+.criteria-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:12px}
+.criteria-title{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px}
+.criteria-desc{font-size:13px;color:var(--ink2);line-height:1.5}
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+.sum-grid{display:grid;gap:10px;margin-top:32px}
+.sum-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.sum-icon{font-size:18px;flex-shrink:0}
+.sum-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.sum-body{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}
+.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}
+.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}
+.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}
+.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}
+.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}
+.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}
+.quiz-reset.show{display:block}
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav class="top-nav">
+  <div class="nav-left"><span class="nav-day">Day 7 · Week 2</span><span class="nav-title">Phase E: Opportunities &amp; Solutions</span></div>
+  <div class="nav-right">
+    <div class="timer-badge">⏱ <span id="read-timer">0:00</span></div>
+    <button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-label">Study Session · Day 7 of 20</div>
+  <h1 class="hero-title">Phase E:<br>Opportunities &amp; Solutions</h1>
+  <div class="hero-meta">
+    <span class="meta-pill">📖 ~30 min read</span>
+    <span class="meta-pill">5 topics</span>
+    <span class="meta-pill">5 quiz questions</span>
+    <span class="meta-pill">ADM Phase E</span>
+  </div>
+  <p class="hero-intro">Phase E is the pivot point of the ADM — where design meets delivery. All the gaps accumulated across Phases B, C, and D are consolidated here into a coherent set of projects, work packages, and transition architectures.</p>
+</header>
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>Phase E Objective — Design to Delivery</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Transition Architectures</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>Work Packages &amp; Implementation Projects</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Consolidated Gap Analysis</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Solution Selection Criteria &amp; Phase E Outputs</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>Knowledge Check</a></li>
+  </ol>
+</nav>
+<article class="article">
+
+  <section class="section" id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">Phase E Objective — Design to Delivery</h2></div>
+    <div class="hl teal"><div class="hl-lbl">Objective</div><p>Phase E <strong>identifies the preferred combination of building blocks</strong> — projects, programmes, transition architectures, and work packages — to deliver the Target Architecture defined in Phases B, C, and D. It is the first phase focused on <em>delivery planning</em> rather than architecture design.</p></div>
+    <p>Phase E represents a fundamental shift in the ADM. Phases B, C, and D asked: <em>what should the architecture look like?</em> Phase E asks: <em>how do we get there?</em> It takes the abstract gap analyses from three detailed phases and turns them into a concrete, actionable roadmap.</p>
+    <div class="hl blue"><div class="hl-lbl">Why Phase E is a pivot</div><p>Up to Phase D, the architecture team has been working primarily in the realm of design — documenting baseline states, defining target states, and identifying gaps. Phase E is where <strong>architects hand over to delivery organisations</strong>. The work packages and transition architectures defined here become inputs to real projects and programmes.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Architecture Roadmap</div><p class="def-text">A time-sequenced view of the work packages and projects needed to move from the Baseline Architecture to the Target Architecture. First produced in Phase E; refined and detailed in Phase F.</p></div>
+      <div class="def-item"><div class="def-term">Implementation and Migration Plan</div><p class="def-text">A detailed, prioritised plan showing the sequence of projects, their dependencies, costs, benefits, and timelines. Phase E produces an initial version; Phase F refines it into the definitive plan.</p></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Phase E is the first of the <strong>delivery planning phases</strong> (E and F). It is not an architecture design phase. The Architecture Roadmap is first created in Phase E. If an exam question asks "when is the Architecture Roadmap first produced?" — the answer is Phase E.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">Transition Architectures</h2></div>
+    <p>One of the most important concepts introduced in Phase E is the <span class="term">Transition Architecture</span>. When the gap between the Baseline Architecture and the Target Architecture is too large to close in a single step, transition architectures define the intermediate states the enterprise passes through.</p>
+    <div class="hl teal"><div class="hl-lbl">Definition</div><p>A <strong>Transition Architecture</strong> is a formally defined intermediate architecture state — a coherent, stable configuration of the enterprise at a point in time between the baseline and target. Each transition architecture represents a valuable and achievable milestone in the journey to the target.</p></div>
+    <div class="transition-diagram">
+      <div class="trans-row">
+        <div class="trans-box baseline">Baseline Architecture<div class="trans-label">Current state</div></div>
+        <span class="trans-arrow">→</span>
+        <div class="trans-box trans1">Transition Architecture 1<div class="trans-label">e.g. 12 months</div></div>
+        <span class="trans-arrow">→</span>
+        <div class="trans-box trans2">Transition Architecture 2<div class="trans-label">e.g. 24 months</div></div>
+        <span class="trans-arrow">→</span>
+        <div class="trans-box target">Target Architecture<div class="trans-label">Future state</div></div>
+      </div>
+    </div>
+    <p>Transition architectures are important because they:</p>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Reduce risk</div><p class="def-text">Instead of one massive, high-risk transformation, the organisation makes a series of smaller, more manageable changes. Each transition architecture is independently achievable and delivers real business value.</p></div>
+      <div class="def-item"><div class="def-term">Enable incremental value delivery</div><p class="def-text">Each transition architecture delivers real capability improvements to the business even if the full target architecture is years away. Stakeholders see progress and value is realised throughout the journey.</p></div>
+      <div class="def-item"><div class="def-term">Allow course correction</div><p class="def-text">Between each transition architecture, the organisation can pause, review, and adjust the plan. If business priorities change, the transition plan can be modified without abandoning all work done so far.</p></div>
+      <div class="def-item"><div class="def-term">Manage operational continuity</div><p class="def-text">The business continues to operate during the transformation. Each transition architecture is a coherent, stable state — not a half-finished mess that disrupts operations.</p></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>A Transition Architecture is <strong>not the same as a target architecture</strong> — it is an intermediate stable state between baseline and target. They are defined in Phase E and sequenced into the Architecture Roadmap. When a question mentions "intermediate architecture states," the answer is Transition Architectures.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">Work Packages &amp; Implementation Projects</h2></div>
+    <p>Phase E organises the delivery work into <span class="term">Work Packages</span> — discrete, manageable units of implementation work that collectively close the gaps identified in Phases B, C, and D.</p>
+    <div class="hl blue"><div class="hl-lbl">Work Package definition</div><p>A <strong>Work Package</strong> is a group of related activities and deliverables required to implement a portion of the architecture. Each work package defines what needs to be done, what will be delivered, what it depends on, and how long it will take.</p></div>
+    <div class="work-pkg">
+      <div class="work-pkg-head">📦 Work Package — Typical Contents</div>
+      <div class="work-pkg-body">
+        <ul>
+          <li>Name and description of the work</li>
+          <li>Architecture building blocks to be implemented</li>
+          <li>Business value delivered when complete</li>
+          <li>Dependencies on other work packages</li>
+          <li>Estimated effort, cost, and duration</li>
+          <li>Risk assessment for this work package</li>
+          <li>Stakeholders affected by this work</li>
+          <li>Acceptance criteria — how we know it's done</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hl green"><div class="hl-lbl">Work Packages → Projects → Programmes</div><p>Work packages are grouped into <strong>implementation projects</strong> — formal project management structures with assigned resources, budgets, and governance. Multiple related projects may be grouped into a <strong>programme</strong>. These projects and programmes are then sequenced onto the Architecture Roadmap in Phase E and detailed in Phase F.</p></div>
+    <div class="hl purple"><div class="hl-lbl">Project Context Diagram</div><p>A key Phase E artefact — the <strong>Project Context Diagram</strong> shows the dependencies between implementation projects and their relationships to the transition architectures. It makes the delivery sequencing visible and is used for portfolio planning and stakeholder communications.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Work packages are defined in Phase E and <strong>refined/prioritised in Phase F</strong>. The Project Context Diagram (Phase E artefact) shows project dependencies and relationships to transition architectures. Know the distinction between Phase E (defines the plan) and Phase F (prioritises and details it).</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">Consolidated Gap Analysis</h2></div>
+    <p>Phase E performs a <strong>Consolidated Gap Analysis</strong> — bringing together all the individual gap analyses from Phases B, C, and D into a single comprehensive view. This consolidation is essential because gaps across architecture domains interact and overlap in ways that individual domain analyses cannot capture.</p>
+    <div class="hl teal"><div class="hl-lbl">Why consolidation matters</div><p>A gap in Business Architecture (Phase B) may be addressable only after a gap in Application Architecture (Phase C) is closed. A technology upgrade (Phase D) may unlock multiple application and business capability improvements. The consolidated view reveals these dependencies — enabling rational sequencing of work.</p></div>
+    <div class="hl amber"><div class="hl-lbl">Gap Analysis categories revisited</div><p>In Phase E, gaps are revisited from all three domains. Each gap is evaluated against: <strong>What work package closes it?</strong> · <strong>Which transition architecture does it belong to?</strong> · <strong>What are the dependencies with other gaps?</strong> · <strong>What is the business priority?</strong> · <strong>What is the estimated cost and risk?</strong></p></div>
+    <p>The output of consolidated gap analysis is a <span class="term">gap-to-project mapping</span> — every gap from Phases B, C, and D is assigned to a work package, and every work package is assigned to a project. This mapping ensures no gap is forgotten and no project exists without traceable architectural justification.</p>
+    <div class="hl blue"><div class="hl-lbl">Architecture Building Blocks vs Solution Building Blocks</div><p>Phase E is also where TOGAF's distinction between <strong>Architecture Building Blocks (ABBs)</strong> and <strong>Solution Building Blocks (SBBs)</strong> becomes operationally important. ABBs are technology-independent architecture components (defined in Phases B–D). SBBs are specific products and technologies that implement ABBs. Phase E maps ABBs to candidate SBBs — the first point at which specific implementation solutions are identified.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The <strong>Consolidated Gap Analysis</strong> in Phase E brings together gaps from <strong>all three of Phases B, C, and D</strong>. This is the first time all gaps are seen together. Phase E is also where Architecture Building Blocks (ABBs) are mapped to Solution Building Blocks (SBBs) — technology-independent to technology-specific.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">Solution Selection Criteria &amp; Phase E Outputs</h2></div>
+    <p>Phase E doesn't just identify what work needs to be done — it also establishes the <strong>criteria by which solutions are evaluated and selected</strong>. This brings rigour to solution selection and prevents purely technical or politically-driven choices.</p>
+    <div class="criteria-grid">
+      <div class="criteria-card"><div class="criteria-title">Fitness for Purpose</div><div class="criteria-desc">Does the solution actually deliver the required capability and close the identified gap?</div></div>
+      <div class="criteria-card"><div class="criteria-title">Alignment to Principles</div><div class="criteria-desc">Does the solution comply with the Architecture Principles defined in the Preliminary Phase?</div></div>
+      <div class="criteria-card"><div class="criteria-title">Cost and Value</div><div class="criteria-desc">Is the cost proportionate to the business value delivered? What is the total cost of ownership?</div></div>
+      <div class="criteria-card"><div class="criteria-title">Risk and Feasibility</div><div class="criteria-desc">Is the solution technically and organisationally feasible? What risks does it introduce?</div></div>
+      <div class="criteria-card"><div class="criteria-title">Vendor and Market</div><div class="criteria-desc">Is the solution from a viable vendor? Is it supported long-term? Does it align to technology standards?</div></div>
+      <div class="criteria-card"><div class="criteria-title">Reuse Potential</div><div class="criteria-desc">Can this solution serve multiple work packages or business areas? Maximising reuse reduces cost.</div></div>
+    </div>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-head in">Key Inputs</div>
+        <ul class="col-list">
+          <li>Architecture Definition Document (B+C+D) ★</li>
+          <li>Gap Analysis results (B, C, D) ★</li>
+          <li>Architecture Vision</li>
+          <li>Architecture Principles</li>
+          <li>Architecture Repository</li>
+          <li>Enterprise Continuum (SBBs)</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-head out">Key Outputs</div>
+        <ul class="col-list">
+          <li>Architecture Roadmap (initial) ★</li>
+          <li>Work Package definitions ★</li>
+          <li>Transition Architecture definitions ★</li>
+          <li>Implementation and Migration Plan (initial)</li>
+          <li>Project Context Diagram</li>
+          <li>Capability Assessment</li>
+        </ul>
+      </div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Phase E produces the <strong>initial Architecture Roadmap</strong> — first appearance in the ADM. It also defines Transition Architectures and Work Packages. Phase F then refines and prioritises all of these. Know what is <em>created</em> in E versus what is <em>refined</em> in F.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2 style="font-family:'Lora',serif;font-size:20px;color:var(--ink);margin-bottom:16px">Session summary</h2>
+    <div class="sum-grid">
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Phase E = pivot from design to delivery</div><p class="sum-body">First delivery planning phase. Consolidates all gaps from B, C, D into actionable work packages and roadmap.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Transition Architectures = intermediate stable states</div><p class="sum-body">When the gap is too large to close in one step, transition architectures define milestones between baseline and target.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Work Packages → Projects → Programmes</div><p class="sum-body">Discrete units of implementation work, grouped into projects, organised on the Architecture Roadmap.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Architecture Roadmap first appears in Phase E</div><p class="sum-body">The initial roadmap is produced here. Phase F refines and details it into the full Migration Plan.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">ABBs mapped to SBBs</div><p class="sum-body">Architecture Building Blocks (technology-independent) are mapped to Solution Building Blocks (specific products) for the first time in Phase E.</p></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">Knowledge Check</div>
+    <div class="quiz-sub">5 questions · Phase E: Opportunities &amp; Solutions</div>
+    <div class="quiz-q" id="quiz-q1">
+      <div class="quiz-q-text">1. When is the Architecture Roadmap first produced in the ADM?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. Phase A — Architecture Vision</button>
+        <button class="quiz-opt" onclick="answer(1,'b')">B. Phase D — Technology Architecture</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. Phase E — Opportunities and Solutions</button>
+        <button class="quiz-opt" onclick="answer(1,'d')">D. Phase F — Migration Planning</button>
+      </div>
+      <div class="quiz-feedback" id="fb1"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q2">
+      <div class="quiz-q-text">2. A Transition Architecture is best described as:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. A simplified version of the Target Architecture for smaller organisations</button>
+        <button class="quiz-opt" onclick="answer(2,'b')">B. A formally defined intermediate architecture state between baseline and target</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. The architecture that exists during a technology migration project</button>
+        <button class="quiz-opt" onclick="answer(2,'d')">D. A temporary architecture approved under a governance dispensation</button>
+      </div>
+      <div class="quiz-feedback" id="fb2"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q3">
+      <div class="quiz-q-text">3. The Consolidated Gap Analysis in Phase E is important because:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. It replaces the individual gap analyses from Phases B, C, and D</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. It identifies new gaps that were not found in Phases B, C, and D</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. It brings all gaps together to reveal cross-domain dependencies and enable rational sequencing</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. It is used to update the Architecture Principles from the Preliminary Phase</button>
+      </div>
+      <div class="quiz-feedback" id="fb3"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q4">
+      <div class="quiz-q-text">4. Architecture Building Blocks (ABBs) differ from Solution Building Blocks (SBBs) in that:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. ABBs are defined in Phase E; SBBs are defined in Phases B, C, and D</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. ABBs are technology-independent architecture components; SBBs are specific products and technologies implementing ABBs</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. ABBs are for large organisations; SBBs are for smaller organisations</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. ABBs are baseline state components; SBBs are target state components</button>
+      </div>
+      <div class="quiz-feedback" id="fb4"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q5">
+      <div class="quiz-q-text">5. What is the primary difference between Phase E and Phase F in the ADM?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. Phase E covers business architecture; Phase F covers technology architecture</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. Phase E identifies and defines the delivery plan; Phase F prioritises, details, and finalises it</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. Phase E is for small projects; Phase F is for large transformation programmes</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. Phase E and Phase F are interchangeable — organisations may skip one</button>
+      </div>
+      <div class="quiz-feedback" id="fb5"></div>
+    </div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+</article>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+let sec=0;const tEl=document.getElementById("read-timer");const iv=setInterval(()=>{sec++;tEl.textContent=Math.floor(sec/60)+":"+(sec%60<10?"0":"")+sec%60;},1000);
+window.addEventListener("scroll",()=>{const d=document.documentElement;document.getElementById("progress-bar").style.width=Math.min(100,(d.scrollTop/(d.scrollHeight-d.clientHeight))*100)+"%";document.getElementById("scroll-top").classList.toggle("show",d.scrollTop>400);});
+function markDone(){clearInterval(iv);try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[7]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("done-btn");b.textContent="✓ Done!";b.classList.add("completed");}
+const ANS={1:'c',2:'b',3:'c',4:'b',5:'b'};
+const FB={
+  1:{c:"Correct! The Architecture Roadmap is first produced in Phase E — Opportunities and Solutions. Phase F then refines and details it into the full Implementation and Migration Plan.",x:"Not quite. The Architecture Roadmap is first produced in Phase E. Phase A produces the Architecture Vision; Phase F refines the roadmap but doesn't create it first."},
+  2:{b:"Correct! A Transition Architecture is a formally defined intermediate stable state between the Baseline Architecture and the Target Architecture. It represents a coherent, achievable milestone in the transformation journey.",x:"Not quite. A Transition Architecture is an intermediate stable state between baseline and target — not a simplification, not a temporary state, and not the same as what happens during a project migration."},
+  3:{c:"Correct! The Consolidated Gap Analysis brings all gaps from Phases B, C, and D together for the first time — revealing cross-domain dependencies and enabling rational sequencing of work packages. This holistic view is not possible when gaps are analysed in isolation.",x:"Not quite. The Consolidated Gap Analysis combines all gaps from B, C, and D to reveal cross-domain dependencies and enable rational sequencing. It doesn't replace the individual analyses — it builds on them."},
+  4:{b:"Correct! Architecture Building Blocks (ABBs) are technology-independent architecture components defined in Phases B–D. Solution Building Blocks (SBBs) are the specific products and technologies that implement those ABBs. Phase E maps ABBs to candidate SBBs for the first time.",x:"Not quite. ABBs are technology-independent components defined in the architecture phases. SBBs are specific technology products that implement ABBs. Phase E is where ABBs are mapped to SBBs for the first time."},
+  5:{b:"Correct! Phase E identifies the overall delivery plan — work packages, transition architectures, initial roadmap. Phase F then takes those outputs and prioritises, sequences, costs, and details them into the definitive Implementation and Migration Plan.",x:"Not quite. Phase E identifies and defines the delivery plan (what needs to be done). Phase F prioritises, details, and finalises it (exactly when and how, with full cost-benefit analysis)."}
+};
+let answered={},score=0;
+function answer(q,opt){if(answered[q])return;answered[q]=opt;const ok=opt===ANS[q];if(ok)score++;document.querySelectorAll(`#quiz-q${q} .quiz-opt`).forEach((b,i)=>{const o=['a','b','c','d'][i];b.classList.add(o===ANS[q]?"correct":o===opt&&!ok?"wrong":"reveal");});const fb=document.getElementById("fb"+q);fb.textContent=(ok?"✓ ":"✗ ")+(ok?FB[q][opt]:FB[q].x);fb.className="quiz-feedback show "+(ok?"ok":"no");if(Object.keys(answered).length===5){const msgs=["Keep going — re-read and try again.","Getting there!","Good effort!","Strong result!","Perfect score! Ready for Day 8."];document.getElementById("quiz-score").textContent=`You scored ${score}/5. ${msgs[score-1]||msgs[0]}`;document.getElementById("quiz-score").classList.add("show");document.getElementById("quiz-reset").classList.add("show");if(score===5)markDone();}}
+function resetQuiz(){answered={};score=0;document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});document.getElementById("quiz-score").classList.remove("show");document.getElementById("quiz-reset").classList.remove("show");}
+</script>
+</body>
+</html>

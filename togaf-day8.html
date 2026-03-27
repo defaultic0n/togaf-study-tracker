@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 8 — Phase F: Migration Planning</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAF7;--ink:#1A1A18;--ink2:#4A4A42;--ink3:#8A8A80;--teal:#0D6E5E;--teal-light:#E6F4F1;--teal-mid:#1A9B86;--amber:#92530A;--amber-light:#FDF3E3;--blue:#1A4A7A;--blue-light:#E8F0F8;--purple:#4A2A7A;--purple-light:#F0EAF8;--green:#1A5A2A;--green-light:#E8F4E8;--coral:#8A2A2A;--coral-light:#F8EAEA;--rule:#E0DFD8;--surface:#FFFFFF;--reading-max:680px}
+html{background:var(--bg);scroll-behavior:smooth}
+body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100;transition:width 0.1s}
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}
+.nav-day{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3)}
+.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer}
+.done-btn.completed{background:#2EAA8A}
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}
+.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}
+.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px;transition:color .15s}
+.toc-list a:hover{color:var(--teal)}
+.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+.section{margin-bottom:48px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+p{margin-bottom:16px;color:var(--ink2)} p strong{color:var(--ink);font-weight:600}
+.hl{border-radius:10px;padding:16px 18px;margin:20px 0}
+.hl.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}.hl.amber{background:var(--amber-light);border-left:3px solid #D4860E}.hl.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}.hl.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}.hl.green{background:var(--green-light);border-left:3px solid #2A7A3A}.hl.coral{background:var(--coral-light);border-left:3px solid #C84A4A}
+.hl-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.hl.teal .hl-lbl{color:var(--teal)}.hl.amber .hl-lbl{color:var(--amber)}.hl.blue .hl-lbl{color:var(--blue)}.hl.purple .hl-lbl{color:var(--purple)}.hl.green .hl-lbl{color:var(--green)}.hl.coral .hl-lbl{color:var(--coral)}
+.hl p{margin-bottom:0;font-size:15px;line-height:1.65}
+.hl.teal p{color:var(--teal)}.hl.amber p{color:var(--amber)}.hl.blue p{color:var(--blue)}.hl.purple p{color:var(--purple)}.hl.green p{color:var(--green)}.hl.coral p{color:var(--coral)}
+.def-grid{display:grid;gap:10px;margin:20px 0}
+.def-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.def-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.def-text{font-size:14px;color:var(--ink2);line-height:1.6;margin:0}
+.term{font-weight:600;color:var(--teal);border-bottom:1px dotted var(--teal-mid)}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.col-box{background:var(--surface);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.col-head{padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:.7px;text-transform:uppercase}
+.col-head.in{background:var(--blue-light);color:var(--blue)}.col-head.out{background:var(--teal-light);color:var(--teal)}
+.col-list{list-style:none;padding:10px 14px;display:flex;flex-direction:column;gap:5px}
+.col-list li{font-size:13px;color:var(--ink2);line-height:1.5;display:flex;gap:6px;align-items:flex-start}
+.col-list li::before{content:'·';color:var(--ink3);flex-shrink:0}
+.step-list{display:flex;flex-direction:column;gap:10px;margin:20px 0}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--teal-light);color:var(--teal);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.step-content{flex:1}
+.step-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.step-desc{font-size:13px;color:var(--ink2);line-height:1.55}
+.ef-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.ef-box{background:var(--surface);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.ef-head{padding:10px 14px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.ef-head.e{background:var(--purple-light);color:var(--purple)}
+.ef-head.f{background:var(--teal-light);color:var(--teal)}
+.ef-list{list-style:none;padding:10px 14px;display:flex;flex-direction:column;gap:5px}
+.ef-list li{font-size:13px;color:var(--ink2);line-height:1.5;display:flex;gap:6px}
+.ef-list li::before{content:'→';flex-shrink:0}
+.ef-list.e li::before{color:var(--purple)}
+.ef-list.f li::before{color:var(--teal)}
+.tech-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+.tech-table th{background:var(--teal-light);color:var(--teal);font-weight:600;padding:9px 12px;text-align:left;border:1px solid var(--rule)}
+.tech-table td{padding:8px 12px;border:1px solid var(--rule);color:var(--ink2);vertical-align:top;line-height:1.5}
+.tech-table tr:nth-child(even) td{background:#F7F6F3}
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+.sum-grid{display:grid;gap:10px;margin-top:32px}
+.sum-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.sum-icon{font-size:18px;flex-shrink:0}
+.sum-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.sum-body{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}
+.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}
+.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}
+.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}
+.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}
+.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}
+.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}
+.quiz-reset.show{display:block}
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav class="top-nav">
+  <div class="nav-left"><span class="nav-day">Day 8 · Week 2</span><span class="nav-title">Phase F: Migration Planning</span></div>
+  <div class="nav-right">
+    <div class="timer-badge">⏱ <span id="read-timer">0:00</span></div>
+    <button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-label">Study Session · Day 8 of 20</div>
+  <h1 class="hero-title">Phase F:<br>Migration Planning</h1>
+  <div class="hero-meta">
+    <span class="meta-pill">📖 ~30 min read</span>
+    <span class="meta-pill">5 topics</span>
+    <span class="meta-pill">5 quiz questions</span>
+    <span class="meta-pill">ADM Phase F</span>
+  </div>
+  <p class="hero-intro">Phase F takes the initial delivery plan from Phase E and makes it real — prioritising work packages, assessing dependencies and costs, refining the Architecture Roadmap, and securing stakeholder sign-off on the definitive Implementation and Migration Plan.</p>
+</header>
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>Phase F Objective — From Outline to Definitive Plan</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Assessing Dependencies, Costs &amp; Benefits</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>Migration Planning Techniques</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Architecture Roadmap Refinement</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Stakeholder Reviews, Sign-off &amp; Phase F Outputs</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>Knowledge Check</a></li>
+  </ol>
+</nav>
+<article class="article">
+
+  <section class="section" id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">Phase F Objective — From Outline to Definitive Plan</h2></div>
+    <div class="hl teal"><div class="hl-lbl">Objective</div><p>Phase F finalises a <strong>detailed, prioritised, and costed Implementation and Migration Plan</strong> — the authoritative delivery document that governs how the enterprise transitions from its Baseline Architecture to its Target Architecture.</p></div>
+    <p>Phase E created the outline — work packages, transition architectures, an initial roadmap. Phase F makes it definitive. The key word is <em>prioritised</em>: not every work package can be started at once. Phase F establishes the order of implementation based on dependencies, business value, cost, and risk.</p>
+    <div class="ef-compare">
+      <div class="ef-box">
+        <div class="ef-head e">Phase E produces</div>
+        <ul class="ef-list e">
+          <li>Initial Architecture Roadmap</li>
+          <li>Work Package definitions</li>
+          <li>Transition Architecture definitions</li>
+          <li>Initial Implementation plan</li>
+          <li>Project Context Diagram</li>
+        </ul>
+      </div>
+      <div class="ef-box">
+        <div class="ef-head f">Phase F refines into</div>
+        <ul class="ef-list f">
+          <li>Finalised Architecture Roadmap</li>
+          <li>Prioritised work packages (sequenced)</li>
+          <li>Confirmed Transition Architectures</li>
+          <li>Definitive Migration Plan</li>
+          <li>Approved Implementation schedule</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hl blue"><div class="hl-lbl">Why Phase F is distinct from Phase E</div><p>Phase E asks: <em>"What work needs to be done and in what order?"</em> Phase F asks: <em>"Exactly when, by whom, at what cost, with what dependencies, and with what governance?"</em> Phase F goes significantly deeper into the practical planning required to mobilise delivery.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Phase E = <strong>identifies and defines</strong> the delivery plan. Phase F = <strong>prioritises, details, and finalises</strong> it. The Implementation and Migration Plan is <strong>finalised in Phase F</strong>, not Phase E. This distinction is tested frequently.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">Assessing Dependencies, Costs &amp; Benefits</h2></div>
+    <p>A core activity of Phase F is the rigorous assessment of each work package — understanding its dependencies, estimating its cost, and quantifying the business benefits it delivers. Without this analysis, the implementation plan cannot be properly prioritised.</p>
+    <div class="hl teal"><div class="hl-lbl">Dependency assessment</div><p>Not all work packages are independent. Some projects cannot begin until others are complete. Phase F <strong>maps all dependencies</strong> — both hard dependencies (must-have sequencing) and soft dependencies (preferred sequencing) — to ensure the implementation plan is executable.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Technical Dependencies</div><p class="def-text">One work package depends on a technical output from another. E.g. a new application cannot be deployed until the infrastructure upgrade it needs is complete.</p></div>
+      <div class="def-item"><div class="def-term">Business Dependencies</div><p class="def-text">A business capability change cannot be implemented until organisational changes are in place. E.g. a new service model cannot be launched until staff are trained.</p></div>
+      <div class="def-item"><div class="def-term">Data Dependencies</div><p class="def-text">An application migration depends on data migration completing first. Data quality issues in the baseline may delay dependent work packages.</p></div>
+      <div class="def-item"><div class="def-term">Resource Dependencies</div><p class="def-text">Two work packages compete for the same scarce resource — a specialist team, a key system, or a budget cycle. Resource conflicts must be resolved in the migration plan.</p></div>
+    </div>
+    <div class="hl green"><div class="hl-lbl">Cost–benefit analysis</div><p>Every work package is assessed for <strong>cost</strong> (implementation, operations, transition) and <strong>business benefit</strong> (revenue, savings, risk reduction, compliance). This analysis produces a <strong>cost-benefit ranking</strong> that, combined with dependency constraints, determines the optimal sequencing of work.</p></div>
+    <div class="hl amber"><div class="hl-lbl">Risk assessment per work package</div><p>Phase F also performs a detailed risk assessment for each work package — identifying technical risks, business disruption risks, and programme-level risks. Risk mitigation strategies are defined and factored into the implementation schedule.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The prioritisation of work packages in Phase F is based on a combination of: <strong>dependency constraints</strong> (what must come first), <strong>business value</strong> (what delivers most benefit), <strong>cost</strong> (what is affordable), and <strong>risk</strong> (what is safest to implement when). All four factors play a role.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">Migration Planning Techniques</h2></div>
+    <p>Phase F uses a set of established planning techniques to turn the outline from Phase E into a detailed, executable plan. These techniques bring analytical rigour to what could otherwise be an ad hoc planning exercise.</p>
+    <div class="hl blue"><div class="hl-lbl">Key techniques</div><p>TOGAF identifies several techniques commonly used in Phase F migration planning — from financial modelling to business value assessment to capability gap scoring.</p></div>
+    <div class="tech-table-wrap" style="overflow-x:auto;margin:20px 0">
+      <table class="tech-table">
+        <thead><tr><th>Technique</th><th>What it does</th><th>Used for</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Business Value Assessment</strong></td><td>Scores each work package against business benefit criteria</td><td>Prioritisation ranking</td></tr>
+          <tr><td><strong>Dependency Modelling</strong></td><td>Maps hard and soft dependencies between work packages</td><td>Sequencing constraints</td></tr>
+          <tr><td><strong>Cost–Benefit Analysis</strong></td><td>Estimates NPV, ROI, payback period for each package</td><td>Financial justification</td></tr>
+          <tr><td><strong>Risk Assessment Matrix</strong></td><td>Scores implementation risk vs business impact</td><td>Risk-based scheduling</td></tr>
+          <tr><td><strong>Capability Gap Scoring</strong></td><td>Ranks work packages by how much capability gap they close</td><td>Strategic alignment</td></tr>
+          <tr><td><strong>Portfolio Optimisation</strong></td><td>Balances the mix of work in each time horizon</td><td>Resource and budget levelling</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="hl purple"><div class="hl-lbl">Prioritisation matrix</div><p>A common Phase F output is a <strong>prioritisation matrix</strong> — plotting each work package against two dimensions (typically business value and implementation effort or risk). High-value, low-risk work packages are scheduled earliest. High-value, high-risk packages are planned with additional mitigation. Low-value packages may be descoped or deferred.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Know that Phase F uses multiple planning techniques — it is not just a sequencing exercise. Business value assessment, cost-benefit analysis, and risk assessment all feed into the final prioritised plan. The exam sometimes asks which phase performs detailed cost-benefit analysis — the answer is Phase F.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">Architecture Roadmap Refinement</h2></div>
+    <p>The Architecture Roadmap, first created in Phase E, is <strong>refined and finalised in Phase F</strong>. The refinement process incorporates the dependency analysis, cost-benefit rankings, and risk assessments to produce a time-sequenced, resource-aware plan.</p>
+    <div class="hl teal"><div class="hl-lbl">From initial to finalised roadmap</div><p>The Phase E roadmap shows <em>what</em> needs to happen and in <em>approximately what order</em>. The Phase F roadmap shows <em>exactly when</em> each work package will be executed, <em>by whom</em>, <em>at what cost</em>, and under <em>what governance</em>.</p></div>
+    <div class="step-list">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><div class="step-title">Confirm Transition Architecture states</div><div class="step-desc">Review the transition architectures from Phase E against the detailed dependency and cost analysis. Adjust if needed.</div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><div class="step-title">Sequence work packages</div><div class="step-desc">Apply dependency constraints and prioritisation rankings to produce a sequenced delivery schedule.</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><div class="step-title">Assign to time horizons</div><div class="step-desc">Group work packages into near-term (0–12 months), mid-term (12–24 months), and long-term (24+ months) horizons.</div></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><div class="step-title">Resource and budget plan</div><div class="step-desc">Assign resources to each work package. Level the resource plan to avoid overloads. Confirm budget envelope for each time horizon.</div></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content"><div class="step-title">Finalise the Roadmap</div><div class="step-desc">Produce the definitive Architecture Roadmap — a time-phased, resource-aware, costed, and governed plan ready for stakeholder approval.</div></div></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The Architecture Roadmap is <strong>created in Phase E</strong> and <strong>finalised in Phase F</strong>. If asked "which phase finalises the roadmap?" — Phase F. If asked "which phase first creates it?" — Phase E. Both are tested.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">Stakeholder Reviews, Sign-off &amp; Phase F Outputs</h2></div>
+    <p>Phase F concludes with formal <strong>stakeholder reviews and governance sign-off</strong>. The Implementation and Migration Plan — now detailed and costed — must be reviewed by the Architecture Board and approved by the sponsoring organisation before delivery can begin.</p>
+    <div class="hl teal"><div class="hl-lbl">The sign-off process</div><p>Phase F's sign-off ensures that the delivery plan has formal organisational endorsement. It also marks the <strong>transition from architecture governance to implementation governance</strong> — the Architecture Board hands over to programme governance structures for Phase G onward.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Architecture Board review</div><p class="def-text">The Architecture Board reviews the finalised Migration Plan and Roadmap against the Architecture Vision and principles. Any deviations require formal dispensation.</p></div>
+      <div class="def-item"><div class="def-term">Sponsor and executive sign-off</div><p class="def-text">The sponsoring executive and key business stakeholders formally approve the plan. This commits organisational resources — budget, staff, time — to the delivery programme.</p></div>
+      <div class="def-item"><div class="def-term">Transition to Phase G</div><p class="def-text">Once the plan is approved, Phase G — Implementation Governance — takes over. Phase G monitors delivery against the approved Architecture Plan throughout implementation.</p></div>
+    </div>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-head in">Key Inputs to Phase F</div>
+        <ul class="col-list">
+          <li>Architecture Roadmap (initial, Phase E) ★</li>
+          <li>Work Package definitions (Phase E) ★</li>
+          <li>Transition Architecture definitions (Phase E)</li>
+          <li>Architecture Definition Document</li>
+          <li>Architecture Vision</li>
+          <li>Architecture Principles</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-head out">Key Outputs of Phase F</div>
+        <ul class="col-list">
+          <li>Implementation &amp; Migration Plan (final) ★</li>
+          <li>Finalised Architecture Roadmap ★</li>
+          <li>Confirmed Transition Architectures ★</li>
+          <li>Architecture contract drafts (for Phase G)</li>
+          <li>Updated Architecture Repository</li>
+          <li>Approved delivery schedule and budget</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hl amber"><div class="hl-lbl">Week 2 complete — what's coming in Week 3</div><p>Phases E and F complete the delivery planning cycle. Week 3 covers the governance and change management phases: <strong>Phase G (Implementation Governance)</strong> and <strong>Phase H (Architecture Change Management)</strong>, plus the continuous <strong>Requirements Management</strong> phase and <strong>ADM Guidelines and Techniques</strong>.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Phase F's primary output is the <strong>finalised Implementation and Migration Plan</strong>. It requires formal <strong>Architecture Board review and sponsor sign-off</strong> before delivery begins. After Phase F, <strong>Phase G</strong> takes over to govern the implementation.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2 style="font-family:'Lora',serif;font-size:20px;color:var(--ink);margin-bottom:16px">Session summary</h2>
+    <div class="sum-grid">
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Phase F = definitive planning</div><p class="sum-body">Phase E defines the plan; Phase F prioritises, details, costs, and finalises it into the approved Migration Plan.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Prioritisation factors</div><p class="sum-body">Dependencies + business value + cost + risk all combine to sequence work packages in the optimal order.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Architecture Roadmap finalised here</div><p class="sum-body">Created in Phase E, refined into the definitive time-phased, costed, resourced roadmap in Phase F.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Sign-off triggers Phase G</div><p class="sum-body">Architecture Board review and sponsor approval of the Migration Plan marks the hand-over to Phase G governance.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Week 2 complete</div><p class="sum-body">ADM phases B through F are done. Phases C, D design complete. E, F plan complete. Week 3: governance.</p></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">Knowledge Check</div>
+    <div class="quiz-sub">5 questions · Phase F: Migration Planning</div>
+    <div class="quiz-q" id="quiz-q1">
+      <div class="quiz-q-text">1. What is the primary difference between the Architecture Roadmap produced in Phase E and the one finalised in Phase F?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. Phase E covers business architecture; Phase F covers technology</button>
+        <button class="quiz-opt" onclick="answer(1,'b')">B. Phase E produces an initial outline; Phase F produces the definitive, prioritised, costed, and approved version</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. The Phase E roadmap is only for architects; the Phase F roadmap is for programme managers</button>
+        <button class="quiz-opt" onclick="answer(1,'d')">D. There is no difference — Phase E and Phase F produce the same roadmap</button>
+      </div>
+      <div class="quiz-feedback" id="fb1"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q2">
+      <div class="quiz-q-text">2. Work package prioritisation in Phase F is based on which combination of factors?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. Technology complexity and vendor preference</button>
+        <button class="quiz-opt" onclick="answer(2,'b')">B. Dependencies, business value, cost, and risk</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. Number of stakeholders affected and project size</button>
+        <button class="quiz-opt" onclick="answer(2,'d')">D. Architecture domain (B, C, or D) and phase sequence</button>
+      </div>
+      <div class="quiz-feedback" id="fb2"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q3">
+      <div class="quiz-q-text">3. The Implementation and Migration Plan is finalised in which ADM phase?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. Phase D — Technology Architecture</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. Phase E — Opportunities and Solutions</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. Phase F — Migration Planning</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. Phase G — Implementation Governance</button>
+      </div>
+      <div class="quiz-feedback" id="fb3"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q4">
+      <div class="quiz-q-text">4. Which body formally reviews and approves the Migration Plan at the end of Phase F?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. The enterprise Architecture team only</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. The Architecture Board and the sponsoring organisation's executive</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. Only the CIO, as the technical authority</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. The programme delivery team</button>
+      </div>
+      <div class="quiz-feedback" id="fb4"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q5">
+      <div class="quiz-q-text">5. After Phase F is complete and the Migration Plan is approved, which ADM phase takes over?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. Phase E — to refine the work packages further</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. Phase H — Architecture Change Management</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. Phase G — Implementation Governance</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. The Preliminary Phase — to update the framework</button>
+      </div>
+      <div class="quiz-feedback" id="fb5"></div>
+    </div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+</article>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+let sec=0;const tEl=document.getElementById("read-timer");const iv=setInterval(()=>{sec++;tEl.textContent=Math.floor(sec/60)+":"+(sec%60<10?"0":"")+sec%60;},1000);
+window.addEventListener("scroll",()=>{const d=document.documentElement;document.getElementById("progress-bar").style.width=Math.min(100,(d.scrollTop/(d.scrollHeight-d.clientHeight))*100)+"%";document.getElementById("scroll-top").classList.toggle("show",d.scrollTop>400);});
+function markDone(){clearInterval(iv);try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[8]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("done-btn");b.textContent="✓ Done!";b.classList.add("completed");}
+const ANS={1:'b',2:'b',3:'c',4:'b',5:'c'};
+const FB={
+  1:{b:"Correct! Phase E produces an initial Architecture Roadmap identifying what needs to happen and in roughly what order. Phase F refines this into the definitive, prioritised, costed, and formally approved version ready to govern delivery.",x:"Not quite. The key difference is that Phase E produces the initial outline, while Phase F produces the definitive, prioritised, costed, and approved version. Both phases produce a roadmap — but at very different levels of detail and authority."},
+  2:{b:"Correct! Phase F prioritises work packages using a combination of dependency constraints (sequencing), business value (benefit), cost (affordability), and risk (feasibility). All four factors are considered together to produce the optimal delivery sequence.",x:"Not quite. The four prioritisation factors in Phase F are: dependency constraints, business value, cost, and risk. Technology complexity and vendor preference are not TOGAF prioritisation criteria."},
+  3:{c:"Correct! The Implementation and Migration Plan is finalised in Phase F. Phase E produces an initial version, but it is Phase F that adds the detailed prioritisation, costing, resource planning, and governance structures needed for the definitive plan.",x:"Not quite. Phase F finalises the Implementation and Migration Plan. Phase E creates the initial version; Phase F makes it definitive with detailed prioritisation, costing, and approval."},
+  4:{b:"Correct! The Architecture Board reviews the Migration Plan against the Architecture Vision and principles, and the sponsoring executive provides business approval committing organisational resources to the delivery programme.",x:"Not quite. Both the Architecture Board (for architectural compliance) and the sponsoring executive (for business commitment and resource allocation) must formally approve the Migration Plan at the end of Phase F."},
+  5:{c:"Correct! After Phase F's Migration Plan is approved, Phase G — Implementation Governance — takes over. Phase G monitors the delivery of each project against the approved Architecture Plan, ensuring implementations conform to the defined architecture.",x:"Not quite. After Phase F, Phase G — Implementation Governance — takes over to monitor and govern the delivery of the approved plan. Phase H handles changes to the architecture once implementation is underway."}
+};
+let answered={},score=0;
+function answer(q,opt){if(answered[q])return;answered[q]=opt;const ok=opt===ANS[q];if(ok)score++;document.querySelectorAll(`#quiz-q${q} .quiz-opt`).forEach((b,i)=>{const o=['a','b','c','d'][i];b.classList.add(o===ANS[q]?"correct":o===opt&&!ok?"wrong":"reveal");});const fb=document.getElementById("fb"+q);fb.textContent=(ok?"✓ ":"✗ ")+(ok?FB[q][opt]:FB[q].x);fb.className="quiz-feedback show "+(ok?"ok":"no");if(Object.keys(answered).length===5){const msgs=["Keep going!","Getting there!","Good effort!","Strong result!","Perfect score! Week 2 complete! 🎉"];document.getElementById("quiz-score").textContent=`You scored ${score}/5. ${msgs[score-1]||msgs[0]}`;document.getElementById("quiz-score").classList.add("show");document.getElementById("quiz-reset").classList.add("show");if(score===5)markDone();}}
+function resetQuiz(){answered={};score=0;document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});document.getElementById("quiz-score").classList.remove("show");document.getElementById("quiz-reset").classList.remove("show");}
+</script>
+</body>
+</html>

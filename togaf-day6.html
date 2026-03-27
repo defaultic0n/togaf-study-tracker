@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 6 — Phase D: Technology Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAF7;--ink:#1A1A18;--ink2:#4A4A42;--ink3:#8A8A80;--teal:#0D6E5E;--teal-light:#E6F4F1;--teal-mid:#1A9B86;--amber:#92530A;--amber-light:#FDF3E3;--blue:#1A4A7A;--blue-light:#E8F0F8;--purple:#4A2A7A;--purple-light:#F0EAF8;--green:#1A5A2A;--green-light:#E8F4E8;--coral:#8A2A2A;--coral-light:#F8EAEA;--rule:#E0DFD8;--surface:#FFFFFF;--reading-max:680px}
+html{background:var(--bg);scroll-behavior:smooth}
+body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100;transition:width 0.1s}
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}
+.nav-day{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink3)}
+.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer}
+.done-btn.completed{background:#2EAA8A}
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}
+.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}
+.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px;transition:color 0.15s}
+.toc-list a:hover{color:var(--teal)}
+.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+.section{margin-bottom:48px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+p{margin-bottom:16px;color:var(--ink2)}
+p strong{color:var(--ink);font-weight:600}
+.hl{border-radius:10px;padding:16px 18px;margin:20px 0}
+.hl.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}
+.hl.amber{background:var(--amber-light);border-left:3px solid #D4860E}
+.hl.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}
+.hl.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}
+.hl.green{background:var(--green-light);border-left:3px solid #2A7A3A}
+.hl.coral{background:var(--coral-light);border-left:3px solid #C84A4A}
+.hl-lbl{font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px}
+.hl.teal .hl-lbl{color:var(--teal)}.hl.amber .hl-lbl{color:var(--amber)}.hl.blue .hl-lbl{color:var(--blue)}.hl.purple .hl-lbl{color:var(--purple)}.hl.green .hl-lbl{color:var(--green)}.hl.coral .hl-lbl{color:var(--coral)}
+.hl p{margin-bottom:0;font-size:15px;line-height:1.65}
+.hl.teal p{color:var(--teal)}.hl.amber p{color:var(--amber)}.hl.blue p{color:var(--blue)}.hl.purple p{color:var(--purple)}.hl.green p{color:var(--green)}.hl.coral p{color:var(--coral)}
+.def-grid{display:grid;gap:10px;margin:20px 0}
+.def-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.def-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.def-text{font-size:14px;color:var(--ink2);line-height:1.6;margin:0}
+.term{font-weight:600;color:var(--teal);border-bottom:1px dotted var(--teal-mid)}
+.layer-stack{display:flex;flex-direction:column;gap:0;margin:20px 0;border-radius:10px;overflow:hidden;border:1px solid var(--rule)}
+.layer{padding:12px 16px;display:flex;align-items:center;gap:12px}
+.layer:not(:last-child){border-bottom:1px solid var(--rule)}
+.layer-icon{font-size:20px;width:32px;text-align:center;flex-shrink:0}
+.layer-content{flex:1}
+.layer-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px}
+.layer-desc{font-size:13px;color:var(--ink2);line-height:1.5}
+.layer.biz{background:#F0F8F0}
+.layer.data{background:#EAF0F8}
+.layer.app{background:#F0EAF8}
+.layer.tech{background:var(--teal-light)}
+.layer.infra{background:#F8F4EA}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.col-box{background:var(--surface);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.col-head{padding:10px 14px;font-size:11px;font-weight:700;letter-spacing:0.7px;text-transform:uppercase}
+.col-head.in{background:var(--blue-light);color:var(--blue)}
+.col-head.out{background:var(--teal-light);color:var(--teal)}
+.col-list{list-style:none;padding:10px 14px;display:flex;flex-direction:column;gap:5px}
+.col-list li{font-size:13px;color:var(--ink2);line-height:1.5;display:flex;gap:6px;align-items:flex-start}
+.col-list li::before{content:'·';color:var(--ink3);flex-shrink:0}
+.art-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+.art-table th{background:var(--teal-light);color:var(--teal);font-weight:600;padding:9px 12px;text-align:left;border:1px solid var(--rule)}
+.art-table td{padding:8px 12px;border:1px solid var(--rule);color:var(--ink2);vertical-align:top;line-height:1.5}
+.art-table tr:nth-child(even) td{background:#F7F6F3}
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+.sum-grid{display:grid;gap:10px;margin-top:32px}
+.sum-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.sum-icon{font-size:18px;flex-shrink:0}
+.sum-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.sum-body{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}
+.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}
+.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}
+.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}
+.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}
+.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}
+.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}
+.quiz-reset.show{display:block}
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav class="top-nav">
+  <div class="nav-left"><span class="nav-day">Day 6 · Week 2</span><span class="nav-title">Phase D: Technology Architecture</span></div>
+  <div class="nav-right">
+    <div class="timer-badge">⏱ <span id="read-timer">0:00</span></div>
+    <button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button>
+  </div>
+</nav>
+<header class="hero">
+  <div class="hero-label">Study Session · Day 6 of 20</div>
+  <h1 class="hero-title">Phase D:<br>Technology Architecture</h1>
+  <div class="hero-meta">
+    <span class="meta-pill">📖 ~30 min read</span>
+    <span class="meta-pill">5 topics</span>
+    <span class="meta-pill">5 quiz questions</span>
+    <span class="meta-pill">ADM Phase D</span>
+  </div>
+  <p class="hero-intro">Phase D is the last of the three detailed architecture phases. It defines the technology infrastructure — hardware, software platforms, network, and services — that supports the applications and data designed in Phase C.</p>
+</header>
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>Phase D Overview &amp; Objective</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Technology Components &amp; Standards</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>Platform Services &amp; Application Platform</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Technology Portfolio Catalogue &amp; Artefacts</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Phase D Inputs, Outputs &amp; Relationship to Phase C</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>Knowledge Check</a></li>
+  </ol>
+</nav>
+<article class="article">
+
+  <section class="section" id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">Phase D Overview &amp; Objective</h2></div>
+    <div class="hl teal"><div class="hl-lbl">Objective</div><p>Phase D develops the <strong>Technology Architecture</strong> — the technology infrastructure required to support the deployment of Business, Data, and Application services. It is the "T" in BDAT and the last of the four architecture domains.</p></div>
+    <p>Phase D completes the BDAT architecture stack. After Phase B defined what the business does, Phase C defined what data and applications support it, Phase D now defines the technology platform on which those applications and data will run. The BDAT domains are always designed in this order — top down.</p>
+    <div class="layer-stack">
+      <div class="layer biz"><span class="layer-icon">🏢</span><div class="layer-content"><div class="layer-name">Business Architecture (Phase B)</div><div class="layer-desc">Strategy, capabilities, value streams, processes, actors</div></div></div>
+      <div class="layer data"><span class="layer-icon">🗄</span><div class="layer-content"><div class="layer-name">Data Architecture (Phase C)</div><div class="layer-desc">Data entities, logical/physical data components, data flows</div></div></div>
+      <div class="layer app"><span class="layer-icon">📱</span><div class="layer-content"><div class="layer-name">Application Architecture (Phase C)</div><div class="layer-desc">Logical/physical applications, integration, portfolios</div></div></div>
+      <div class="layer tech"><span class="layer-icon">⚙️</span><div class="layer-content"><div class="layer-name">Technology Architecture (Phase D) — TODAY</div><div class="layer-desc">Infrastructure, platforms, networks, standards, hosting</div></div></div>
+    </div>
+    <div class="hl amber"><div class="hl-lbl">Phase D objective in full</div><p>Develop the <strong>Baseline Technology Architecture</strong> (current state), the <strong>Target Technology Architecture</strong> (future state consistent with the Architecture Vision), perform <strong>Gap Analysis</strong>, and define candidate architecture roadmap components.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Phase D is the <strong>last detailed phase before Phases E and F move into delivery planning</strong>. After Phase D, the architecture (B, C, D) is complete and Phase E begins identifying how to close the gaps across all three domains.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">Technology Components &amp; Standards</h2></div>
+    <div class="hl blue"><div class="hl-lbl">Technology components defined</div><p>Technology Architecture identifies and categorises all the <strong>technology components</strong> needed to support the application and data layers — hardware, operating systems, middleware, network, storage, and hosting.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Technology Component</div><p class="def-text">Any hardware or software element that forms part of the technology infrastructure. Can be logical (technology-independent) or physical (technology-specific). Examples: compute resource, network switch, database engine, middleware service.</p></div>
+      <div class="def-item"><div class="def-term">Logical Technology Component</div><p class="def-text">A technology capability defined independently of specific products. E.g. "Relational Database Management Service" — specifies what is needed without choosing a vendor product.</p></div>
+      <div class="def-item"><div class="def-term">Physical Technology Component</div><p class="def-text">A specific technology product. E.g. "Oracle Database 21c" implements the Relational DBMS logical component. Chosen based on standards and organisational constraints.</p></div>
+      <div class="def-item"><div class="def-term">Technology Standards</div><p class="def-text">The approved technology products, versions, and configurations the organisation uses. Defined in the Standards Library of the Architecture Repository. Standards constrain which physical technology components can be selected.</p></div>
+    </div>
+    <div class="hl green"><div class="hl-lbl">Why technology standards matter</div><p>Standards reduce operational complexity, lower support costs, enable reuse, and ensure vendor-supported products are in use. They are defined at the enterprise level — often in the Preliminary Phase — and enforced through architecture governance. Phase D must comply with them.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The same <strong>logical / physical distinction</strong> from Phase C applies in Phase D. Logical components are technology-independent; physical components are specific products. Design logical first, then select physical implementations that comply with standards.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">Platform Services &amp; Application Platform</h2></div>
+    <p>A key concept in Phase D is the <span class="term">Application Platform</span> — the shared technology layer that all application components sit on top of. Understanding this helps explain why Phase D is so important: the platform choices made here affect every application designed in Phase C.</p>
+    <div class="hl blue"><div class="hl-lbl">Application Platform</div><p>The <strong>Application Platform</strong> is the complete set of technology services required to run application components. TOGAF organises these services into a taxonomy — making it clear what the technology architecture must provide.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Data Interchange Services</div><p class="def-text">Services enabling applications to exchange data — messaging, queuing, API management, event streaming. The "integration bus" that connects applications.</p></div>
+      <div class="def-item"><div class="def-term">Data Management Services</div><p class="def-text">Database management, data access, data caching, and storage services. The foundation for all data persistence and retrieval.</p></div>
+      <div class="def-item"><div class="def-term">Security Services</div><p class="def-text">Authentication, authorisation, encryption, key management, audit logging. Provides the security fabric across all applications.</p></div>
+      <div class="def-item"><div class="def-term">Operating System Services</div><p class="def-text">Process management, file systems, scheduling, memory management. The fundamental layer on which all higher services run.</p></div>
+      <div class="def-item"><div class="def-term">Network Services</div><p class="def-text">Connectivity, routing, load balancing, DNS, firewall. The communication fabric enabling all distributed components to work together.</p></div>
+      <div class="def-item"><div class="def-term">Location and Directory Services</div><p class="def-text">Identity directories, service registries, service discovery. Enables components to find and connect to each other across the infrastructure.</p></div>
+    </div>
+    <div class="hl amber"><div class="hl-lbl">Cloud and hybrid environments</div><p>In modern enterprises, the Application Platform may span on-premise infrastructure, private cloud, and public cloud services (IaaS, PaaS, SaaS). Phase D must model this hybrid environment — including where data resides, how applications communicate across boundaries, and what compliance constraints apply to each location.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The Application Platform is the shared infrastructure layer that all applications run on. Know its taxonomy of services — data interchange, data management, security, OS, network, and location/directory. The exam tests whether you understand what falls in the technology domain versus the application domain.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">Technology Portfolio Catalogue &amp; Artefacts</h2></div>
+    <p>Phase D produces the same three artefact types as Phases B and C — Catalogues, Matrices, and Diagrams — but now focused on the technology domain. The most important is the <span class="term">Technology Portfolio Catalogue</span>.</p>
+    <div class="art-table-wrap" style="overflow-x:auto;margin:20px 0">
+      <table class="art-table">
+        <thead><tr><th>Artefact</th><th>Type</th><th>What it Shows</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Technology Portfolio Catalogue</strong></td><td>Catalogue</td><td>Complete inventory of technology components — hardware, software, middleware, cloud services — both baseline and target</td></tr>
+          <tr><td><strong>Technology Standards Catalogue</strong></td><td>Catalogue</td><td>Approved technology standards — approved vendors, products, versions, and configurations</td></tr>
+          <tr><td><strong>Application / Technology Matrix</strong></td><td>Matrix</td><td>Maps Phase C applications to the Phase D technology components they run on — the dependency map</td></tr>
+          <tr><td><strong>Environments and Locations Diagram</strong></td><td>Diagram</td><td>Where technology components are deployed — data centres, cloud regions, branch offices, user locations</td></tr>
+          <tr><td><strong>Platform Decomposition Diagram</strong></td><td>Diagram</td><td>The hierarchical breakdown of the Application Platform into its services and components</td></tr>
+          <tr><td><strong>Processing Diagram</strong></td><td>Diagram</td><td>How processing is distributed across locations — data flows at the infrastructure level</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="hl teal"><div class="hl-lbl">Environments and Locations Diagram</div><p>This diagram is particularly important — it shows the <strong>physical and logical locations</strong> where technology components are deployed. For a global enterprise, this includes head office, regional offices, data centres, cloud regions, and disaster recovery sites. It directly answers the questions: where does data physically reside, and where do applications actually run?</p></div>
+    <div class="hl purple"><div class="hl-lbl">Application / Technology Matrix</div><p>This matrix is the critical link between Phase C and Phase D — mapping each application (from Phase C) to the technology components (from Phase D) it depends on. It makes dependencies visible and is essential for impact analysis when technology changes are proposed.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The <strong>Technology Portfolio Catalogue</strong> and the <strong>Application / Technology Matrix</strong> are the most exam-tested Phase D artefacts. The matrix is particularly important because it links Phase C (applications) to Phase D (technology) — demonstrating how the BDAT domains connect.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">Phase D Inputs, Outputs &amp; Relationship to Phase C</h2></div>
+    <p>Phase D is the final detailed architecture phase. Once complete, all four BDAT architecture domains have been addressed — and the architecture is ready for Phase E, which plans how to close the accumulated gaps.</p>
+    <div class="two-col">
+      <div class="col-box">
+        <div class="col-head in">Key Inputs</div>
+        <ul class="col-list">
+          <li>IS Architecture (Phase C) ★</li>
+          <li>Architecture Vision (Phase A)</li>
+          <li>Architecture Principles</li>
+          <li>Architecture Repository (incl. standards)</li>
+          <li>Existing Technology documentation</li>
+          <li>IT strategy and technology roadmap</li>
+        </ul>
+      </div>
+      <div class="col-box">
+        <div class="col-head out">Key Outputs</div>
+        <ul class="col-list">
+          <li>Baseline Technology Architecture ★</li>
+          <li>Target Technology Architecture ★</li>
+          <li>Technology Architecture Gap Analysis ★</li>
+          <li>Technology Portfolio Catalogue</li>
+          <li>Environments and Locations Diagram</li>
+          <li>Architecture Definition Doc (D chapter)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="hl teal"><div class="hl-lbl">After Phase D — what happens next</div><p>After Phase D, the architecture work across all four domains is complete. Phase E takes all the gaps identified in <strong>Phase B, Phase C, and Phase D</strong> and identifies the projects, work packages, and transition architectures needed to close them. This is why Phase E is often called the "planning" phase — it turns three phases of gap analysis into an actionable delivery roadmap.</p></div>
+    <div class="hl amber"><div class="hl-lbl">The Architecture Definition Document</div><p>By the end of Phase D, the <strong>Architecture Definition Document</strong> is substantially complete — it has accumulated a Business Architecture chapter (Phase B), an Information Systems Architecture chapter (Phase C), and now a Technology Architecture chapter (Phase D). This consolidated document becomes a key input to Phase E.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Phase D completes the architecture definition. After Phase D, Phases E and F focus on <strong>planning delivery</strong>, not on architecture design. The gaps from B + C + D are all consolidated in Phase E. This transition from design to delivery planning is frequently tested.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section>
+    <h2 style="font-family:'Lora',serif;font-size:20px;color:var(--ink);margin-bottom:16px">Session summary</h2>
+    <div class="sum-grid">
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Phase D = Technology Architecture (the T in BDAT)</div><p class="sum-body">Last of the three detailed phases. Defines the infrastructure supporting applications and data.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Logical before physical</div><p class="sum-body">Same pattern as Phase C. Define technology-independent logical components first, then select physical products complying with standards.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Application Platform = shared infrastructure services</div><p class="sum-body">Data interchange, data management, security, OS, network, location/directory services.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Application / Technology Matrix links C to D</div><p class="sum-body">Shows which applications (Phase C) depend on which technology components (Phase D).</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Phase D gaps consolidate in Phase E</div><p class="sum-body">Gaps from B + C + D all feed Phase E for delivery planning. Phase D marks end of architecture design.</p></div></div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">Knowledge Check</div>
+    <div class="quiz-sub">5 questions · Phase D: Technology Architecture</div>
+    <div class="quiz-q" id="quiz-q1">
+      <div class="quiz-q-text">1. Phase D is the last of the three detailed architecture phases. What happens immediately after Phase D is complete?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. Phase G — Implementation Governance begins</button>
+        <button class="quiz-opt" onclick="answer(1,'b')">B. Phase E — Opportunities and Solutions consolidates all gaps and plans delivery</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. The Preliminary Phase is revisited to update principles</button>
+        <button class="quiz-opt" onclick="answer(1,'d')">D. Phase H — Architecture Change Management is triggered</button>
+      </div>
+      <div class="quiz-feedback" id="fb1"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q2">
+      <div class="quiz-q-text">2. The Application / Technology Matrix is important because it:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. Lists all application components in the enterprise</button>
+        <button class="quiz-opt" onclick="answer(2,'b')">B. Maps Phase C applications to the Phase D technology components they depend on</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. Shows how applications interact with each other</button>
+        <button class="quiz-opt" onclick="answer(2,'d')">D. Documents the technology standards approved for use</button>
+      </div>
+      <div class="quiz-feedback" id="fb2"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q3">
+      <div class="quiz-q-text">3. Technology Standards in TOGAF are primarily stored in:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. The Architecture Vision document</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. The Technology Portfolio Catalogue</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. The Standards Library within the Architecture Repository</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. The Statement of Architecture Work</button>
+      </div>
+      <div class="quiz-feedback" id="fb3"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q4">
+      <div class="quiz-q-text">4. The Environments and Locations Diagram in Phase D shows:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. How business actors are distributed across organisational units</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. The application portfolio and which apps are baseline vs target</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. Where technology components are physically and logically deployed across the enterprise</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. The data flows between applications at the network level</button>
+      </div>
+      <div class="quiz-feedback" id="fb4"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q5">
+      <div class="quiz-q-text">5. Which of the following correctly describes the BDAT architecture sequence in TOGAF?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. Technology → Application → Data → Business (bottom-up, infrastructure first)</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. Business → Data → Application → Technology (top-down, strategy first)</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. Data → Business → Technology → Application (data-centric)</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. All four domains are designed simultaneously in Phase B/C/D</button>
+      </div>
+      <div class="quiz-feedback" id="fb5"></div>
+    </div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+</article>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+let sec=0;const tEl=document.getElementById("read-timer");const iv=setInterval(()=>{sec++;tEl.textContent=Math.floor(sec/60)+":"+(sec%60<10?"0":"")+sec%60;},1000);
+window.addEventListener("scroll",()=>{const d=document.documentElement;document.getElementById("progress-bar").style.width=Math.min(100,(d.scrollTop/(d.scrollHeight-d.clientHeight))*100)+"%";document.getElementById("scroll-top").classList.toggle("show",d.scrollTop>400);});
+function markDone(){clearInterval(iv);try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[6]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("done-btn");b.textContent="✓ Done!";b.classList.add("completed");}
+const ANS={1:'b',2:'b',3:'c',4:'c',5:'b'};
+const FB={
+  1:{b:"Correct! After Phase D completes the architecture definition, Phase E — Opportunities and Solutions — takes all the gaps identified across Phases B, C, and D and consolidates them into projects and transition architectures for delivery.",x:"Not quite. After Phase D, Phase E (Opportunities and Solutions) consolidates all gaps from B, C, and D into an implementation plan. Phase G is later in the cycle; Phase H is after G."},
+  2:{b:"Correct! The Application / Technology Matrix is the critical link between Phase C and Phase D — it maps each application to its dependent technology components. This dependency map is essential for impact analysis when technology changes are proposed.",x:"Not quite. The Application / Technology Matrix maps Phase C applications to their Phase D technology dependencies — it's the bridge between the two phases, not a catalogue or interaction diagram."},
+  3:{c:"Correct! Technology Standards are stored in the Standards Library, which is one of the key components of the Architecture Repository initialised in the Preliminary Phase. They constrain which physical technology products can be selected.",x:"Not quite. Technology Standards are stored in the Standards Library within the Architecture Repository. The Portfolio Catalogue lists technology components; standards live in their own library."},
+  4:{c:"Correct! The Environments and Locations Diagram shows where technology components are physically and logically deployed — data centres, cloud regions, branch offices, disaster recovery sites. It answers 'where does it all run?'",x:"Not quite. The Environments and Locations Diagram shows where technology components are deployed across physical and logical locations — data centres, cloud regions, offices. It's infrastructure geography."},
+  5:{b:"Correct! TOGAF designs architectures top-down: Business first (Phase B), then Data and Application (Phase C), then Technology (Phase D). This order ensures that technology choices are driven by business need, not the other way around.",x:"Not quite. TOGAF's BDAT sequence is top-down: Business → Data → Application → Technology. This ensures technology serves business strategy rather than business being constrained by technology."}
+};
+let answered={},score=0;
+function answer(q,opt){if(answered[q])return;answered[q]=opt;const ok=opt===ANS[q];if(ok)score++;document.querySelectorAll(`#quiz-q${q} .quiz-opt`).forEach((b,i)=>{const o=['a','b','c','d'][i];b.classList.add(o===ANS[q]?"correct":o===opt&&!ok?"wrong":"reveal");});const fb=document.getElementById("fb"+q);fb.textContent=(ok?"✓ ":"✗ ")+(ok?FB[q][opt]:FB[q].x);fb.className="quiz-feedback show "+(ok?"ok":"no");if(Object.keys(answered).length===5){const msgs=["Keep going — re-read and try again.","Getting there!","Good effort!","Strong result!","Perfect score! Ready for Day 7."];document.getElementById("quiz-score").textContent=`You scored ${score}/5. ${msgs[score-1]||msgs[0]}`;document.getElementById("quiz-score").classList.add("show");document.getElementById("quiz-reset").classList.add("show");if(score===5)markDone();}}
+function resetQuiz(){answered={};score=0;document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});document.getElementById("quiz-score").classList.remove("show");document.getElementById("quiz-reset").classList.remove("show");}
+</script>
+</body>
+</html>
