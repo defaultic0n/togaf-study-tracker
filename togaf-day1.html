@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Day 1 — TOGAF Overview & Core Concepts</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#FAFAF7;
+  --ink:#1A1A18;
+  --ink2:#4A4A42;
+  --ink3:#8A8A80;
+  --teal:#0D6E5E;
+  --teal-light:#E6F4F1;
+  --teal-mid:#1A9B86;
+  --amber:#92530A;
+  --amber-light:#FDF3E3;
+  --blue:#1A4A7A;
+  --blue-light:#E8F0F8;
+  --purple:#4A2A7A;
+  --purple-light:#F0EAF8;
+  --coral:#8A2A2A;
+  --coral-light:#F8EAEA;
+  --rule:#E0DFD8;
+  --surface:#FFFFFF;
+  --tag-r:4px;
+  --reading-max:680px;
+}
+
+html{background:var(--bg);scroll-behavior:smooth}
+body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+
+/* Reading progress bar */
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100;transition:width 0.1s}
+
+/* Top nav */
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}
+.nav-day{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink3)}
+.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap}
+#read-timer{font-variant-numeric:tabular-nums}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer;white-space:nowrap}
+.done-btn.completed{background:#2EAA8A}
+
+/* Hero */
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px;letter-spacing:-0.3px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+
+/* TOC */
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}
+.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}
+.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px;transition:color 0.15s}
+.toc-list a:hover{color:var(--teal)}
+.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+
+/* Article content */
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+
+/* Section */
+.section{margin-bottom:48px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+
+/* Body text */
+p{margin-bottom:16px;color:var(--ink2)}
+p strong{color:var(--ink);font-weight:600}
+
+/* Highlight box */
+.highlight{border-radius:10px;padding:16px 18px;margin:20px 0}
+.highlight.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}
+.highlight.amber{background:var(--amber-light);border-left:3px solid #D4860E}
+.highlight.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}
+.highlight.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}
+.highlight-label{font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:6px}
+.highlight.teal .highlight-label{color:var(--teal)}
+.highlight.amber .highlight-label{color:var(--amber)}
+.highlight.blue .highlight-label{color:var(--blue)}
+.highlight.purple .highlight-label{color:var(--purple)}
+.highlight p{margin-bottom:0;font-size:15px;line-height:1.65}
+.highlight.teal p{color:var(--teal)}
+.highlight.amber p{color:var(--amber)}
+.highlight.blue p{color:var(--blue)}
+.highlight.purple p{color:var(--purple)}
+
+/* Definition term */
+.def-grid{display:grid;gap:10px;margin:20px 0}
+.def-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.def-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px;letter-spacing:0.2px}
+.def-text{font-size:14px;color:var(--ink2);line-height:1.6;margin:0}
+
+/* BDAT domain cards */
+.domain-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+.domain-card{border-radius:10px;padding:16px;position:relative;overflow:hidden}
+.domain-card.biz{background:var(--teal-light);border:1px solid rgba(13,110,94,0.15)}
+.domain-card.data{background:var(--blue-light);border:1px solid rgba(26,74,122,0.15)}
+.domain-card.app{background:var(--purple-light);border:1px solid rgba(74,42,122,0.15)}
+.domain-card.tech{background:var(--amber-light);border:1px solid rgba(146,83,10,0.15)}
+.domain-icon{font-size:22px;margin-bottom:8px}
+.domain-name{font-size:13px;font-weight:700;margin-bottom:4px}
+.domain-card.biz .domain-name{color:var(--teal)}
+.domain-card.data .domain-name{color:var(--blue)}
+.domain-card.app .domain-name{color:var(--purple)}
+.domain-card.tech .domain-name{color:var(--amber)}
+.domain-desc{font-size:12px;line-height:1.5;margin:0}
+.domain-card.biz .domain-desc{color:#2A7A6A}
+.domain-card.data .domain-desc{color:#2A5A8A}
+.domain-card.app .domain-desc{color:#6A4AAA}
+.domain-card.tech .domain-desc{color:#A06020}
+.domain-examples{margin-top:6px;font-size:11px;opacity:0.8}
+.domain-card.biz .domain-examples{color:var(--teal)}
+.domain-card.data .domain-examples{color:var(--blue)}
+.domain-card.app .domain-examples{color:var(--purple)}
+.domain-card.tech .domain-examples{color:var(--amber)}
+
+/* ADM phase row */
+.adm-list{display:flex;flex-direction:column;gap:8px;margin:20px 0}
+.adm-phase{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;background:var(--surface);border:1px solid var(--rule);border-radius:8px}
+.adm-phase-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;margin-top:1px}
+.adm-phase.prel .adm-phase-badge{background:#E8F8E8;color:#2A7A2A}
+.adm-phase.a .adm-phase-badge{background:var(--teal-light);color:var(--teal)}
+.adm-phase.b .adm-phase-badge{background:var(--blue-light);color:var(--blue)}
+.adm-phase.c .adm-phase-badge{background:var(--purple-light);color:var(--purple)}
+.adm-phase.d .adm-phase-badge{background:var(--amber-light);color:var(--amber)}
+.adm-phase.e .adm-phase-badge{background:#F8EEF0;color:#8A2A4A}
+.adm-phase.f .adm-phase-badge{background:#EEF4E8;color:#3A6A2A}
+.adm-phase.g .adm-phase-badge{background:#F8F0E8;color:#7A4A1A}
+.adm-phase.h .adm-phase-badge{background:#EAE8F8;color:#4A3A8A}
+.adm-phase.req .adm-phase-badge{background:#F4F4F0;color:#5A5A4A}
+.adm-phase-info{flex:1}
+.adm-phase-name{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.adm-phase-desc{font-size:13px;color:var(--ink2);line-height:1.5}
+
+/* Component table */
+.comp-grid{display:grid;gap:8px;margin:20px 0}
+.comp-item{display:flex;gap:12px;padding:12px 14px;border-radius:8px;border:1px solid var(--rule);background:var(--surface);align-items:flex-start}
+.comp-dot{width:8px;height:8px;border-radius:50%;margin-top:6px;flex-shrink:0}
+.comp-info{flex:1}
+.comp-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.comp-desc{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+
+/* Key term inline */
+.term{font-weight:600;color:var(--teal);border-bottom:1px dotted var(--teal-mid)}
+
+/* Exam tip */
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+
+/* Quiz section */
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}
+.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}
+.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;transition:all 0.15s;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt:active{transform:scale(0.99)}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}
+.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}
+.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}
+.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}
+.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}
+.quiz-reset.show{display:block}
+
+/* Summary cards */
+.summary-grid{display:grid;gap:10px;margin-top:32px}
+.summary-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.summary-icon{font-size:18px;flex-shrink:0;margin-top:1px}
+.summary-text{flex:1}
+.summary-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}
+.summary-body{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+
+/* Divider */
+.divider{height:1px;background:var(--rule);margin:40px 0}
+
+/* Scroll to top */
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity 0.3s;box-shadow:0 2px 12px rgba(0,0,0,0.15)}
+.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- Top nav -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <span class="nav-day">Day 1 · Week 1</span>
+    <span class="nav-title">TOGAF Overview & Core Concepts</span>
+  </div>
+  <div class="nav-right">
+    <div class="timer-badge">⏱ <span id="read-timer">0:00</span></div>
+    <button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button>
+  </div>
+</nav>
+
+<!-- Hero -->
+<header class="hero">
+  <div class="hero-label">Study Session · Day 1 of 20</div>
+  <h1 class="hero-title">TOGAF Overview &amp;<br>Core Concepts</h1>
+  <div class="hero-meta">
+    <span class="meta-pill">📖 ~30 min read</span>
+    <span class="meta-pill">5 topics</span>
+    <span class="meta-pill">5 quiz questions</span>
+    <span class="meta-pill">Foundation exam</span>
+  </div>
+  <p class="hero-intro">Before diving into the details of TOGAF, you need to understand what it is, why it exists, and how its pieces fit together. This session gives you the foundation everything else builds on.</p>
+</header>
+
+<!-- TOC -->
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>What is TOGAF?</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>The Four Architecture Domains (BDAT)</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>Key Terminology</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>The ADM Cycle — High-Level Overview</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>TOGAF Components Overview</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>Knowledge Check</a></li>
+  </ol>
+</nav>
+
+<!-- Article -->
+<article class="article">
+
+  <!-- SECTION 1 -->
+  <section class="section" id="s1">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">What is TOGAF?</h2>
+    </div>
+
+    <div class="highlight teal">
+      <div class="highlight-label">Definition</div>
+      <p><strong>TOGAF</strong> — The Open Group Architecture Framework — is a globally recognised framework and methodology for developing, maintaining, and governing enterprise architectures. It is owned and maintained by <strong>The Open Group</strong>, an international consortium of technology and business organisations.</p>
+    </div>
+
+    <p>Think of TOGAF as a <strong>common language and structured approach</strong> that organisations use when designing large-scale IT and business systems. Without a framework like TOGAF, different teams in the same organisation would design architecture in inconsistent ways, making it hard to reuse work, manage change, or communicate decisions to leadership.</p>
+
+    <p>TOGAF was first published in 1995. The most widely used version is <strong>TOGAF 9.2</strong> (released 2018), which is what the Foundation exam is based on. TOGAF 10 was released in 2022 but exam content still centres on 9.2 concepts.</p>
+
+    <div class="highlight amber">
+      <div class="highlight-label">Why organisations adopt TOGAF</div>
+      <p>It provides a <strong>repeatable, consistent process</strong> to align business goals with IT capabilities, reduce duplication, manage complexity, support digital transformation, and make architecture decisions that are traceable and governable.</p>
+    </div>
+
+    <p>TOGAF is not prescriptive — it is a <span class="term">framework</span>, not a rigid standard. Organisations are expected to <strong>tailor it</strong> to their own context, culture, and maturity level. This is an important exam concept: TOGAF must always be adapted, never applied blindly.</p>
+
+    <div class="exam-tip">
+      <div class="exam-tip-label">⭐ Exam tip</div>
+      <p>The exam often tests whether you understand that TOGAF is a <strong>framework to be tailored</strong>, not a rigid standard to be followed exactly. Remember: The Open Group owns TOGAF; organisations tailor it to their needs.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 2 -->
+  <section class="section" id="s2">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">The Four Architecture Domains (BDAT)</h2>
+    </div>
+
+    <p>TOGAF organises enterprise architecture into <strong>four interconnected domains</strong>, commonly remembered with the acronym <span class="term">BDAT</span>. Each domain addresses a different layer of the enterprise, and together they form a complete picture of how an organisation works.</p>
+
+    <div class="domain-grid">
+      <div class="domain-card biz">
+        <div class="domain-icon">🏢</div>
+        <div class="domain-name">Business</div>
+        <p class="domain-desc">Business strategy, governance, organisation, and key business processes</p>
+        <p class="domain-examples">e.g. org charts, value streams, business capabilities</p>
+      </div>
+      <div class="domain-card data">
+        <div class="domain-icon">🗄️</div>
+        <div class="domain-name">Data</div>
+        <p class="domain-desc">Structure and management of logical and physical data assets</p>
+        <p class="domain-examples">e.g. data models, data entities, data governance</p>
+      </div>
+      <div class="domain-card app">
+        <div class="domain-icon">📱</div>
+        <div class="domain-name">Application</div>
+        <p class="domain-desc">Individual applications, their interactions and relationships to business processes</p>
+        <p class="domain-examples">e.g. application portfolio, interfaces, ERP, CRM</p>
+      </div>
+      <div class="domain-card tech">
+        <div class="domain-icon">⚙️</div>
+        <div class="domain-name">Technology</div>
+        <p class="domain-desc">Hardware, software, and network infrastructure that supports applications</p>
+        <p class="domain-examples">e.g. servers, cloud platforms, middleware, networks</p>
+      </div>
+    </div>
+
+    <p>These four domains are <strong>not designed in isolation</strong>. Changes in the Business domain — say, a merger — will trigger changes in Data, Application, and Technology as well. TOGAF's process (the ADM) guides architects to work through all four domains in sequence.</p>
+
+    <div class="highlight blue">
+      <div class="highlight-label">How to remember the order</div>
+      <p>Think top-down: <strong>Business</strong> drives everything → the business needs <strong>Data</strong> → data is managed by <strong>Applications</strong> → applications run on <strong>Technology</strong>. The sequence mirrors how strategy flows down to infrastructure.</p>
+    </div>
+
+    <div class="exam-tip">
+      <div class="exam-tip-label">⭐ Exam tip</div>
+      <p>Know the full names of all four domains and the acronym BDAT. The exam may present them out of order and ask you to identify which is which. Business and Data are often confused — Business is about <em>processes and capabilities</em>, Data is about <em>information assets</em>.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 3 -->
+  <section class="section" id="s3">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">Key Terminology</h2>
+    </div>
+
+    <p>TOGAF has its own vocabulary. Getting these terms precisely right is essential for the exam — many questions deliberately test the boundaries between similar terms.</p>
+
+    <div class="def-grid">
+      <div class="def-item">
+        <div class="def-term">Enterprise</div>
+        <p class="def-text">Any collection of organisations that share a common set of goals. In TOGAF, "enterprise" is broader than a single company — it can mean a government body, a business unit, a consortium, or even a whole industry sector. The enterprise defines the <em>scope</em> of the architecture work.</p>
+      </div>
+      <div class="def-item">
+        <div class="def-term">Architecture</div>
+        <p class="def-text">TOGAF defines architecture in two ways: (1) a <em>formal description</em> of a system (the components, how they relate, and governing principles); or (2) the <em>structure of components</em> themselves. Both definitions are used in the exam — context determines which applies.</p>
+      </div>
+      <div class="def-item">
+        <div class="def-term">Enterprise Architecture (EA)</div>
+        <p class="def-text">A coherent whole-of-enterprise description — covering all four domains (BDAT) — that provides a strategic context for IT investments and change. EA enables organisations to respond to change in a consistent, controlled way.</p>
+      </div>
+      <div class="def-item">
+        <div class="def-term">Stakeholder</div>
+        <p class="def-text">An individual, team, or organisation that has an interest in, or concern about, the outcome of the architecture work. Stakeholders are not just executives — they include developers, operations staff, regulators, customers, and end users. Managing stakeholder concerns is a core TOGAF activity.</p>
+      </div>
+      <div class="def-item">
+        <div class="def-term">Concern</div>
+        <p class="def-text">A specific interest or worry that a stakeholder has about the architecture — such as security, performance, cost, or compliance. A concern is what keeps a stakeholder up at night. Architects must identify and address concerns through architecture <em>views</em>.</p>
+      </div>
+      <div class="def-item">
+        <div class="def-term">View</div>
+        <p class="def-text">A representation of the architecture from the perspective of a specific set of stakeholders and their concerns. Different stakeholders get different views of the same architecture (e.g., a CEO sees a high-level business view; a developer sees a technical component view).</p>
+      </div>
+      <div class="def-item">
+        <div class="def-term">Viewpoint</div>
+        <p class="def-text">The specification (template) for constructing a view. If a view is a photograph of a building, a viewpoint is the instructions for which camera angle and lens to use. Viewpoints are reusable; views are the actual outputs produced by applying a viewpoint.</p>
+      </div>
+      <div class="def-item">
+        <div class="def-term">Architecture Principles</div>
+        <p class="def-text">General rules and guidelines that govern the architecture process and its resulting designs. They represent the values and intentions of the enterprise. Example: "Data is an asset" or "Technology independence." Principles are defined in the Preliminary Phase.</p>
+      </div>
+    </div>
+
+    <div class="highlight purple">
+      <div class="highlight-label">View vs Viewpoint — the key distinction</div>
+      <p>A <strong>viewpoint</strong> is a template or pattern. A <strong>view</strong> is the result of applying that template to a specific architecture. Viewpoints are created once and reused; views are created per architecture project. The exam tests this distinction repeatedly.</p>
+    </div>
+
+    <div class="exam-tip">
+      <div class="exam-tip-label">⭐ Exam tip</div>
+      <p>Know the distinction between <strong>View</strong> and <strong>Viewpoint</strong>, and between <strong>Concern</strong> and <strong>Stakeholder</strong>. Also: the TOGAF definition of "enterprise" is deliberately broad — it is not just a company. Any question asking "what is the enterprise?" should be answered with "any collection of organisations sharing common goals."</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 4 -->
+  <section class="section" id="s4">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">The ADM Cycle — High-Level Overview</h2>
+    </div>
+
+    <p>The <span class="term">Architecture Development Method (ADM)</span> is the core of TOGAF. It is a step-by-step method for developing an enterprise architecture. Everything else in TOGAF — the guidelines, techniques, repository, governance — exists to support the ADM.</p>
+
+    <div class="highlight teal">
+      <div class="highlight-label">What the ADM does</div>
+      <p>The ADM provides a <strong>tested, repeatable process</strong> for developing architecture. It tells architects what to do, in what order, with what inputs and outputs — ensuring nothing is missed and all four domains are addressed consistently.</p>
+    </div>
+
+    <p>The ADM consists of <strong>10 phases</strong> arranged in a cycle. The cycle nature is important — organisations don't do it once and stop; they continuously iterate as the business and technology landscape evolves.</p>
+
+    <div class="adm-list">
+      <div class="adm-phase prel">
+        <span class="adm-phase-badge">Prelim</span>
+        <div class="adm-phase-info">
+          <div class="adm-phase-name">Preliminary Phase</div>
+          <div class="adm-phase-desc">Set up the architecture capability. Define framework, principles, tools, and how TOGAF will be tailored. The "getting ready" phase.</div>
+        </div>
+      </div>
+      <div class="adm-phase a">
+        <span class="adm-phase-badge">Phase A</span>
+        <div class="adm-phase-info">
+          <div class="adm-phase-name">Architecture Vision</div>
+          <div class="adm-phase-desc">Define scope, identify stakeholders, create high-level vision of the target state, and get approval to proceed.</div>
+        </div>
+      </div>
+      <div class="adm-phase b">
+        <span class="adm-phase-badge">Phase B</span>
+        <div class="adm-phase-info">
+          <div class="adm-phase-name">Business Architecture</div>
+          <div class="adm-phase-desc">Develop baseline and target Business Architecture. Identify gaps between them.</div>
+        </div>
+      </div>
+      <div class="adm-phase c">
+        <span class="adm-phase-badge">Phase C</span>
+        <div class="adm-phase-info">
+          <div class="adm-phase-name">Information Systems Architecture</div>
+          <div class="adm-phase-desc">Develop Data and Application architectures. Two sub-domains addressed together.</div>
+        </div>
+      </div>
+      <div class="adm-phase d">
+        <span class="adm-phase-badge">Phase D</span>
+        <div class="adm-phase-info">
+          <div class="adm-phase-name">Technology Architecture</div>
+          <div class="adm-phase-desc">Develop the Technology Architecture that supports Data and Application architectures.</div>
+        </div>
+      </div>
+      <div class="adm-phase e">
+        <span class="adm-phase-badge">Phase E</span>
+        <div class="adm-phase-info">
+          <div class="adm-phase-name">Opportunities &amp; Solutions</div>
+          <div class="adm-phase-desc">Identify delivery vehicles (projects, programmes). Plan transition architectures.</div>
+        </div>
+      </div>
+      <div class="adm-phase f">
+        <span class="adm-phase-badge">Phase F</span>
+        <div class="adm-phase-info">
+          <div class="adm-phase-name">Migration Planning</div>
+          <div class="adm-phase-desc">Create a detailed migration plan. Prioritise projects. Assess costs, benefits, risks.</div>
+        </div>
+      </div>
+      <div class="adm-phase g">
+        <span class="adm-phase-badge">Phase G</span>
+        <div class="adm-phase-info">
+          <div class="adm-phase-name">Implementation Governance</div>
+          <div class="adm-phase-desc">Oversee implementation projects. Ensure conformance with the target architecture.</div>
+        </div>
+      </div>
+      <div class="adm-phase h">
+        <span class="adm-phase-badge">Phase H</span>
+        <div class="adm-phase-info">
+          <div class="adm-phase-name">Architecture Change Management</div>
+          <div class="adm-phase-desc">Manage changes to the architecture. Decide if changes need a new ADM cycle.</div>
+        </div>
+      </div>
+      <div class="adm-phase req">
+        <span class="adm-phase-badge">Req. Mgmt</span>
+        <div class="adm-phase-info">
+          <div class="adm-phase-name">Requirements Management</div>
+          <div class="adm-phase-desc">A continuous phase at the centre of the cycle. Manages architecture requirements throughout all phases.</div>
+        </div>
+      </div>
+    </div>
+
+    <p>An important ADM concept for today: the phases are <strong>B, C, D</strong> correspond directly to three of the four BDAT domains. The Business domain is Phase B; Data and Application (both Information Systems) are Phase C; Technology is Phase D. Phase A (Vision) sets context for all of them.</p>
+
+    <div class="exam-tip">
+      <div class="exam-tip-label">⭐ Exam tip</div>
+      <p>Know the <strong>order</strong> of ADM phases (Prelim → A → B → C → D → E → F → G → H) and what each one focuses on at a high level. The exam tests phase names, sequence, and — critically — that <strong>Requirements Management sits at the centre</strong> and is continuous, not a linear step.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SECTION 5 -->
+  <section class="section" id="s5">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">TOGAF Components Overview</h2>
+    </div>
+
+    <p>TOGAF is more than just the ADM. It is a collection of interrelated components that work together. Think of the ADM as the engine, and these components as the fuel, navigation system, and chassis around it.</p>
+
+    <div class="comp-grid">
+      <div class="comp-item">
+        <div class="comp-dot" style="background:#1A9B86"></div>
+        <div class="comp-info">
+          <div class="comp-name">Architecture Development Method (ADM)</div>
+          <p class="comp-desc">The step-by-step process for developing enterprise architecture. The heart of TOGAF. All other components support it.</p>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-dot" style="background:#2A6DB5"></div>
+        <div class="comp-info">
+          <div class="comp-name">ADM Guidelines &amp; Techniques</div>
+          <p class="comp-desc">A collection of tools, guidelines, and techniques to support specific ADM tasks — such as stakeholder management, gap analysis, business scenarios, and risk assessment.</p>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-dot" style="background:#7A4ABF"></div>
+        <div class="comp-info">
+          <div class="comp-name">Architecture Content Framework</div>
+          <p class="comp-desc">Defines what architecture work produces: deliverables, artifacts, and building blocks. Provides a consistent taxonomy for architecture outputs.</p>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-dot" style="background:#C08010"></div>
+        <div class="comp-info">
+          <div class="comp-name">Enterprise Continuum &amp; Tools</div>
+          <p class="comp-desc">A classification system for architecture and solution assets, ranging from generic (Foundation) to organisation-specific. Includes the Architecture Repository where assets are stored.</p>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-dot" style="background:#8A2A2A"></div>
+        <div class="comp-info">
+          <div class="comp-name">TOGAF Reference Models</div>
+          <p class="comp-desc">Two built-in reference models: the <strong>Technical Reference Model (TRM)</strong> for technology infrastructure, and the <strong>Integrated Information Infrastructure Reference Model (III-RM)</strong> for information flow.</p>
+        </div>
+      </div>
+      <div class="comp-item">
+        <div class="comp-dot" style="background:#3A6A2A"></div>
+        <div class="comp-info">
+          <div class="comp-name">Architecture Capability Framework</div>
+          <p class="comp-desc">Guidance on how to establish and operate an Architecture Capability within an organisation — including roles, responsibilities, skills, and processes needed to run an EA practice.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="highlight teal">
+      <div class="highlight-label">The big picture</div>
+      <p>All components work in service of one goal: <strong>helping the organisation develop, maintain, and govern its enterprise architecture in a consistent, repeatable, and business-aligned way.</strong> The ADM is the process; the other components provide the content, storage, standards, and governance that make that process effective.</p>
+    </div>
+
+    <div class="exam-tip">
+      <div class="exam-tip-label">⭐ Exam tip</div>
+      <p>You need to recognise all six components and know roughly what each one does. A common question: "Which TOGAF component provides guidance on how to set up an architecture function within an organisation?" Answer: <strong>Architecture Capability Framework</strong>.</p>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Session summary -->
+  <section>
+    <h2 style="font-family:'Lora',serif;font-size:20px;color:var(--ink);margin-bottom:16px">Session summary</h2>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <span class="summary-icon">📌</span>
+        <div class="summary-text">
+          <div class="summary-head">TOGAF is a framework, not a standard</div>
+          <p class="summary-body">It must be tailored to the organisation. Owned by The Open Group. Current exam version is 9.2.</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <span class="summary-icon">📌</span>
+        <div class="summary-text">
+          <div class="summary-head">Four domains: BDAT</div>
+          <p class="summary-body">Business → Data → Application → Technology. Each domain builds on the one above it.</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <span class="summary-icon">📌</span>
+        <div class="summary-text">
+          <div class="summary-head">Key term pairs to distinguish</div>
+          <p class="summary-body">View vs Viewpoint · Stakeholder vs Concern · Enterprise (broad) vs Company (narrow)</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <span class="summary-icon">📌</span>
+        <div class="summary-text">
+          <div class="summary-head">ADM has 10 phases in a cycle</div>
+          <p class="summary-body">Prelim → A through H, with Requirements Management at the continuous centre. Phases B/C/D map to BDAT domains.</p>
+        </div>
+      </div>
+      <div class="summary-card">
+        <span class="summary-icon">📌</span>
+        <div class="summary-text">
+          <div class="summary-head">Six TOGAF components</div>
+          <p class="summary-body">ADM · Guidelines &amp; Techniques · Content Framework · Enterprise Continuum · Reference Models · Capability Framework</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- Quiz -->
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">Knowledge Check</div>
+    <div class="quiz-sub">5 questions · Test your understanding before moving on</div>
+
+    <div id="quiz-q1" class="quiz-q">
+      <div class="quiz-q-text">1. TOGAF defines "enterprise" as:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. A large private sector company</button>
+        <button class="quiz-opt" onclick="answer(1,'b')">B. Any collection of organisations sharing common goals</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. A government agency or public institution</button>
+        <button class="quiz-opt" onclick="answer(1,'d')">D. An IT department within a corporation</button>
+      </div>
+      <div class="quiz-feedback" id="fb1"></div>
+    </div>
+
+    <div id="quiz-q2" class="quiz-q">
+      <div class="quiz-q-text">2. Which TOGAF component provides guidance on how to establish and run an architecture practice within an organisation?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. Architecture Content Framework</button>
+        <button class="quiz-opt" onclick="answer(2,'b')">B. Enterprise Continuum</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. Architecture Capability Framework</button>
+        <button class="quiz-opt" onclick="answer(2,'d')">D. ADM Guidelines &amp; Techniques</button>
+      </div>
+      <div class="quiz-feedback" id="fb2"></div>
+    </div>
+
+    <div id="quiz-q3" class="quiz-q">
+      <div class="quiz-q-text">3. In TOGAF, what is a "viewpoint"?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. A representation of the architecture for a specific stakeholder group</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. A stakeholder's specific concern about the architecture</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. A specification (template) for constructing an architecture view</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. A type of architecture principle</button>
+      </div>
+      <div class="quiz-feedback" id="fb3"></div>
+    </div>
+
+    <div id="quiz-q4" class="quiz-q">
+      <div class="quiz-q-text">4. The ADM phase that sits at the centre of the ADM cycle and runs continuously throughout all phases is:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. Phase A — Architecture Vision</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. Preliminary Phase</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. Phase H — Architecture Change Management</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. Requirements Management</button>
+      </div>
+      <div class="quiz-feedback" id="fb4"></div>
+    </div>
+
+    <div id="quiz-q5" class="quiz-q">
+      <div class="quiz-q-text">5. The correct order of the four TOGAF architecture domains from highest to most foundational level is:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. Technology → Application → Data → Business</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. Business → Application → Data → Technology</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. Business → Data → Application → Technology</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. Data → Business → Technology → Application</button>
+      </div>
+      <div class="quiz-feedback" id="fb5"></div>
+    </div>
+
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+
+</article>
+
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// Reading timer
+let seconds=0,timerInterval=null;
+const timerEl=document.getElementById("read-timer");
+function fmt(s){return Math.floor(s/60)+":"+(s%60<10?"0":"")+s%60}
+timerInterval=setInterval(()=>{seconds++;timerEl.textContent=fmt(seconds);},1000);
+
+// Progress bar
+window.addEventListener("scroll",()=>{
+  const doc=document.documentElement;
+  const pct=(doc.scrollTop/(doc.scrollHeight-doc.clientHeight))*100;
+  document.getElementById("progress-bar").style.width=Math.min(100,pct)+"%";
+  document.getElementById("scroll-top").classList.toggle("show",doc.scrollTop>400);
+});
+
+// Mark done
+function markDone(){
+  clearInterval(timerInterval);
+  try{
+    const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");
+    d[1]=true;
+    localStorage.setItem("togaf_done",JSON.stringify(d));
+  }catch(e){}
+  const btn=document.getElementById("done-btn");
+  btn.textContent="✓ Done!";
+  btn.classList.add("completed");
+}
+
+// Quiz
+const answers={1:'b',2:'c',3:'c',4:'d',5:'c'};
+const feedback={
+  1:{b:"Correct! TOGAF's definition of enterprise is intentionally broad — it can be a company, a government body, a consortium, or any group of organisations sharing common goals.",
+     x:"Not quite. The TOGAF definition is deliberately broad. It can be any collection of organisations sharing common goals — not limited to companies or governments specifically."},
+  2:{c:"Correct! The Architecture Capability Framework provides guidance on establishing and operating an EA practice — including roles, responsibilities, skills, and governance processes.",
+     x:"Not this one. The Architecture Capability Framework is specifically about setting up and running an architecture function within the organisation."},
+  3:{c:"Correct! A viewpoint is the specification or template for constructing a view. It defines what information to show and how to show it. A view is the actual result of applying a viewpoint.",
+     x:"Close, but that describes a 'view' — not a viewpoint. A viewpoint is the template/specification used to create a view. Views are the outputs; viewpoints are the instructions."},
+  4:{d:"Correct! Requirements Management sits at the centre of the ADM cycle and operates continuously throughout all phases, managing architecture requirements as they emerge and change.",
+     x:"Not quite. Requirements Management is the special phase that sits at the centre of the ADM and runs continuously. It is not one of the lettered phases."},
+  5:{c:"Correct! Business → Data → Application → Technology (BDAT). Business strategy drives data needs, data is managed by applications, and applications run on technology infrastructure.",
+     x:"Not quite. The correct order is Business → Data → Application → Technology (BDAT). Think top-down: strategy drives data needs, which are served by applications, which run on technology."}
+};
+let answered={},score=0;
+
+function answer(q,opt){
+  if(answered[q]) return;
+  answered[q]=opt;
+  const isCorrect=opt===answers[q];
+  if(isCorrect) score++;
+  const btns=document.querySelectorAll(`#quiz-q${q} .quiz-opt`);
+  btns.forEach((b,i)=>{
+    const o=['a','b','c','d'][i];
+    if(o===answers[q]) b.classList.add("correct");
+    else if(o===opt&&!isCorrect) b.classList.add("wrong");
+    else b.classList.add("reveal");
+  });
+  const fb=document.getElementById("fb"+q);
+  fb.textContent=isCorrect?("✓ "+feedback[q][opt]):("✗ "+feedback[q].x);
+  fb.className="quiz-feedback show "+(isCorrect?"ok":"no");
+  if(Object.keys(answered).length===5){
+    const s=document.getElementById("quiz-score");
+    const msgs=["Keep going — re-read and try again.","Getting there — review sections you missed.","Good effort — review the incorrect ones.","Strong result — just a couple to polish.","Perfect score! You're ready for Day 2."];
+    s.textContent=`You scored ${score}/5. ${msgs[score-1]||msgs[0]}`;
+    s.classList.add("show");
+    document.getElementById("quiz-reset").classList.add("show");
+    if(score===5) markDone();
+  }
+}
+
+function resetQuiz(){
+  answered={};score=0;
+  document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");
+  document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});
+  document.getElementById("quiz-score").classList.remove("show");
+  document.getElementById("quiz-reset").classList.remove("show");
+}
+</script>
+</body>
+</html>

@@ -106,6 +106,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 .mark-btn{font-size:12px;font-weight:500;padding:7px 16px;border-radius:8px;border:1px solid var(--teal);color:var(--teal);background:transparent;cursor:pointer;transition:all 0.15s}
 .mark-btn:active{background:var(--teal-bg)}
 .mark-btn.done-btn{border-color:var(--text3);color:var(--text3)}
+.read-btn{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;padding:9px 16px;border-radius:8px;background:var(--teal);color:#0E1117;text-decoration:none;transition:opacity 0.15s;margin-top:10px}
+.read-btn:active{opacity:0.85}
+.read-btn svg{width:14px;height:14px;flex-shrink:0}
+.read-btn.done-read{background:var(--surface3);color:var(--text2)}
 
 /* Streak banner */
 .streak-banner{margin:0 20px 4px;background:var(--amber-bg);border:1px solid rgba(245,158,11,0.2);border-radius:var(--radius-sm);padding:10px 14px;display:flex;align-items:center;gap:8px}
@@ -174,7 +178,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 
 <script>
 const SESSIONS=[
-{w:1,d:"Mon",day:1,title:"TOGAF Overview & Core Concepts",tag:"core",tagLabel:"Core",points:["TOGAF definition and purpose","Four architecture domains: Business, Data, Application, Technology","Key terminology: enterprise, architecture, stakeholders","ADM cycle high-level overview","TOGAF components overview"]},
+{w:1,d:"Mon",day:1,title:"TOGAF Overview & Core Concepts",tag:"core",tagLabel:"Core",content:"togaf-day1.html",points:["TOGAF definition and purpose","Four architecture domains: Business, Data, Application, Technology","Key terminology: enterprise, architecture, stakeholders","ADM cycle high-level overview","TOGAF components overview"]},
 {w:1,d:"Tue",day:2,title:"ADM Cycle & Preliminary Phase",tag:"adm",tagLabel:"ADM",points:["ADM as the core process of TOGAF","Preliminary Phase: framework & principles","Architecture principles definition and examples","Tailoring TOGAF to the enterprise","Key inputs and outputs of Preliminary Phase"]},
 {w:1,d:"Wed",day:3,title:"Phase A: Architecture Vision",tag:"adm",tagLabel:"ADM",points:["Objectives of Phase A","Statement of Architecture Work","Architecture Vision document","Stakeholder identification and concerns","Request for Architecture Work trigger"]},
 {w:1,d:"Thu",day:4,title:"Phase B: Business Architecture",tag:"adm",tagLabel:"ADM",points:["Business architecture definition and scope","Business capabilities and value streams","Organization map and actors","Baseline vs target business architecture","Business architecture catalogs, matrices, diagrams"]},
@@ -269,6 +273,7 @@ function render(){
               <span class="detail-duration">⏱ 30 min session</span>
               <button class="mark-btn${isDone?" done-btn":""}" onclick="toggleDone(event,${s.day})">${isDone?"Mark pending":"Mark done"}</button>
             </div>
+            ${s.content?`<a class="read-btn${isDone?" done-read":""}" href="${s.content}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>${isDone?"Re-read content →":"Start reading →"}</a>`:""}
           </div>
         </div>
       </div>`;
