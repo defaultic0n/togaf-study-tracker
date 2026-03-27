@@ -1,30 +1,35 @@
-# TOGAF Foundation Study Tracker
+const CACHE = "togaf-v1";
+const ASSETS = [
+  "/",
+  "/index.html",
+  "/manifest.json",
+  "https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap"
+];
 
-A Progressive Web App (PWA) to track your TOGAF Foundation exam study sessions.
+self.addEventListener("install", e => {
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+  );
+});
 
-## Features
-- 20 study sessions, 30 min/day, Mon–Thu over 5 weeks
-- Offline support via service worker
-- Install to home screen on iOS & Android
-- Progress ring, streak counter, filter by topic
-- Data persists in localStorage
+self.addEventListener("activate", e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+});
 
-## File Structure
-```
-togaf-pwa/
-├── index.html       ← Main app
-├── manifest.json    ← PWA manifest
-├── sw.js            ← Service worker (offline support)
-└── icons/
-    ├── icon-192.png
-    └── icon-512.png
-```
-
-## Deploy to GitHub Pages
-
-See the step-by-step guide in the main README or follow these steps:
-
-1. Create a new GitHub repo (e.g. `togaf-study-tracker`)
-2. Upload all files keeping the folder structure
-3. Go to Settings → Pages → Source: Deploy from branch → main → / (root)
-4. Your app will be live at: `https://<your-username>.github.io/togaf-study-tracker/`
+self.addEventListener("fetch", e => {
+  e.respondWith(
+    caches.match(e.request).then(cached => {
+      if (cached) return cached;
+      return fetch(e.request).then(res => {
+        if (!res || res.status !== 200 || res.type === "opaque") return res;
+        const clone = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, clone));
+        return res;
+      }).catch(() => caches.match("/index.html"));
+    })
+  );
+});
