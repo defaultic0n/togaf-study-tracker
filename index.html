@@ -178,7 +178,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min
 
 <script>
 const SESSIONS=[
-{w:1,d:"Mon",day:1,title:"TOGAF Overview & Core Concepts",tag:"core",tagLabel:"Core",content:"togaf-day1.html",points:["TOGAF definition and purpose","Four architecture domains: Business, Data, Application, Technology","Key terminology: enterprise, architecture, stakeholders","ADM cycle high-level overview","TOGAF components overview"]},
+{w:1,d:"Mon",day:1,title:"TOGAF Overview & Core Concepts",tag:"core",tagLabel:"Core",content:"togaf-day1.html",slides:"togaf-day1-slides.html",points:["TOGAF definition and purpose","Four architecture domains: Business, Data, Application, Technology","Key terminology: enterprise, architecture, stakeholders","ADM cycle high-level overview","TOGAF components overview"]},
 {w:1,d:"Tue",day:2,title:"ADM Cycle & Preliminary Phase",tag:"adm",tagLabel:"ADM",points:["ADM as the core process of TOGAF","Preliminary Phase: framework & principles","Architecture principles definition and examples","Tailoring TOGAF to the enterprise","Key inputs and outputs of Preliminary Phase"]},
 {w:1,d:"Wed",day:3,title:"Phase A: Architecture Vision",tag:"adm",tagLabel:"ADM",points:["Objectives of Phase A","Statement of Architecture Work","Architecture Vision document","Stakeholder identification and concerns","Request for Architecture Work trigger"]},
 {w:1,d:"Thu",day:4,title:"Phase B: Business Architecture",tag:"adm",tagLabel:"ADM",points:["Business architecture definition and scope","Business capabilities and value streams","Organization map and actors","Baseline vs target business architecture","Business architecture catalogs, matrices, diagrams"]},
@@ -273,7 +273,10 @@ function render(){
               <span class="detail-duration">⏱ 30 min session</span>
               <button class="mark-btn${isDone?" done-btn":""}" onclick="toggleDone(event,${s.day})">${isDone?"Mark pending":"Mark done"}</button>
             </div>
-            ${s.content?`<a class="read-btn${isDone?" done-read":""}" href="${s.content}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>${isDone?"Re-read content →":"Start reading →"}</a>`:""}
+            ${s.content||s.slides?`<div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">
+              ${s.slides?`<a class="read-btn" href="${s.slides}" style="background:var(--teal);justify-content:center"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="5,3 13,8 5,13" fill="currentColor" stroke="none"/></svg>Watch slides with voiceover</a>`:""}
+              ${s.content?`<a class="read-btn${isDone?" done-read":""}" href="${s.content}" style="background:transparent;border:1px solid var(--teal);color:var(--teal);justify-content:center"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>${isDone?"Re-read notes →":"Read study notes →"}</a>`:""}
+            </div>`:""}
           </div>
         </div>
       </div>`;
