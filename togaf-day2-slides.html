@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 2 Slides — ADM Cycle &amp; Preliminary Phase</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;
+  --teal:#2DD4BF;--teal2:#1BA898;--teal3:rgba(45,212,191,0.15);--teal4:rgba(45,212,191,0.08);
+  --gold:#F0B429;--gold2:rgba(240,180,41,0.15);
+  --slate:#94A3B8;--slate2:#64748B;--slate3:#334155;
+  --white:#F8FAFC;--white2:#E2E8F0;--white3:#CBD5E1;
+  --coral:#FB7185;--coral2:rgba(251,113,133,0.15);
+  --blue:#60A5FA;--blue2:rgba(96,165,250,0.12);
+  --purple:#A78BFA;--purple2:rgba(167,139,250,0.12);
+  --green:#4ADE80;--green2:rgba(74,222,128,0.12);
+  --indigo:#818CF8;--indigo2:rgba(129,140,248,0.12);
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+/* START OVERLAY */
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:0.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;padding:0 24px;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;padding:0 32px;line-height:1.6;margin-bottom:48px}
+.start-meta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:56px}
+.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
+.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:transform 0.15s,opacity 0.15s}
+.start-btn:active{transform:scale(0.97);opacity:0.9}
+.start-btn svg{width:18px;height:18px}
+.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
+.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:0.06}
+/* DECK */
+#deck{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
+/* SLIDES */
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.slide.exit-left{animation:exitLeft 0.4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-right{animation:enterRight 0.4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.exit-right{animation:exitRight 0.4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-left{animation:enterLeft 0.4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes exitLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes enterRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes exitRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
+@keyframes enterLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}
+.slide-body::-webkit-scrollbar{display:none}
+/* TITLE */
+.slide-title .slide-body{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:32px 28px}
+.title-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
+.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:20px}
+.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
+.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
+/* SECTION */
+.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:32px 28px}
+.section-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
+.section-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.section-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
+.section-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
+/* CONTENT */
+.slide-content .slide-body{padding:24px 20px 0}
+.content-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.content-h{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:18px}
+/* CALLOUT */
+.callout{border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.callout.teal{background:var(--teal3);border-left:3px solid var(--teal)}
+.callout.gold{background:var(--gold2);border-left:3px solid var(--gold)}
+.callout.blue{background:var(--blue2);border-left:3px solid var(--blue)}
+.callout.purple{background:var(--purple2);border-left:3px solid var(--purple)}
+.callout.coral{background:var(--coral2);border-left:3px solid var(--coral)}
+.callout.indigo{background:var(--indigo2);border-left:3px solid var(--indigo)}
+.callout-label{font-size:10px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;margin-bottom:5px}
+.callout.teal .callout-label{color:var(--teal)}
+.callout.gold .callout-label{color:var(--gold)}
+.callout.blue .callout-label{color:var(--blue)}
+.callout.purple .callout-label{color:var(--purple)}
+.callout.coral .callout-label{color:var(--coral)}
+.callout.indigo .callout-label{color:var(--indigo)}
+.callout p,.callout-p{font-size:14px;line-height:1.6;margin:0}
+.callout.teal p,.callout.teal .callout-p{color:rgba(45,212,191,0.9)}
+.callout.gold p,.callout.gold .callout-p{color:rgba(240,180,41,0.9)}
+.callout.blue p,.callout.blue .callout-p{color:rgba(96,165,250,0.9)}
+.callout.purple p,.callout.purple .callout-p{color:rgba(167,139,250,0.9)}
+.callout.coral p,.callout.coral .callout-p{color:rgba(251,113,133,0.9)}
+.callout.indigo p,.callout.indigo .callout-p{color:rgba(129,140,248,0.9)}
+/* BULLETS */
+.bullet-list{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.bullet{display:flex;gap:12px;align-items:flex-start}
+.bullet-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
+.bullet-text{font-size:15px;color:var(--white2);line-height:1.55}
+.bullet-text strong{color:var(--white);font-weight:600}
+.bullet-text em{color:var(--teal);font-style:normal}
+/* EXAM TIP */
+.exam-bar{background:var(--gold2);border:1px solid rgba(240,180,41,0.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
+.exam-star{font-size:16px;flex-shrink:0;margin-top:1px}
+.exam-text{font-size:13px;color:rgba(240,180,41,0.9);line-height:1.6}
+.exam-text strong{color:var(--gold)}
+/* PHASE CYCLE VISUAL */
+.phase-strip{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.phase-row{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;border:1px solid rgba(255,255,255,0.05)}
+.phase-row.active-row{border-color:rgba(45,212,191,0.4);background:rgba(45,212,191,0.06)}
+.phase-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px;flex-shrink:0;min-width:38px;text-align:center}
+.phase-name{font-size:13px;font-weight:500;color:var(--white2);flex:1}
+.phase-note{font-size:11px;color:var(--slate2);flex-shrink:0;text-align:right;max-width:110px;line-height:1.3}
+/* PRINCIPLE CARD */
+.principle-card{background:var(--navy3);border:1px solid rgba(255,255,255,0.07);border-radius:10px;margin-bottom:12px;overflow:hidden}
+.principle-header{background:var(--teal3);padding:9px 14px;font-size:13px;font-weight:600;color:var(--teal)}
+.principle-body{padding:10px 14px;display:flex;flex-direction:column;gap:8px}
+.principle-row{display:flex;gap:10px;font-size:13px}
+.principle-label{font-weight:600;color:var(--white);min-width:90px;flex-shrink:0}
+.principle-val{color:var(--slate);line-height:1.5}
+/* IO GRID */
+.io-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.io-box{background:var(--navy3);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,0.05)}
+.io-header{padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:0.7px;text-transform:uppercase}
+.io-header.in{background:rgba(96,165,250,0.12);color:var(--blue)}
+.io-header.out{background:var(--teal3);color:var(--teal)}
+.io-list{list-style:none;padding:8px 12px;display:flex;flex-direction:column;gap:4px}
+.io-list li{font-size:12px;color:var(--slate);line-height:1.5;display:flex;gap:5px}
+.io-list li::before{content:'·';color:var(--slate2);flex-shrink:0}
+/* TAILORING GRID */
+.tailoring-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.tailoring-card{background:var(--navy3);border-radius:8px;padding:12px;border:1px solid rgba(255,255,255,0.05)}
+.tailoring-icon{font-size:18px;margin-bottom:6px}
+.tailoring-title{font-size:12px;font-weight:600;color:var(--white);margin-bottom:4px;line-height:1.35}
+.tailoring-desc{font-size:11px;color:var(--slate);line-height:1.5}
+/* DEF LIST */
+.def-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+.def-item{background:var(--navy3);border-radius:8px;padding:10px 12px;border:1px solid rgba(255,255,255,0.05)}
+.def-term{font-size:13px;font-weight:600;color:var(--teal);margin-bottom:3px}
+.def-text{font-size:12px;color:var(--slate);line-height:1.5}
+/* SUMMARY GRID */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sum-card{background:var(--navy3);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.06)}
+.sum-num{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:5px;letter-spacing:1px}
+.sum-text{font-size:12px;color:var(--white2);line-height:1.55}
+.sum-text strong{color:var(--white)}
+/* PROGRESS */
+#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
+#progress-fill{height:100%;background:var(--teal);transition:width 0.4s cubic-bezier(.4,0,.2,1)}
+/* CONTROLS */
+#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,0.06);display:flex;align-items:center;gap:8px}
+.ctrl-btn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background 0.15s;flex-shrink:0;color:var(--white2)}
+.ctrl-btn:active{background:var(--navy4)}
+.ctrl-btn svg{width:16px;height:16px}
+.ctrl-btn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}
+.ctrl-btn.primary svg{width:18px;height:18px}
+.ctrl-btn.primary:active{opacity:0.85}
+.ctrl-btn:disabled{opacity:0.3;cursor:not-allowed}
+.slide-counter{flex:1;text-align:center;font-size:12px;color:var(--slate2)}
+.slide-counter strong{color:var(--slate);font-weight:600}
+.voice-status{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
+.voice-dots{display:flex;gap:3px;align-items:center}
+.voice-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vdot 1.2s infinite}
+.voice-dot:nth-child(2){animation-delay:0.2s}
+.voice-dot:nth-child(3){animation-delay:0.4s}
+@keyframes vdot{0%,80%,100%{transform:scaleY(0.4);opacity:0.4}40%{transform:scaleY(1);opacity:1}}
+.speed-btn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,0.08);color:var(--slate);cursor:pointer}
+.swipe-hint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0;letter-spacing:0.3px}
+</style>
+</head>
+<body>
+<!-- START OVERLAY -->
+<div id="start-overlay">
+  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="350" cy="80" r="180" fill="#2DD4BF"/><circle cx="20" cy="400" r="120" fill="#60A5FA"/><circle cx="300" cy="600" r="100" fill="#A78BFA"/></svg>
+  <div class="start-logo">TOGAF Foundation · Day 2</div>
+  <div class="start-title">ADM Cycle &amp;<br>Preliminary Phase</div>
+  <p class="start-sub">20 slides with voiceover narration.<br>Approx. 30 minutes to complete.</p>
+  <div class="start-meta">
+    <span class="start-pill">📊 20 slides</span>
+    <span class="start-pill">🎙 Voice narration</span>
+    <span class="start-pill">⏱ ~30 min</span>
+  </div>
+  <button class="start-btn" id="start-btn">
+    <svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>
+    Start Presentation
+  </button>
+  <p class="start-note">Tap Start to enable voice narration · Swipe or use controls to navigate</p>
+</div>
+<!-- DECK -->
+<div id="deck">
+  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
+  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
+  <div style="padding:2px 16px 0">
+    <div class="voice-status" id="voice-status"></div>
+    <div class="swipe-hint">swipe left/right to navigate</div>
+  </div>
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+    <button class="ctrl-btn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
+    <button class="ctrl-btn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+    <div class="slide-counter"><strong id="slide-num">1</strong> / <span id="slide-total">20</span></div>
+    <button class="speed-btn" id="speed-btn" onclick="cycleSpeed()">1×</button>
+    <button class="ctrl-btn" id="btn-done" onclick="markDone()" title="Mark complete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+  </div>
+</div>
+<script>
+const SLIDES=[
+{type:"title",bg:"navy",
+ html:`<div class="title-eyebrow">TOGAF Foundation · Day 2 of 20</div>
+<h1 class="title-h">ADM Cycle &amp;<br>Preliminary Phase</h1>
+<div class="title-rule"></div>
+<p class="title-sub">A deep-dive into the engine of TOGAF — how the ADM works, what the Preliminary Phase does, and how to tailor the framework for your enterprise.</p>
+<div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">⭐ Exam-ready</span></div>`,
+ voice:`Welcome to Day 2. Today we go deep into the ADM — the Architecture Development Method — which is the very heart of TOGAF. We'll cover the full ADM cycle and why it's structured as an iterative loop, the Preliminary Phase in detail, how architecture principles are structured and what each component means, how TOGAF is tailored to fit real organisations, and the key inputs and outputs you must know for the exam. Let's begin.`
+},
+{type:"section",bg:"teal",
+ html:`<div class="section-num">01</div>
+<div class="section-label">Section One</div>
+<h2 class="section-h">The ADM as TOGAF's Core Process</h2>
+<p class="section-desc">Understanding why the ADM exists, how it's structured, and the critical role it plays in the whole framework.</p>`,
+ voice:`Section one: The ADM as TOGAF's Core Process. If there's one thing you take from today, it's this: the ADM is the engine of TOGAF. Everything else supports it.`
+},
+{type:"content",
+ html:`<div class="content-label">What is the ADM?</div>
+<h2 class="content-h">The Architecture Development Method</h2>
+<div class="callout teal"><div class="callout-label">Definition</div><p>The ADM provides a <strong>tested, repeatable, iterative</strong> method for developing enterprise architecture — specifying what to do, in what order, and with what inputs and outputs at each phase.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Everything else in TOGAF exists to support the ADM</strong> — Content Framework, Reference Models, Capability Framework</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Structured as a <em>cycle</em> — organisations iterate as the enterprise evolves</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Each phase has defined <strong>objectives, inputs, steps, and outputs</strong></div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">The ADM is <strong>not prescriptive</strong> — it is tailored to the organisation's context</div></div>
+</div>`,
+ voice:`The ADM — Architecture Development Method — is the process at the core of TOGAF. It provides a tested, repeatable, iterative method for developing enterprise architecture. It tells architects exactly what to do, in what order, and what the inputs and outputs should be at each step. Everything else in TOGAF — the Content Framework, Reference Models, Capability Framework — all exist to support this process. The ADM is structured as a cycle because organisations don't do architecture once. They iterate as the business evolves. And crucially, the ADM is not prescriptive — it is designed to be tailored.`
+},
+{type:"content",
+ html:`<div class="content-label">The full cycle</div>
+<h2 class="content-h">ADM Phases at a Glance</h2>
+<div class="phase-strip">
+  <div class="phase-row active-row"><span class="phase-badge" style="background:rgba(74,222,128,0.15);color:#4ADE80">Prelim</span><span class="phase-name">Preliminary Phase</span><span class="phase-note">Set up &amp; tailor framework</span></div>
+  <div class="phase-row"><span class="phase-badge" style="background:var(--teal3);color:var(--teal)">A</span><span class="phase-name">Architecture Vision</span><span class="phase-note">Scope, stakeholders, vision</span></div>
+  <div class="phase-row"><span class="phase-badge" style="background:var(--blue2);color:var(--blue)">B</span><span class="phase-name">Business Architecture</span><span class="phase-note">Baseline &amp; target business</span></div>
+  <div class="phase-row"><span class="phase-badge" style="background:var(--purple2);color:var(--purple)">C</span><span class="phase-name">Information Systems</span><span class="phase-note">Data &amp; Application</span></div>
+  <div class="phase-row"><span class="phase-badge" style="background:var(--gold2);color:var(--gold)">D</span><span class="phase-name">Technology Architecture</span><span class="phase-note">Infrastructure layer</span></div>
+  <div class="phase-row"><span class="phase-badge" style="background:var(--coral2);color:var(--coral)">E</span><span class="phase-name">Opportunities &amp; Solutions</span><span class="phase-note">Projects &amp; transitions</span></div>
+  <div class="phase-row"><span class="phase-badge" style="background:rgba(74,222,128,0.12);color:#4ADE80">F</span><span class="phase-name">Migration Planning</span><span class="phase-note">Detailed migration plan</span></div>
+  <div class="phase-row"><span class="phase-badge" style="background:rgba(251,191,36,0.12);color:#FBBf24">G</span><span class="phase-name">Implementation Governance</span><span class="phase-note">Oversee conformance</span></div>
+  <div class="phase-row"><span class="phase-badge" style="background:var(--purple2);color:var(--purple)">H</span><span class="phase-name">Architecture Change Mgmt</span><span class="phase-note">Monitor &amp; manage change</span></div>
+  <div class="phase-row"><span class="phase-badge" style="background:rgba(255,255,255,0.07);color:var(--slate)">Req</span><span class="phase-name">Requirements Management</span><span class="phase-note">Centre — continuous</span></div>
+</div>`,
+ voice:`Here are all ten ADM phases. The Preliminary Phase — highlighted in green — is today's main focus. It comes before Phase A and sets everything up. Then Phases A through H progress from Vision through Business, Information Systems, Technology, and into delivery and governance. Phase H, Architecture Change Management, completes the cycle — and the organisation loops back when new change is needed. Requirements Management sits at the centre, running continuously. Notice how the sequence mirrors the BDAT domains: Phase B covers Business, Phase C covers Data and Application together, and Phase D covers Technology.`
+},
+{type:"content",
+ html:`<div class="content-label">The iterative cycle</div>
+<h2 class="content-h">Why It's a Cycle, Not a Line</h2>
+<div class="callout blue"><div class="callout-label">Key concept</div><p>The ADM is explicitly designed as a <strong>cycle</strong> because enterprise architecture is never finished. As the business evolves, so must the architecture.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">After Phase H, the organisation <strong>re-evaluates and decides</strong> whether to restart</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Major transformation</strong> → may restart from the Preliminary Phase</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Incremental change</strong> → may restart from Phase A with updated scope</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">The ADM also supports <strong>iteration within phases</strong> — you can loop back if new requirements emerge</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Exam tip:</strong> The exam tests whether you understand the sequence A → B → C → D → E → F → G → H. Questions frequently present phases out of order. Also: the Preliminary Phase is <em>not</em> Phase A.</div></div>`,
+ voice:`Why is the ADM a cycle? Because enterprise architecture is never truly finished. Businesses merge, strategies change, technologies emerge. The architecture must evolve with them. After Phase H — Architecture Change Management — the organisation re-evaluates. If the change is major, it may restart from the Preliminary Phase. If it's incremental, it may restart from Phase A with an updated scope. The ADM also supports iteration within phases — if new requirements emerge during Phase C, you can loop back to earlier phases to address them. This iterative, cyclical nature is fundamental to how TOGAF is designed.`
+},
+{type:"section",bg:"blue",
+ html:`<div class="section-num">02</div>
+<div class="section-label">Section Two</div>
+<h2 class="section-h">Preliminary Phase</h2>
+<p class="section-desc">The "getting ready" phase — establishing architecture capability, defining principles, and setting up governance before the first architecture cycle begins.</p>`,
+ voice:`Section two: The Preliminary Phase. This is where it all begins. Before any architecture work can happen, the organisation must prepare itself. That preparation is the Preliminary Phase.`
+},
+{type:"content",
+ html:`<div class="content-label">Purpose &amp; trigger</div>
+<h2 class="content-h">What the Preliminary Phase Does</h2>
+<div class="callout teal"><div class="callout-label">Objective</div><p>Prepare the organisation to undertake enterprise architecture work — establishing the architecture capability, tailoring TOGAF, defining principles, and setting up governance structures.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Triggered when</strong> an organisation decides it needs an architecture capability — or needs to update an existing one</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Happens <strong>before Phase A</strong> — you cannot skip to Phase A without completing the Preliminary Phase</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Think of it as <em>laying foundations</em> — checking the ground before construction begins</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Answers the questions: <strong>who does architecture here, how is it done, what tools are used, what principles guide it?</strong></div></div>
+</div>`,
+ voice:`The Preliminary Phase is triggered when an organisation decides it needs an architecture capability — or needs to update one it already has. It happens before Phase A, and you cannot skip it. Think of it like laying the foundations of a building. You wouldn't start construction without checking the ground and preparing your tools. The Preliminary Phase checks the ground. It answers four fundamental questions: who does architecture here, how is it done, what tools are used, and what principles guide all future decisions?`
+},
+{type:"content",
+ html:`<div class="content-label">Key concepts</div>
+<h2 class="content-h">What Gets Established</h2>
+<div class="def-list">
+  <div class="def-item"><div class="def-term">Architecture Capability</div><div class="def-text">The combination of skills, roles, processes, tools, and governance that enables effective architecture work. Created or updated here.</div></div>
+  <div class="def-item"><div class="def-term">Architecture Framework</div><div class="def-text">The selected approach for conducting architecture work. TOGAF is chosen and tailored — possibly integrated with other frameworks.</div></div>
+  <div class="def-item"><div class="def-term">Architecture Governance Framework</div><div class="def-text">The processes governing architecture decisions and compliance. Covers the Architecture Board, review cycles, and contracts.</div></div>
+  <div class="def-item"><div class="def-term">Architecture Principles</div><div class="def-text">Guiding rules for all architecture work going forward. Defined here and applied in every subsequent phase.</div></div>
+</div>`,
+ voice:`The Preliminary Phase establishes four critical things. First, the Architecture Capability — the skills, roles, processes, tools, and governance needed to do architecture work effectively. Second, the Architecture Framework — the chosen and tailored version of TOGAF, possibly integrated with other frameworks. Third, the Architecture Governance Framework — the processes that govern architecture decisions, including the Architecture Board and review cycles. And fourth, the Architecture Principles — the guiding rules that will shape every architecture decision made in all subsequent phases. Getting these right is what makes the rest of the ADM work.`
+},
+{type:"content",
+ html:`<div class="content-label">Six steps</div>
+<h2 class="content-h">Steps of the Preliminary Phase</h2>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Step 1:</strong> Scope the enterprise organisations impacted by the architecture work</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Step 2:</strong> Confirm governance and support frameworks already in place</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Step 3:</strong> Define and establish the Architecture Team — roles and responsibilities</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Step 4:</strong> Identify and establish Architecture Principles</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Step 5:</strong> Tailor TOGAF and any other selected frameworks</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Step 6:</strong> Implement Architecture Tools — repositories, modelling tools</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Exam tip:</strong> Principles are established in <strong>Step 4</strong> — after scoping and governance (steps 1–3), not first. The exam may test the order of these steps.</div></div>`,
+ voice:`TOGAF specifies six steps for the Preliminary Phase. Step one: scope which enterprise organisations are impacted. Step two: confirm what governance and support frameworks already exist — ITIL, COBIT, whatever is in place. Step three: define and establish the architecture team — who does what. Step four: identify and establish the architecture principles — this is where principles are formally created. Step five: tailor TOGAF and any other frameworks. Step six: implement architecture tools, including the repository. Notice that principles come in step four — after scoping and governance are confirmed. The exam occasionally tests this order.`
+},
+{type:"section",bg:"purple",
+ html:`<div class="section-num">03</div>
+<div class="section-label">Section Three</div>
+<h2 class="section-h">Architecture Principles</h2>
+<p class="section-desc">Their definition, four-part structure, and examples — one of the most tested areas in the Foundation exam.</p>`,
+ voice:`Section three: Architecture Principles. This is heavily tested. You need to know the definition, the four-part structure, and be able to identify which component is which.`
+},
+{type:"content",
+ html:`<div class="content-label">Definition</div>
+<h2 class="content-h">What Are Architecture Principles?</h2>
+<div class="callout teal"><div class="callout-label">TOGAF definition</div><p>Architecture principles are <strong>general rules and guidelines, intended to be enduring and seldom amended</strong>, that inform and support the way in which an organisation sets about fulfilling its mission.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Represent the enterprise's <em>values and beliefs</em> about IT and architecture</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Not operational rules</strong> (which change often) or policies (which are more specific)</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">High-level, durable, and <strong>stable over time</strong></div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Apply to <strong>all four architecture domains</strong> — Business, Data, Application, Technology</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Defined in the <strong>Preliminary Phase</strong>; applied throughout all ADM phases</div></div>
+</div>`,
+ voice:`Architecture principles are general rules and guidelines that are intended to be enduring and seldom amended. They inform and support how the organisation fulfils its mission. They represent the enterprise's values and beliefs about technology and architecture. Importantly, they are not operational rules — which change frequently. They are not policies — which are more specific. They are high-level, stable statements that endure over time. They apply to all four architecture domains and are defined in the Preliminary Phase, then applied throughout the entire ADM.`
+},
+{type:"content",
+ html:`<div class="content-label">Critical structure</div>
+<h2 class="content-h">The Four Components of a Principle</h2>
+<div class="principle-card">
+  <div class="principle-header">Every architecture principle has exactly these four components</div>
+  <div class="principle-body">
+    <div class="principle-row"><span class="principle-label">Name</span><span class="principle-val">Short, memorable identifier. Conveys the essence in a few words. E.g. "Data is an Asset"</span></div>
+    <div class="principle-row"><span class="principle-label">Statement</span><span class="principle-val">Concise, unambiguous declaration of the rule. Should be testable — can you tell if a decision follows it?</span></div>
+    <div class="principle-row"><span class="principle-label">Rationale</span><span class="principle-val">The business reason why the principle exists. Why it matters. Links back to strategy and risk.</span></div>
+    <div class="principle-row"><span class="principle-label">Implications</span><span class="principle-val">What following the principle means in practice — the costs and requirements on business and IT.</span></div>
+  </div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Exam tip:</strong> "Which component explains WHY the principle exists?" → <strong>Rationale</strong>. "Which describes the cost of following it?" → <strong>Implications</strong>.</div></div>`,
+ voice:`Every architecture principle has exactly four components. The Name is a short, memorable identifier — it conveys the essence in a few words. The Statement is a concise, unambiguous declaration of the rule — it should be testable, meaning you can tell whether a decision follows it or not. The Rationale is the business reason why the principle exists — why it matters, and what risk there is in ignoring it. It links to strategy. And the Implications describe what following the principle means in practice — the costs and requirements it places on the business and IT. The exam tests these distinctions directly. Rationale is the "why". Implications are the "what it costs".`
+},
+{type:"content",
+ html:`<div class="content-label">Real example</div>
+<h2 class="content-h">Principle: "Data is an Asset"</h2>
+<div class="principle-card">
+  <div class="principle-header">Full worked example — all four components</div>
+  <div class="principle-body">
+    <div class="principle-row"><span class="principle-label">Name</span><span class="principle-val">Data is an Asset</span></div>
+    <div class="principle-row"><span class="principle-label">Statement</span><span class="principle-val">Data is a valuable asset that has value to the enterprise and is managed accordingly.</span></div>
+    <div class="principle-row"><span class="principle-label">Rationale</span><span class="principle-val">Data is a valuable corporate resource. Like other assets, it must be safeguarded and properly managed to remain useful and accessible.</span></div>
+    <div class="principle-row"><span class="principle-label">Implications</span><span class="principle-val">Investment in data management is required. Data ownership must be assigned. Costs for governance, quality management, and access controls are implied.</span></div>
+  </div>
+</div>
+<div class="callout gold"><div class="callout-label">Other common examples</div><p class="callout-p">Technology Independence · Single Source of Truth · Reuse Before Buy Before Build · Security by Design · Common Vocabulary and Data Definitions</p></div>`,
+ voice:`Let's look at a fully worked example: "Data is an Asset." The Name is simply "Data is an Asset." The Statement says: Data is a valuable asset that has value to the enterprise and is managed accordingly. The Rationale explains that data, like other corporate assets, must be safeguarded and properly managed to remain useful and accessible — this links to risk and business value. The Implications are: investment in data management is required, data ownership must be assigned, and costs for data governance, quality management, and access controls are all implied. Other common principles include Technology Independence, Single Source of Truth, Reuse Before Buy Before Build, Security by Design, and Common Vocabulary.`
+},
+{type:"section",bg:"green",
+ html:`<div class="section-num">04</div>
+<div class="section-label">Section Four</div>
+<h2 class="section-h">Tailoring TOGAF to the Enterprise</h2>
+<p class="section-desc">TOGAF is designed to be adapted. Applying it out-of-the-box is actually incorrect. Tailoring happens in the Preliminary Phase.</p>`,
+ voice:`Section four: Tailoring TOGAF to the Enterprise. This is one of the most important and most misunderstood aspects of TOGAF. The framework is explicitly designed to be adapted — not used as-is.`
+},
+{type:"content",
+ html:`<div class="content-label">Why tailoring matters</div>
+<h2 class="content-h">No Organisation Uses TOGAF "Out of the Box"</h2>
+<div class="callout teal"><div class="callout-label">Core principle</div><p>TOGAF is <strong>designed to be used in conjunction with other frameworks</strong>. It expects to be integrated, combined, and adapted. Applying it unchanged is incorrect use.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Every organisation has different <strong>maturity, culture, regulation, and strategy</strong></div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">TOGAF must work <em>within</em> existing constraints — not override them</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Tailoring happens primarily in the <strong>Preliminary Phase</strong></div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">TOGAF coexists with <strong>ITIL</strong> (service management), <strong>COBIT</strong> (governance), <strong>PRINCE2</strong> (projects), and <strong>Zachman</strong> (architecture framework)</div></div>
+</div>`,
+ voice:`Every organisation is different. They have different maturity levels, different cultures, different regulatory environments, and different strategic priorities. TOGAF must work within those constraints — not override them. Tailoring happens in the Preliminary Phase, and it is required, not optional. The TOGAF standard explicitly states it is designed to be used in conjunction with other frameworks. TOGAF is meant to coexist with ITIL for service management, COBIT for IT governance, PRINCE2 for project management, and Zachman as an alternative architecture framework. Using them together is correct use of TOGAF.`
+},
+{type:"content",
+ html:`<div class="content-label">What gets tailored</div>
+<h2 class="content-h">Five Areas of Tailoring</h2>
+<div class="tailoring-grid">
+  <div class="tailoring-card"><div class="tailoring-icon">🔧</div><div class="tailoring-title">Select TOGAF components</div><div class="tailoring-desc">Not every organisation needs all six. Small orgs may focus on ADM and Content Framework only.</div></div>
+  <div class="tailoring-card"><div class="tailoring-icon">🔗</div><div class="tailoring-title">Integrate other frameworks</div><div class="tailoring-desc">Map TOGAF onto existing ITIL, COBIT, PRINCE2. Define where each framework applies.</div></div>
+  <div class="tailoring-card"><div class="tailoring-icon">🔄</div><div class="tailoring-title">Adapt ADM phases</div><div class="tailoring-desc">Phases may be combined, shortened, or iterated differently. Agile environments run short sprints per phase.</div></div>
+  <div class="tailoring-card"><div class="tailoring-icon">🏛️</div><div class="tailoring-title">Define governance structures</div><div class="tailoring-desc">Architecture Board composition, review cycles, contract templates — tailored to existing governance.</div></div>
+  <div class="tailoring-card"><div class="tailoring-icon">📏</div><div class="tailoring-title">Define scope and horizons</div><div class="tailoring-desc">Which business units are in scope, what architecture levels to target, and time horizons for roadmaps.</div></div>
+  <div class="tailoring-card"><div class="tailoring-icon">⚙️</div><div class="tailoring-title">Select tools and repository</div><div class="tailoring-desc">Choose modelling tools, repository structure, and how architecture artefacts are stored and versioned.</div></div>
+</div>`,
+ voice:`What exactly gets tailored? Six things. First, selecting which TOGAF components to use — not every organisation needs all six. Second, integrating with other frameworks like ITIL, COBIT, and PRINCE2. Third, adapting the ADM phases — phases can be combined, shortened, or run in sprints for Agile organisations. Fourth, defining governance structures — the Architecture Board's composition, review cycles, and contract templates. Fifth, defining scope and horizons — which business units are covered and what time horizons apply. And sixth, selecting tools and repository structure — the software and storage approach for all architecture artefacts.`
+},
+{type:"content",
+ html:`<div class="content-label">Scenario example</div>
+<h2 class="content-h">Tailoring in Practice</h2>
+<div class="callout gold"><div class="callout-label">Scenario</div><p class="callout-p">"An organisation already uses COBIT for IT governance. How should they approach TOGAF adoption?"</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot" style="background:var(--green)"></div><div class="bullet-text"><strong>Correct approach:</strong> Tailor TOGAF during the Preliminary Phase to integrate with COBIT — map governance processes, avoid duplication</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--coral)"></div><div class="bullet-text"><strong>Wrong approach:</strong> Replace COBIT with TOGAF's governance framework — this ignores existing investment and disrupts operations</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--coral)"></div><div class="bullet-text"><strong>Wrong approach:</strong> Skip the Preliminary Phase since governance already exists — the Preliminary Phase is always required</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Exam tip:</strong> Tailoring scenario questions always have the same answer pattern: <strong>integrate, don't replace</strong>. TOGAF complements existing frameworks — it does not supersede them.</div></div>`,
+ voice:`Here's a scenario you might see in the exam: an organisation already uses COBIT for IT governance. How should they approach TOGAF? The correct answer is: tailor TOGAF during the Preliminary Phase to integrate with COBIT — map the governance processes and avoid duplication. The wrong answers are: replacing COBIT with TOGAF's governance framework, which ignores existing investment; or skipping the Preliminary Phase because governance already exists, which is never correct. The Preliminary Phase is always required. The golden rule for tailoring questions: integrate, don't replace.`
+},
+{type:"section",bg:"coral",
+ html:`<div class="section-num">05</div>
+<div class="section-label">Section Five</div>
+<h2 class="section-h">Preliminary Phase — Inputs &amp; Outputs</h2>
+<p class="section-desc">The deliverables the exam tests most. Know what goes in and what comes out — especially what triggers Phase A.</p>`,
+ voice:`Section five: Preliminary Phase Inputs and Outputs. This is pure exam preparation. You need to know the key inputs and outputs, and specifically which output triggers Phase A.`
+},
+{type:"content",
+ html:`<div class="content-label">Exam essentials</div>
+<h2 class="content-h">Key Inputs &amp; Outputs</h2>
+<div class="io-grid">
+  <div class="io-box">
+    <div class="io-header in">Key Inputs</div>
+    <ul class="io-list">
+      <li>TOGAF and other framework resources</li>
+      <li>Board strategies, business plans, IT strategy</li>
+      <li>Existing frameworks (ITIL, COBIT, etc.)</li>
+      <li>Existing governance and legal frameworks</li>
+      <li>Architecture maturity assessments</li>
+      <li>Partnership and contract agreements</li>
+      <li>Existing organisational model for EA</li>
+    </ul>
+  </div>
+  <div class="io-box">
+    <div class="io-header out">Key Outputs</div>
+    <ul class="io-list">
+      <li>Tailored Architecture Framework</li>
+      <li>Initial Architecture Repository</li>
+      <li>Restatement of business goals</li>
+      <li><strong style="color:var(--teal)">Architecture Principles</strong></li>
+      <li>Architecture Governance Framework</li>
+      <li>Architecture Capability defined</li>
+      <li><strong style="color:var(--teal)">Request for Architecture Work ★</strong></li>
+    </ul>
+  </div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">The <strong>Request for Architecture Work</strong> is the critical output — it formally triggers Phase A. Without it, Phase A has no mandate. This is tested frequently.</div></div>`,
+ voice:`Let's map out the inputs and outputs. Inputs include TOGAF resources, board strategies, business plans, existing frameworks like ITIL and COBIT, existing governance frameworks, architecture maturity assessments, and any partnership or contract agreements. The outputs are what you need to memorise: a Tailored Architecture Framework, the initial Architecture Repository, a restatement of business goals, the Architecture Principles, an Architecture Governance Framework, the defined Architecture Capability, and — critically — the Request for Architecture Work. That last one is highlighted for a reason. It is the document that formally triggers Phase A. Without it, Phase A has no mandate to begin.`
+},
+{type:"content",
+ html:`<div class="content-label">Critical document</div>
+<h2 class="content-h">Request for Architecture Work</h2>
+<div class="callout teal"><div class="callout-label">The Phase A trigger</div><p>The <strong>Request for Architecture Work</strong> is the formal document produced at the end of the Preliminary Phase that officially initiates Phase A. It defines the scope, constraints, and business context for the architecture work to follow.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Issued by the <strong>sponsoring organisation</strong> to the architecture organisation</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Contains: business context, description of change, constraints, budget, schedule</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Becomes an <strong>input to Phase A</strong> — Phase A cannot begin without it</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Should not be confused with the <strong>Statement of Architecture Work</strong> — which is an <em>output</em> of Phase A</div></div>
+</div>`,
+ voice:`The Request for Architecture Work deserves its own slide because it's so frequently tested. It is the formal document produced at the end of the Preliminary Phase that officially initiates Phase A. It is issued by the sponsoring organisation to the architecture team, and contains the business context, a description of what needs to change, constraints, budget, and schedule. It becomes an input to Phase A — Phase A literally cannot begin without it. And critically: do not confuse it with the Statement of Architecture Work, which is a different document — an output of Phase A, not an input to it. Request for Architecture Work triggers Phase A. Statement of Architecture Work is produced during Phase A.`
+},
+{type:"content",
+ html:`<div class="content-label">The Architecture Repository</div>
+<h2 class="content-h">Initialised in the Preliminary Phase</h2>
+<div class="callout indigo"><div class="callout-label">What it is</div><p class="callout-p">The Architecture Repository is the storage system for all architecture assets. It is <strong>initialised</strong> in the Preliminary Phase but populated and used throughout all subsequent phases.</p></div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot" style="background:var(--indigo)"></div><div class="bullet-text"><strong>Architecture Landscape:</strong> Current and target state architectures at all levels</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--indigo)"></div><div class="bullet-text"><strong>Reference Library:</strong> Reference architectures, models, and guidelines</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--indigo)"></div><div class="bullet-text"><strong>Standards Library:</strong> Industry standards, legal requirements, templates</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--indigo)"></div><div class="bullet-text"><strong>Governance Log:</strong> Decisions, dispensations, and compliance records</div></div>
+  <div class="bullet"><div class="bullet-dot" style="background:var(--indigo)"></div><div class="bullet-text"><strong>Solutions Portfolio:</strong> Deployed and in-progress solutions</div></div>
+</div>`,
+ voice:`The Architecture Repository is also initialised during the Preliminary Phase. It is the central storage system for all architecture assets — think of it as the library for everything the architecture practice produces and uses. It contains five main areas. The Architecture Landscape holds current and target state architectures. The Reference Library stores reference architectures and guidelines. The Standards Library holds industry standards and legal requirements. The Governance Log records decisions, dispensations, and compliance. And the Solutions Portfolio tracks deployed and in-progress solutions. It is initialised here and then continuously populated throughout the ADM cycle.`
+},
+{type:"content",
+ html:`<div class="content-label">Session summary</div>
+<h2 class="content-h">Key Takeaways — Day 2</h2>
+<div class="sum-grid">
+  <div class="sum-card"><div class="sum-num">01</div><div class="sum-text"><strong>ADM is iterative</strong> — a cycle of 10 phases. Sequence: Prelim → A → B → C → D → E → F → G → H.</div></div>
+  <div class="sum-card"><div class="sum-num">02</div><div class="sum-text"><strong>Preliminary Phase = "getting ready"</strong> — comes before Phase A. Establishes capability, tailors TOGAF, defines principles.</div></div>
+  <div class="sum-card"><div class="sum-num">03</div><div class="sum-text"><strong>Principles have 4 parts</strong> — Name · Statement · Rationale (why) · Implications (cost). All four are examinable.</div></div>
+  <div class="sum-card"><div class="sum-num">04</div><div class="sum-text"><strong>Tailoring = integrate, not replace</strong> — TOGAF works alongside ITIL, COBIT, PRINCE2. Never replaces them.</div></div>
+  <div class="sum-card"><div class="sum-num">05</div><div class="sum-text"><strong>Request for Architecture Work triggers Phase A</strong> — not the Statement of Architecture Work, which is a Phase A output.</div></div>
+  <div class="sum-card"><div class="sum-num">06</div><div class="sum-text"><strong>Architecture Repository</strong> — initialised in Preliminary Phase. Contains Landscape, Reference Library, Standards, Governance Log, Solutions Portfolio.</div></div>
+</div>`,
+ voice:`Let's close with the six key takeaways from Day 2. One: the ADM is iterative — a cycle of ten phases following the sequence Preliminary, then A through H. Two: the Preliminary Phase is about getting ready — it comes before Phase A and establishes capability, tailors TOGAF, and defines principles. Three: every principle has four parts — Name, Statement, Rationale, and Implications. All four are examinable. Four: tailoring means integrate, not replace — TOGAF works alongside ITIL, COBIT, and PRINCE2. Five: the Request for Architecture Work triggers Phase A — not the Statement of Architecture Work, which is a Phase A output. Six: the Architecture Repository is initialised in the Preliminary Phase and contains the Landscape, Reference Library, Standards, Governance Log, and Solutions Portfolio.`
+},
+{type:"title",bg:"end",
+ html:`<div class="title-eyebrow">Day 2 Complete</div>
+<h1 class="title-h" style="font-size:clamp(24px,6vw,40px)">ADM &amp; Preliminary Phase<br>— done.</h1>
+<div class="title-rule"></div>
+<p class="title-sub" style="margin-bottom:24px">Next up: <strong>Day 3 — Phase A: Architecture Vision</strong>. You'll learn how to define scope, identify stakeholders, and create the Architecture Vision document.</p>
+<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+  <a href="togaf-day2.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,0.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>
+    Open reading version · Take the quiz
+  </a>
+  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>
+    Mark Day 2 as done
+  </button>
+</div>`,
+ voice:`Congratulations — Day 2 is complete. You've covered the ADM cycle, the Preliminary Phase in depth, architecture principles, tailoring, and the key inputs and outputs. Before moving to Day 3, open the reading version and take the five-question quiz to cement what you've learned. Day 3 will cover Phase A — Architecture Vision — where you'll learn how to define scope, engage stakeholders, and produce the Architecture Vision document. See you there.`
+},
+];
+
+let current=0,isPlaying=false,speedIdx=1,utterance=null,touchStartX=0,animating=false;
+const SPEEDS=[0.8,1,1.2,1.5];
+const wrap=document.getElementById("slides-wrap");
+document.getElementById("slide-total").textContent=SLIDES.length;
+
+function getBg(bg){return{navy:"var(--navy2)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",green:"linear-gradient(135deg,#0A1A10,#0D2218)",coral:"linear-gradient(135deg,#1A0A0E,#2A0D15)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"}[bg]||"var(--navy2)";}
+
+SLIDES.forEach((s,i)=>{
+  const div=document.createElement("div");
+  div.className="slide slide-"+(s.type||"content");
+  div.id="slide-"+i;
+  div.style.background=getBg(s.bg);
+  div.innerHTML=`<div class="slide-body">${s.html}</div>`;
+  if(i===0) div.classList.add("active");
+  wrap.appendChild(div);
+});
+
+function goTo(idx,dir){
+  if(animating||idx<0||idx>=SLIDES.length) return;
+  animating=true; stopSpeech();
+  const from=document.getElementById("slide-"+current);
+  const to=document.getElementById("slide-"+idx);
+  from.classList.remove("active"); to.classList.add("active");
+  from.classList.add(dir>0?"exit-left":"exit-right");
+  to.classList.add(dir>0?"enter-right":"enter-left");
+  to.querySelector(".slide-body").scrollTop=0;
+  setTimeout(()=>{
+    from.classList.remove("exit-left","exit-right","active");
+    to.classList.remove("enter-right","enter-left");
+    animating=false; current=idx; updateUI();
+    if(isPlaying) speakCurrent();
+  },420);
+}
+function nextSlide(){if(current<SLIDES.length-1) goTo(current+1,1);}
+function prevSlide(){if(current>0) goTo(current-1,-1);}
+function updateUI(){
+  document.getElementById("slide-num").textContent=current+1;
+  document.getElementById("progress-fill").style.width=((current+1)/SLIDES.length*100)+"%";
+  document.getElementById("btn-prev").disabled=current===0;
+  document.getElementById("btn-next").disabled=current===SLIDES.length-1;
+}
+function speakCurrent(){
+  stopSpeech();
+  if(!("speechSynthesis" in window)){setVoiceStatus("Voice not supported");return;}
+  const text=SLIDES[current].voice;
+  if(!text){if(isPlaying) setTimeout(nextSlide,800); return;}
+  utterance=new SpeechSynthesisUtterance(text);
+  utterance.rate=SPEEDS[speedIdx]; utterance.pitch=1; utterance.lang="en-GB";
+  const voices=speechSynthesis.getVoices();
+  const pref=voices.find(v=>v.lang.startsWith("en")&&(v.name.includes("Daniel")||v.name.includes("Samantha")||v.name.includes("Karen")||v.name.includes("Google UK")||v.name.includes("Alex")))||voices.find(v=>v.lang.startsWith("en"))||voices[0];
+  if(pref) utterance.voice=pref;
+  utterance.onstart=()=>setVoiceStatus("speaking");
+  utterance.onend=()=>{setVoiceStatus("");if(isPlaying&&current<SLIDES.length-1) setTimeout(nextSlide,600); else if(current===SLIDES.length-1){isPlaying=false;updatePlayBtn();}};
+  utterance.onerror=()=>setVoiceStatus("");
+  speechSynthesis.speak(utterance);
+}
+function stopSpeech(){if("speechSynthesis" in window) speechSynthesis.cancel(); utterance=null; setVoiceStatus("");}
+function togglePlay(){isPlaying=!isPlaying; updatePlayBtn(); if(isPlaying) speakCurrent(); else stopSpeech();}
+function updatePlayBtn(){const icon=document.getElementById("play-icon"); icon.innerHTML=isPlaying?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
+function setVoiceStatus(state){const el=document.getElementById("voice-status"); el.innerHTML=state==="speaking"?`<div class="voice-dots"><div class="voice-dot"></div><div class="voice-dot"></div><div class="voice-dot"></div></div><span>Narrating…</span>`:state?state:"";}
+function cycleSpeed(){speedIdx=(speedIdx+1)%SPEEDS.length; document.getElementById("speed-btn").textContent=SPEEDS[speedIdx]+"×"; if(isPlaying){stopSpeech();setTimeout(speakCurrent,100);}}
+function markDone(){
+  try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[2]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}
+  const btn=document.getElementById("btn-done");
+  btn.style.background="var(--teal3)"; btn.style.borderColor="var(--teal)"; btn.querySelector("svg").style.stroke="var(--teal)";
+  goTo(SLIDES.length-1,1);
+}
+document.getElementById("start-btn").addEventListener("click",()=>{
+  document.getElementById("start-overlay").style.display="none";
+  document.getElementById("deck").style.display="flex";
+  updateUI();
+  if("speechSynthesis" in window){
+    const primer=new SpeechSynthesisUtterance(" "); primer.volume=0; speechSynthesis.speak(primer);
+    setTimeout(()=>{isPlaying=true; updatePlayBtn(); speakCurrent();},400);
+  }
+});
+wrap.addEventListener("touchstart",e=>{touchStartX=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-touchStartX; if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown") nextSlide(); if(e.key==="ArrowLeft"||e.key==="ArrowUp") prevSlide(); if(e.key===" "){e.preventDefault();togglePlay();}});
+if("speechSynthesis" in window) speechSynthesis.onvoiceschanged=()=>{};
+document.getElementById("deck").style.display="none";
+</script>
+</body>
+</html>
