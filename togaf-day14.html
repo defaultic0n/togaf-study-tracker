@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 14 — Enterprise Continuum &amp; Repository</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAF7;--ink:#1A1A18;--ink2:#4A4A42;--ink3:#8A8A80;--teal:#0D6E5E;--teal-light:#E6F4F1;--teal-mid:#1A9B86;--amber:#92530A;--amber-light:#FDF3E3;--blue:#1A4A7A;--blue-light:#E8F0F8;--purple:#4A2A7A;--purple-light:#F0EAF8;--green:#1A5A2A;--green-light:#E8F4E8;--coral:#8A2A2A;--coral-light:#F8EAEA;--rule:#E0DFD8;--surface:#FFFFFF;--reading-max:680px}
+html{background:var(--bg);scroll-behavior:smooth}body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100}
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}.nav-day{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3)}.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer}.done-btn.completed{background:#2EAA8A}
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px}.toc-list a:hover{color:var(--teal)}.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+.section{margin-bottom:48px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+p{margin-bottom:16px;color:var(--ink2)}p strong{color:var(--ink)}
+.hl{border-radius:10px;padding:16px 18px;margin:20px 0}
+.hl.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}.hl.amber{background:var(--amber-light);border-left:3px solid #D4860E}.hl.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}.hl.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}.hl.green{background:var(--green-light);border-left:3px solid #2A7A3A}
+.hl-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.hl.teal .hl-lbl{color:var(--teal)}.hl.amber .hl-lbl{color:var(--amber)}.hl.blue .hl-lbl{color:var(--blue)}.hl.purple .hl-lbl{color:var(--purple)}.hl.green .hl-lbl{color:var(--green)}
+.hl p{margin-bottom:0;font-size:15px;line-height:1.65}
+.hl.teal p{color:var(--teal)}.hl.amber p{color:var(--amber)}.hl.blue p{color:var(--blue)}.hl.purple p{color:var(--purple)}.hl.green p{color:var(--green)}
+.def-grid{display:grid;gap:10px;margin:20px 0}.def-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.def-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}.def-text{font-size:14px;color:var(--ink2);line-height:1.6;margin:0}
+.continuum-row{display:flex;gap:0;margin:20px 0;border-radius:10px;overflow:hidden;border:1px solid var(--rule)}
+.cont-box{flex:1;padding:12px;text-align:center;border-right:1px solid var(--rule)}
+.cont-box:last-child{border-right:none}
+.cont-box.f{background:#F0F8F0}.cont-box.cs{background:var(--blue-light)}.cont-box.is{background:var(--purple-light)}.cont-box.os{background:var(--teal-light)}
+.cont-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.cont-box.f .cont-label{color:var(--green)}.cont-box.cs .cont-label{color:var(--blue)}.cont-box.is .cont-label{color:var(--purple)}.cont-box.os .cont-label{color:var(--teal)}
+.cont-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:4px}.cont-desc{font-size:11px;color:var(--ink2);line-height:1.45}
+.repo-grid{display:grid;gap:10px;margin:20px 0}
+.repo-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start}
+.repo-icon{font-size:20px;flex-shrink:0}.repo-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px}.repo-desc{font-size:13px;color:var(--ink2);line-height:1.55}
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+.sum-grid{display:grid;gap:10px;margin-top:32px}
+.sum-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.sum-icon{font-size:18px;flex-shrink:0}.sum-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}.sum-body{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}.quiz-reset.show{display:block}
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;box-shadow:0 2px 12px rgba(0,0,0,.15)}.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav class="top-nav">
+  <div class="nav-left"><span class="nav-day">Day 14 · Week 4</span><span class="nav-title">Enterprise Continuum &amp; Repository</span></div>
+  <div class="nav-right"><div class="timer-badge">⏱ <span id="read-timer">0:00</span></div><button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button></div>
+</nav>
+<header class="hero">
+  <div class="hero-label">Study Session · Day 14 of 20</div>
+  <h1 class="hero-title">Enterprise Continuum<br>&amp; Repository</h1>
+  <div class="hero-meta"><span class="meta-pill">📖 ~30 min read</span><span class="meta-pill">5 topics</span><span class="meta-pill">5 quiz questions</span><span class="meta-pill">Core</span></div>
+  <p class="hero-intro">The Enterprise Continuum is TOGAF's model for classifying architecture and solutions from generic to organisation-specific. The Architecture Repository is the storage system that makes this classification operational — housing everything from principles to reusable building blocks.</p>
+</header>
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>Architecture Continuum — Foundation to Organisation</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Solutions Continuum Structure</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>Architecture Repository Components</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Architecture Landscape Levels</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Reference Library, Standards Library &amp; Governance Log</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>Knowledge Check</a></li>
+  </ol>
+</nav>
+<article class="article">
+
+  <section class="section" id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">Architecture Continuum — Foundation to Organisation</h2></div>
+    <div class="hl teal"><div class="hl-lbl">What the Enterprise Continuum is</div><p>The <strong>Enterprise Continuum</strong> is a model for classifying architectures and solutions from the most generic (Foundation Architecture) to the most specific (Organisation-Specific Architecture). It provides a consistent way to contextualise architecture work across industry, organisation, and project levels.</p></div>
+    <p>The Enterprise Continuum has two dimensions: the <strong>Architecture Continuum</strong> (for architecture descriptions and building blocks) and the <strong>Solutions Continuum</strong> (for implemented solutions). Both run from generic to specific.</p>
+    <div class="continuum-row">
+      <div class="cont-box f"><div class="cont-label">Most Generic</div><div class="cont-name">Foundation Architecture</div><div class="cont-desc">TOGAF Technical Reference Model, III-RM. Applies to all organisations.</div></div>
+      <div class="cont-box cs"><div class="cont-label">↓</div><div class="cont-name">Common Systems Architecture</div><div class="cont-desc">Architectures applying to multiple enterprises. E.g. federated identity, SOA frameworks.</div></div>
+      <div class="cont-box is"><div class="cont-label">↓</div><div class="cont-name">Industry Architecture</div><div class="cont-desc">Architectures for a specific industry sector. E.g. banking, healthcare, retail reference architectures.</div></div>
+      <div class="cont-box os"><div class="cont-label">Most Specific</div><div class="cont-name">Organisation-Specific Architecture</div><div class="cont-desc">Architectures tailored to one enterprise's needs, constraints, and context.</div></div>
+    </div>
+    <div class="hl blue"><div class="hl-lbl">Direction of the Continuum</div><p>Architectures are developed from <strong>right to left</strong> — starting from generic Foundation architectures and extending towards organisation-specific ones. This prevents reinvention: architects first leverage what already exists at the foundation and common systems level before creating organisation-specific elements.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The Architecture Continuum runs from <strong>Foundation → Common Systems → Industry → Organisation-Specific</strong>. Foundation Architecture is the most generic (applies to all). Organisation-Specific is the most tailored. Architecture Continuum = architectural descriptions. Solutions Continuum = implementations.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">Solutions Continuum Structure</h2></div>
+    <div class="hl purple"><div class="hl-lbl">Definition</div><p>The <strong>Solutions Continuum</strong> represents the implementations of the architectures defined in the Architecture Continuum. Where the Architecture Continuum contains ABBs, the Solutions Continuum contains SBBs — the actual products, solutions, and deployed systems.</p></div>
+    <p>The Solutions Continuum parallels the Architecture Continuum exactly:</p>
+    <div class="continuum-row">
+      <div class="cont-box f"><div class="cont-label">Foundation Solutions</div><div class="cont-name">Products &amp; Tools</div><div class="cont-desc">COTS products, open-source tools, industry-standard components.</div></div>
+      <div class="cont-box cs"><div class="cont-label">↓</div><div class="cont-name">Common Systems Solutions</div><div class="cont-desc">Configured shared platforms, enterprise integration layers.</div></div>
+      <div class="cont-box is"><div class="cont-label">↓</div><div class="cont-name">Industry Solutions</div><div class="cont-desc">Sector-specific packaged solutions, industry platforms.</div></div>
+      <div class="cont-box os"><div class="cont-label">Organisation Specific</div><div class="cont-name">Deployed Systems</div><div class="cont-desc">The enterprise's specific deployed systems and custom solutions.</div></div>
+    </div>
+    <div class="hl amber"><div class="hl-lbl">Architecture Continuum vs Solutions Continuum</div><p>The <strong>Architecture Continuum</strong> contains <em>descriptions</em> (what architecture should look like — ABBs, patterns, reference architectures). The <strong>Solutions Continuum</strong> contains <em>implementations</em> (what solutions actually exist — SBBs, products, deployed systems). The two continua are linked: every position in the Solutions Continuum realises the equivalent position in the Architecture Continuum.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Architecture Continuum = <strong>descriptions / ABBs</strong>. Solutions Continuum = <strong>implementations / SBBs</strong>. They are parallel structures at four levels: Foundation, Common Systems, Industry, Organisation-Specific.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">Architecture Repository Components</h2></div>
+    <div class="hl teal"><div class="hl-lbl">The repository defined</div><p>The <strong>Architecture Repository</strong> is the storage mechanism for all architecture-related information produced and used during the ADM cycle. It is the enterprise's single source of truth for architecture assets — organised into six key components.</p></div>
+    <div class="repo-grid">
+      <div class="repo-item"><span class="repo-icon">🏗</span><div><div class="repo-name">Architecture Metamodel</div><div class="repo-desc">The enterprise's customised version of the Architecture Content Metamodel — defines what types of architectural entities and relationships are used.</div></div></div>
+      <div class="repo-item"><span class="repo-icon">🗺</span><div><div class="repo-name">Architecture Landscape</div><div class="repo-desc">The architectural representations of the current, transition, and target states across all BDAT domains. Organised into Strategic, Segment, and Capability levels.</div></div></div>
+      <div class="repo-item"><span class="repo-icon">📚</span><div><div class="repo-name">Reference Library</div><div class="repo-desc">Guidelines, templates, patterns, and reference architectures from external sources (TOGAF, industry standards, technology vendors) that can be leveraged.</div></div></div>
+      <div class="repo-item"><span class="repo-icon">📐</span><div><div class="repo-name">Standards Library</div><div class="repo-desc">The approved technology products, versions, and standards the organisation uses. Constrains physical component selection in Phase D.</div></div></div>
+      <div class="repo-item"><span class="repo-icon">📋</span><div><div class="repo-name">Governance Log</div><div class="repo-desc">Records of all governance decisions — compliance assessments, dispensations, change requests, risk acceptances. The audit trail of architecture governance.</div></div></div>
+      <div class="repo-item"><span class="repo-icon">📊</span><div><div class="repo-name">Architecture Requirements Repository</div><div class="repo-desc">Stores all requirements — business, functional, non-functional, technical — with full traceability, version history, and status tracking.</div></div></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Know all six Architecture Repository components: Architecture Metamodel, Architecture Landscape, Reference Library, Standards Library, Governance Log, Architecture Requirements Repository. The <strong>Standards Library</strong> constrains Phase D technology choices. The <strong>Governance Log</strong> records all governance decisions.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">Architecture Landscape Levels</h2></div>
+    <p>Within the Architecture Repository's Architecture Landscape, TOGAF defines three levels of abstraction for architecture descriptions. Each level has a different scope and audience.</p>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Strategic Architecture</div><p class="def-text">The highest-level summary view of the entire enterprise architecture — spanning the full BDAT stack at a high level of abstraction. Used by C-suite and senior leadership to understand the strategic direction of the enterprise architecture. Typically spans 3–5 years.</p></div>
+      <div class="def-item"><div class="def-term">Segment Architecture</div><p class="def-text">Architecture for a specific area of the enterprise — a business unit, geographic region, or functional domain. More detailed than Strategic Architecture but less detailed than Capability Architecture. Used by segment leaders and programme managers. Typically spans 1–3 years.</p></div>
+      <div class="def-item"><div class="def-term">Capability Architecture</div><p class="def-text">Architecture for a specific capability or solution — the most detailed level. Directly supports implementation projects. Used by solution architects, developers, and delivery teams. Typically spans 0–18 months.</p></div>
+    </div>
+    <div class="hl green"><div class="hl-lbl">Levels and the ADM</div><p>The three levels connect to ADM iteration patterns. Strategic Architecture is updated through full Architecture Iteration cycles. Segment Architecture is updated through Capability Iterations scoped to a business unit. Capability Architecture is produced during standard ADM cycles for specific implementation projects.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Three Architecture Landscape levels: <strong>Strategic</strong> (whole enterprise, C-suite, 3–5 years), <strong>Segment</strong> (business unit, programme, 1–3 years), <strong>Capability</strong> (specific solution, delivery teams, 0–18 months). Strategic is highest abstraction; Capability is lowest.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">Reference Library, Standards Library &amp; Governance Log</h2></div>
+    <p>Three of the most exam-tested Architecture Repository components deserve deeper focus: the Reference Library, Standards Library, and Governance Log.</p>
+    <div class="hl blue"><div class="hl-lbl">Reference Library</div><p>Stores reusable <strong>guidelines, templates, patterns, and reference architectures</strong> from external sources. These include TOGAF's own Technical Reference Model, industry reference architectures (BIAN for banking, HL7 for healthcare), technology vendor reference architectures, and internally developed architecture patterns. Teams use it to avoid reinvention.</p></div>
+    <div class="hl purple"><div class="hl-lbl">Standards Library</div><p>Stores the enterprise's approved <strong>technology standards</strong> — the specific vendors, products, versions, and configurations the organisation has approved for use. When architects select physical technology components in Phase D, they must choose from this library. Non-standard selections require a dispensation from the Architecture Board.</p></div>
+    <div class="hl amber"><div class="hl-lbl">Governance Log</div><p>The <strong>audit trail of all architecture governance decisions</strong>. Contains: compliance assessment outcomes (Fully Conformant / Conditionally Conformant / Non-Conformant), all dispensations granted (with rationale), architecture change request outcomes, and risk acceptance records. It provides accountability and supports post-project review and continuous improvement.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Reference Library = reusable patterns and external reference architectures. Standards Library = approved technology products (constrains Phase D). Governance Log = all governance decisions — compliance outcomes, dispensations, change requests. The Governance Log is the <strong>audit trail</strong> of architecture governance.</p></div>
+  </section>
+
+  <div class="divider"></div>
+  <section>
+    <h2 style="font-family:'Lora',serif;font-size:20px;color:var(--ink);margin-bottom:16px">Session summary</h2>
+    <div class="sum-grid">
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Enterprise Continuum = generic to specific</div><p class="sum-body">Foundation → Common Systems → Industry → Organisation-Specific. Two parallel tracks: Architecture (ABBs) and Solutions (SBBs).</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Six Repository components</div><p class="sum-body">Metamodel, Landscape, Reference Library, Standards Library, Governance Log, Requirements Repository.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Three Landscape levels</div><p class="sum-body">Strategic (whole enterprise) · Segment (business unit) · Capability (specific solution).</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Standards Library constrains Phase D</div><p class="sum-body">Technology products must be selected from the approved Standards Library. Non-standard = dispensation required.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Governance Log = audit trail</div><p class="sum-body">Records all compliance outcomes, dispensations, change requests, and risk acceptances.</p></div></div>
+    </div>
+  </section>
+  <div class="divider"></div>
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">Knowledge Check</div><div class="quiz-sub">5 questions · Enterprise Continuum &amp; Repository</div>
+    <div class="quiz-q" id="quiz-q1"><div class="quiz-q-text">1. Which level of the Enterprise Continuum is the most generic, applying to all organisations?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. Industry Architecture</button>
+        <button class="quiz-opt" onclick="answer(1,'b')">B. Organisation-Specific Architecture</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. Foundation Architecture</button>
+        <button class="quiz-opt" onclick="answer(1,'d')">D. Common Systems Architecture</button>
+      </div><div class="quiz-feedback" id="fb1"></div></div>
+    <div class="quiz-q" id="quiz-q2"><div class="quiz-q-text">2. The Standards Library in the Architecture Repository primarily serves to:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. Store reusable architecture patterns and external reference architectures</button>
+        <button class="quiz-opt" onclick="answer(2,'b')">B. Record all governance decisions, dispensations, and compliance outcomes</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. Store approved technology products, versions, and configurations that constrain Phase D technology choices</button>
+        <button class="quiz-opt" onclick="answer(2,'d')">D. Document the types of architectural entities and their relationships</button>
+      </div><div class="quiz-feedback" id="fb2"></div></div>
+    <div class="quiz-q" id="quiz-q3"><div class="quiz-q-text">3. The Architecture Landscape within the Repository is organised into which three levels?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. Foundation, Industry, Organisation</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. Business, Information Systems, Technology</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. Strategic, Segment, Capability</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. Baseline, Transition, Target</button>
+      </div><div class="quiz-feedback" id="fb3"></div></div>
+    <div class="quiz-q" id="quiz-q4"><div class="quiz-q-text">4. How does the Solutions Continuum relate to the Architecture Continuum?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. The Solutions Continuum replaces the Architecture Continuum once implementations are complete</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. The Solutions Continuum contains implementations (SBBs) that realise the architectures (ABBs) described in the Architecture Continuum</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. The Architecture Continuum is used for current-state descriptions; the Solutions Continuum for target-state descriptions</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. The two continua are identical — they use different names for the same content</button>
+      </div><div class="quiz-feedback" id="fb4"></div></div>
+    <div class="quiz-q" id="quiz-q5"><div class="quiz-q-text">5. The Governance Log in the Architecture Repository contains:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. The enterprise's approved technology standards and vendor lists</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. External reference architectures and reusable templates</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. The audit trail of all architecture governance decisions — compliance outcomes, dispensations, and change request records</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. All architecture requirements with traceability and version history</button>
+      </div><div class="quiz-feedback" id="fb5"></div></div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+</article>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+let sec=0;const tEl=document.getElementById("read-timer");const iv=setInterval(()=>{sec++;tEl.textContent=Math.floor(sec/60)+":"+(sec%60<10?"0":"")+sec%60;},1000);
+window.addEventListener("scroll",()=>{const d=document.documentElement;document.getElementById("progress-bar").style.width=Math.min(100,(d.scrollTop/(d.scrollHeight-d.clientHeight))*100)+"%";document.getElementById("scroll-top").classList.toggle("show",d.scrollTop>400);});
+function markDone(){clearInterval(iv);try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[14]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("done-btn");b.textContent="✓ Done!";b.classList.add("completed");}
+const ANS={1:'c',2:'c',3:'c',4:'b',5:'c'};
+const FB={
+  1:{c:"Correct! Foundation Architecture is the most generic level — the TOGAF Technical Reference Model and III-RM apply to all organisations regardless of industry or size. It is the starting point of the Architecture Continuum.",x:"Not quite. Foundation Architecture is the most generic — it includes the TRM and III-RM which apply universally. The continuum runs from Foundation (most generic) through Common Systems and Industry to Organisation-Specific (most tailored)."},
+  2:{c:"Correct! The Standards Library stores the enterprise's approved technology products, versions, and configurations. When architects select physical technology components in Phase D, they must choose from this approved list — non-standard choices require a dispensation.",x:"Not quite. The Standards Library stores approved technology products and configurations, constraining Phase D choices. The Reference Library stores patterns and external architectures. The Governance Log records decisions."},
+  3:{c:"Correct! The Architecture Landscape is organised into three levels: Strategic (whole-enterprise, C-suite perspective), Segment (business unit or functional domain), and Capability (specific solution or project). These levels span from long-term strategic to near-term implementation.",x:"Not quite. The three Architecture Landscape levels are Strategic, Segment, and Capability. Foundation/Industry/Organisation describes the Enterprise Continuum. Baseline/Transition/Target describes architecture states within the ADM."},
+  4:{b:"Correct! The Solutions Continuum contains SBBs — specific products and implemented solutions — that realise the ABBs and architecture descriptions in the Architecture Continuum. They are parallel structures: every position in the Solutions Continuum implements the corresponding position in the Architecture Continuum.",x:"Not quite. The Solutions Continuum (SBBs / implementations) realises the Architecture Continuum (ABBs / descriptions). They are parallel, not sequential or replacing structures."},
+  5:{c:"Correct! The Governance Log is the audit trail of all architecture governance decisions — compliance assessment outcomes, dispensations granted, change request decisions, and risk acceptance records. It provides accountability and supports post-project review.",x:"Not quite. The Governance Log records all governance decisions — compliance outcomes, dispensations, and change requests. The Standards Library stores technology standards. The Reference Library stores patterns. The Requirements Repository tracks requirements."}
+};
+let answered={},score=0;
+function answer(q,opt){if(answered[q])return;answered[q]=opt;const ok=opt===ANS[q];if(ok)score++;document.querySelectorAll(`#quiz-q${q} .quiz-opt`).forEach((b,i)=>{const o=['a','b','c','d'][i];b.classList.add(o===ANS[q]?"correct":o===opt&&!ok?"wrong":"reveal");});const fb=document.getElementById("fb"+q);fb.textContent=(ok?"✓ ":"✗ ")+(ok?FB[q][opt]:FB[q].x);fb.className="quiz-feedback show "+(ok?"ok":"no");if(Object.keys(answered).length===5){const msgs=["Keep going!","Getting there!","Good effort!","Strong result!","Perfect score! Ready for Day 15."];document.getElementById("quiz-score").textContent=`You scored ${score}/5. ${msgs[score-1]||msgs[0]}`;document.getElementById("quiz-score").classList.add("show");document.getElementById("quiz-reset").classList.add("show");if(score===5)markDone();}}
+function resetQuiz(){answered={};score=0;document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});document.getElementById("quiz-score").classList.remove("show");document.getElementById("quiz-reset").classList.remove("show");}
+</script>
+</body>
+</html>

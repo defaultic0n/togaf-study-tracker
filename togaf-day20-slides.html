@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 20 Slides — Mock Exam &amp; Exam Strategy</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;--teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);--gold:#F0B429;--gold2:rgba(240,180,41,0.15);--gold3:rgba(240,180,41,0.08);--slate:#94A3B8;--slate2:#64748B;--slate3:#334155;--white:#F8FAFC;--white2:#E2E8F0;--coral:#FB7185;--coral2:rgba(251,113,133,0.15);--blue:#60A5FA;--blue2:rgba(96,165,250,0.12);--purple:#A78BFA;--purple2:rgba(167,139,250,0.12);--green:#4ADE80;--green2:rgba(74,222,128,0.12);--amber:#FBBF24;--amber2:rgba(251,191,36,0.12)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+#start-overlay{position:fixed;inset:0;z-index:200;background:linear-gradient(135deg,#080E1A,#0F1000);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:.07}
+.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:40px;opacity:.9}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;line-height:1.6;margin-bottom:48px;max-width:320px}
+.start-meta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:48px}
+.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid rgba(240,180,41,.25);color:var(--gold);font-weight:500}
+.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--gold);color:#0A0800;font-size:15px;font-weight:700;border:none;cursor:pointer}
+.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
+#deck{width:100%;height:100%;display:flex;flex-direction:column;display:none}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.slide.exit-left{animation:eL .4s cubic-bezier(.4,0,.2,1) forwards}.slide.enter-right{animation:eR .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.exit-right{animation:xR .4s cubic-bezier(.4,0,.2,1) forwards}.slide.enter-left{animation:xL .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes eL{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes eR{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes xR{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
+@keyframes xL{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}.slide-body::-webkit-scrollbar{display:none}
+.slide-title .slide-body,.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:32px 28px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:16px}
+.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
+.title-rule{width:48px;height:3px;background:var(--gold);border-radius:2px;margin-bottom:20px}
+.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
+.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid rgba(240,180,41,.25);color:rgba(240,180,41,.8)}
+.sec-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--gold3);line-height:1;margin-bottom:8px}
+.sec-lbl{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gold);margin-bottom:12px}
+.sec-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
+.sec-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
+.clbl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gold);margin-bottom:10px}
+.ch{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:14px}
+.box{border-radius:10px;padding:13px 15px;margin-bottom:11px}
+.box.gold{background:var(--gold2);border-left:3px solid var(--gold)}.box.teal{background:var(--teal3);border-left:3px solid var(--teal)}.box.green{background:var(--green2);border-left:3px solid var(--green)}.box.blue{background:var(--blue2);border-left:3px solid var(--blue)}.box.purple{background:var(--purple2);border-left:3px solid var(--purple)}.box.coral{background:var(--coral2);border-left:3px solid var(--coral)}
+.box-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.box.gold .box-lbl{color:var(--gold)}.box.teal .box-lbl{color:var(--teal)}.box.green .box-lbl{color:var(--green)}.box.blue .box-lbl{color:var(--blue)}.box.purple .box-lbl{color:var(--purple)}.box.coral .box-lbl{color:var(--coral)}
+.box p{font-size:13px;line-height:1.6;margin:0}
+.box.gold p{color:rgba(240,180,41,.9)}.box.teal p{color:rgba(45,212,191,.9)}.box.green p{color:rgba(74,222,128,.9)}.box.blue p{color:rgba(96,165,250,.9)}.box.purple p{color:rgba(167,139,250,.9)}.box.coral p{color:rgba(251,113,133,.9)}
+.blist{display:flex;flex-direction:column;gap:8px;margin-bottom:11px}
+.bi{display:flex;gap:11px;align-items:flex-start}
+.bd{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;margin-top:8px}
+.bt{font-size:13px;color:var(--white2);line-height:1.55}.bt strong{color:var(--white)}
+.exam{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:11px 13px;margin-bottom:11px;display:flex;gap:10px}
+.exam-s{font-size:15px;flex-shrink:0}.exam-t{font-size:12px;color:rgba(240,180,41,.9);line-height:1.6}.exam-t strong{color:var(--gold)}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:11px}
+.stat{background:var(--navy3);border-radius:9px;padding:11px 10px;text-align:center;border:1px solid rgba(240,180,41,.15)}
+.stat-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--gold);line-height:1}
+.stat-lbl{font-size:10px;color:var(--slate);margin-top:4px;line-height:1.3}
+.strat-row{display:flex;gap:8px;align-items:flex-start;padding:9px 11px;background:var(--navy3);border-radius:8px;margin-bottom:6px;border:1px solid rgba(255,255,255,.04)}
+.strat-n{font-size:18px;font-weight:700;font-family:'Playfair Display',serif;color:var(--gold3);width:24px;flex-shrink:0;line-height:1}
+.strat-body{font-size:12px;color:var(--slate);line-height:1.5}.strat-body strong{color:var(--white2)}
+.topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:11px}
+.topic{background:var(--navy3);border-radius:8px;padding:9px 11px;border:1px solid rgba(255,255,255,.04)}
+.topic-icon{font-size:16px;margin-bottom:4px}
+.topic-title{font-size:12px;font-weight:700;color:var(--white2);margin-bottom:3px}
+.topic-detail{font-size:10px;color:var(--slate);line-height:1.35}
+.tip-row{display:flex;gap:10px;align-items:flex-start;padding:9px 11px;background:var(--navy3);border-radius:8px;margin-bottom:6px;border:1px solid rgba(255,255,255,.04)}
+.tip-icon{font-size:16px;flex-shrink:0}
+.tip-text{font-size:12px;color:var(--slate);line-height:1.5}.tip-text strong{color:var(--white2)}
+.finish-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:16px}
+.fs{background:rgba(240,180,41,.08);border:1px solid rgba(240,180,41,.2);border-radius:8px;padding:10px 6px;text-align:center}
+.fs-num{font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:var(--gold);line-height:1}
+.fs-lbl{font-size:9px;color:var(--slate);margin-top:3px;line-height:1.3}
+#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
+#progress-fill{height:100%;background:var(--gold);transition:width .4s}
+#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
+.cbtn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--white2)}
+.cbtn svg{width:16px;height:16px}.cbtn.primary{background:var(--gold);border-color:var(--gold);color:#0A0800;width:44px;height:44px}.cbtn.primary svg{width:18px;height:18px}.cbtn:disabled{opacity:.3;cursor:not-allowed}
+.sc-ctr{flex:1;text-align:center;font-size:12px;color:var(--slate2)}.sc-ctr strong{color:var(--slate)}
+.vs{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
+.vd{display:flex;gap:3px;align-items:center}.vdot{width:4px;height:4px;border-radius:50%;background:var(--gold);animation:vdE 1.2s infinite}
+.vdot:nth-child(2){animation-delay:.2s}.vdot:nth-child(3){animation-delay:.4s}
+@keyframes vdE{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
+.spdbtn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
+.shint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+</style>
+</head>
+<body>
+<div id="start-overlay">
+  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="200" cy="350" r="300" fill="#F0B429"/><circle cx="50" cy="50" r="80" fill="#FBBF24"/><circle cx="380" cy="680" r="60" fill="#F0B429"/></svg>
+  <div class="start-logo">TOGAF Foundation · Day 20</div>
+  <div class="start-title">Mock Exam &amp;<br>Exam Strategy</div>
+  <p class="start-sub">Your final session. 20 slides on exam format, strategy, high-frequency topics, and the mindset to pass.</p>
+  <div class="start-meta"><span class="start-pill">🏆 Final session</span><span class="start-pill">🎙 Narrated</span><span class="start-pill">⏱ 60 min exam</span></div>
+  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Final Session</button>
+  <p class="start-note">Tap Start to enable voice · Swipe or use controls</p>
+</div>
+<div id="deck">
+  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
+  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
+  <div style="padding:2px 16px 0"><div class="vs" id="vs"></div><div class="shint">swipe left/right to navigate</div></div>
+  <div id="controls">
+    <button class="cbtn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+    <button class="cbtn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
+    <button class="cbtn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+    <div class="sc-ctr"><strong id="snum">1</strong> / <span id="stotal">20</span></div>
+    <button class="spdbtn" id="spdbtn" onclick="cycleSpeed()">1×</button>
+    <button class="cbtn" id="btn-done" onclick="markDone()" title="Mark done"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+  </div>
+</div>
+<script>
+const SLIDES=[
+{type:"title",bg:"gold",
+html:`<div class="eyebrow">TOGAF Foundation · Day 20 of 20 — Final Session 🏆</div><h1 class="title-h">Mock Exam &amp;<br>Exam Strategy</h1><div class="title-rule" style="background:var(--gold)"></div><p class="title-sub">This is it. Exam format, question strategy, the highest-frequency topics, gap analysis, and the mindset to walk in confident and walk out certified.</p><div class="title-tags"><span class="title-tag">🏆 Day 20</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">⏱ 60 min</span><span class="title-tag">55% pass</span></div>`,
+voice:`Welcome to Day 20 — the final session. Thursday of Week 5. You've completed 19 sessions across 5 weeks and studied every domain of the TOGAF Foundation syllabus. Today is about exam readiness: understanding exactly what you'll face, how to approach questions systematically, which topics carry the most marks, and the mindset that gets you over the line. Let's close this out.`},
+
+{type:"section",bg:"gold-dark",
+html:`<div class="sec-num">01</div><div class="sec-lbl">Section One</div><h2 class="sec-h">Exam Format: 40 Questions, 60 Min, 55% Pass</h2><p class="sec-desc">Exactly what the TOGAF Foundation exam looks like — format, rules, and what to expect.</p>`,
+voice:`Section one: the exam format. Knowing exactly what you're walking into removes anxiety and lets you focus on answering questions correctly.`},
+
+{type:"content",
+html:`<div class="clbl">Know the format cold</div><h2 class="ch">TOGAF Foundation Exam Format</h2>
+<div class="stat-grid">
+  <div class="stat"><div class="stat-num">40</div><div class="stat-lbl">Questions total</div></div>
+  <div class="stat"><div class="stat-num">60</div><div class="stat-lbl">Minutes allowed</div></div>
+  <div class="stat"><div class="stat-num">55%</div><div class="stat-lbl">Pass mark (22/40)</div></div>
+</div>
+<div class="box gold"><div class="box-lbl">Format details</div><p><strong>Multiple choice</strong> — each question has four options (A, B, C, D). One is the best answer. <strong>No negative marking</strong> — answer every question. <strong>Computer-based</strong> — delivered at a Pearson VUE test centre or online proctored. <strong>Closed book</strong> for Foundation level — no reference materials permitted.</p></div>
+<div class="blist">
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>90 seconds per question</strong> — you have plenty of time. 40 questions in 60 minutes = 90 seconds each. Don't rush.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>22 correct answers pass</strong> — 55% of 40. You have a generous margin. You can get 18 wrong and still pass.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Flag and return</strong> — flag uncertain questions and come back. Don't spend more than 2–3 minutes on any single question.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Combined exam available</strong> — Foundation + Practitioner can be taken together (80 questions, 150 minutes). Foundation-only is 40Q/60min.</div></div>
+</div>
+<div class="exam"><div class="exam-s">🎯</div><div class="exam-t">You need <strong>22 correct answers</strong> to pass. You've studied every single topic on the syllabus. This is very achievable. <strong>No negative marking</strong> — always guess rather than leave blank.</div></div>`,
+voice:`The TOGAF Foundation exam has 40 multiple-choice questions with four options each. You have 60 minutes — that's 90 seconds per question. The pass mark is 55%, which means 22 correct answers out of 40. You can get 18 wrong and still pass. There is no negative marking — always answer every question, even if you're unsure. The exam is computer-based, delivered at a Pearson VUE centre or online proctored. Foundation level is closed book. Key strategies for the format itself: flag uncertain questions and come back to them. Don't spend more than two or three minutes on any single question. You have plenty of time. And a combined Foundation plus Practitioner exam is available if you want to do both levels together — 80 questions in 150 minutes. But for Foundation alone, it's 40 questions in 60 minutes. You need 22 correct. You've prepared for all 40 topics.`},
+
+{type:"section",bg:"gold-dark",
+html:`<div class="sec-num">02</div><div class="sec-lbl">Section Two</div><h2 class="sec-h">Question Strategy: Eliminate Wrong Answers First</h2><p class="sec-desc">The systematic approach to every question — even when you're not sure of the right answer.</p>`,
+voice:`Section two: question strategy. The right technique turns uncertain questions into educated answers, not coin flips.`},
+
+{type:"content",
+html:`<div class="clbl">The systematic approach</div><h2 class="ch">How to Attack Every Question</h2>
+<div class="strat-row"><div class="strat-n">1</div><div class="strat-body"><strong>Read the question twice.</strong> Identify the subject (what is this about?), the constraint (what specific aspect?), and what form of answer is needed (definition, which phase, what output, who does what).</div></div>
+<div class="strat-row"><div class="strat-n">2</div><div class="strat-body"><strong>Eliminate the obviously wrong answers first.</strong> TOGAF questions usually have 1–2 options that are clearly incorrect or belong to a different phase/concept. Remove them immediately — now it's a 50/50 choice at worst.</div></div>
+<div class="strat-row"><div class="strat-n">3</div><div class="strat-body"><strong>Look for "TOGAF language" — the official wording matters.</strong> If an option uses precise TOGAF terminology (Architecture Vision, Statement of Architecture Work, Architecture Landscape), it's more likely correct than paraphrased alternatives.</div></div>
+<div class="strat-row"><div class="strat-n">4</div><div class="strat-body"><strong>Watch for "best" vs "correct" phrasing.</strong> Many questions ask for the "best" or "most appropriate" answer — all options may be partially true, but one aligns more precisely with TOGAF's stated approach.</div></div>
+<div class="strat-row"><div class="strat-n">5</div><div class="strat-body"><strong>Trust your first instinct on well-prepared topics.</strong> If you've studied it and an answer feels right immediately — go with it. Second-guessing well-prepared knowledge usually hurts your score.</div></div>
+<div class="strat-row"><div class="strat-n">6</div><div class="strat-body"><strong>Always guess — never leave blank.</strong> No negative marking. If you can't decide, pick the option that sounds most like official TOGAF language and move on.</div></div>
+<div class="exam"><div class="exam-s">🎯</div><div class="exam-t">Eliminate wrong answers → identify TOGAF-specific language → choose "most appropriate" → flag uncertain → return with fresh eyes. This process works for every question.</div></div>`,
+voice:`Six steps for attacking every question. Step one: read the question twice. Identify the subject, the constraint, and what form of answer is needed. Step two: eliminate obviously wrong answers first. TOGAF questions usually have one or two options that clearly belong to a different phase or concept. Remove them — now it's at worst a fifty-fifty choice. Step three: look for TOGAF language. Options using precise TOGAF terminology — Architecture Vision, Statement of Architecture Work, Architecture Landscape — are more likely correct than paraphrased alternatives. Step four: watch for "best" versus "correct" phrasing. Many questions ask for the best or most appropriate answer. All options may be partially true, but one aligns more precisely with TOGAF's stated approach. Step five: trust your first instinct on well-prepared topics. Second-guessing well-prepared knowledge usually hurts your score. Step six: always guess. Never leave blank. No negative marking. If you genuinely can't decide, pick the option that sounds most like official TOGAF language and move on. This six-step process works for every question.`},
+
+{type:"section",bg:"gold-dark",
+html:`<div class="sec-num">03</div><div class="sec-lbl">Section Three</div><h2 class="sec-h">High-Frequency Topics</h2><p class="sec-desc">The topics most likely to appear on the exam — focus your final review here.</p>`,
+voice:`Section three: high-frequency topics. Not all topics are equal. These areas consistently account for the most questions on the Foundation exam.`},
+
+{type:"content",
+html:`<div class="clbl">Exam weight distribution</div><h2 class="ch">Most-Tested Topics</h2>
+<div class="topic-grid">
+  <div class="topic"><div class="topic-icon">🔄</div><div class="topic-title">ADM Phases (25–30%)</div><div class="topic-detail">Phase objectives, key inputs/outputs, which deliverable belongs in which phase. Phase A and Phase G are heavily tested.</div></div>
+  <div class="topic"><div class="topic-icon">📋</div><div class="topic-title">Content Framework (15–20%)</div><div class="topic-detail">Deliverable vs artefact vs building block. ABB vs SBB. Architecture Definition Document vs Statement of Architecture Work.</div></div>
+  <div class="topic"><div class="topic-icon">🏛</div><div class="topic-title">Governance (15%)</div><div class="topic-detail">Architecture Board authority, Architecture Contracts (Phase F vs G), compliance vs conformance, dispensations.</div></div>
+  <div class="topic"><div class="topic-icon">🗄</div><div class="topic-title">Enterprise Continuum (10%)</div><div class="topic-detail">Four levels, Architecture vs Solutions Continuum. Six Repository components. Architecture Landscape levels.</div></div>
+  <div class="topic"><div class="topic-icon">👁</div><div class="topic-title">Views &amp; Viewpoints (10%)</div><div class="topic-detail">View = content. Viewpoint = template. Concern-Viewpoint-View chain. Communications Plan as Phase A output.</div></div>
+  <div class="topic"><div class="topic-icon">📐</div><div class="topic-title">TRM &amp; III-RM (8%)</div><div class="topic-detail">TRM two layers. III-RM cross-enterprise flow. Boundaryless information flow definition. Foundation Architecture level.</div></div>
+</div>
+<div class="box teal"><div class="box-lbl">Strategic focus</div><p>ADM phases plus Content Framework together account for <strong>40–50%</strong> of exam questions. If you have limited time to review, these two domains are where to focus your energy. Governance is the third priority.</p></div>`,
+voice:`Six high-frequency topic areas to know by weight. First: ADM Phases account for roughly 25 to 30% of questions. Phase objectives, key inputs and outputs, which deliverable belongs in which phase. Phase A and Phase G are the most heavily tested individual phases. Second: Content Framework accounts for 15 to 20%. Deliverable versus artefact versus building block, ABB versus SBB, Architecture Definition Document versus Statement of Architecture Work. Third: Governance at roughly 15%. Architecture Board authority, Architecture Contracts in Phase F versus G, compliance versus conformance, dispensations. Fourth: Enterprise Continuum at around 10%. Four levels, Architecture versus Solutions Continuum, six Repository components, Architecture Landscape levels. Fifth: Views and Viewpoints at 10%. View equals content, Viewpoint equals template, the Concern-Viewpoint-View chain, Communications Plan as Phase A output. Sixth: TRM and III-RM at about 8%. TRM two layers, III-RM cross-enterprise flow, boundaryless information flow. Strategic priority: ADM phases plus Content Framework together are 40 to 50% of the exam. Start there if time is limited.`},
+
+{type:"section",bg:"gold-dark",
+html:`<div class="sec-num">04</div><div class="sec-lbl">Section Four</div><h2 class="sec-h">Final Knowledge Gap Review</h2><p class="sec-desc">The specific distinctions most candidates confuse — one final chance to nail them.</p>`,
+voice:`Section four: the final knowledge gap review. These are the distinctions that separate passing candidates from failing ones.`},
+
+{type:"content",
+html:`<div class="clbl">The must-know distinctions</div><h2 class="ch">Final Gap Checklist ✓</h2>
+<div class="blist">
+  <div class="bi"><div class="bd"></div><div class="bt">📍 <strong>ADM phases that produce the Architecture Roadmap:</strong> First version in Phase E, refined in Phase F. Phase A produces the Architecture Vision — not the Roadmap.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt">📍 <strong>Statement of Architecture Work:</strong> Output of Phase A. Formally authorises the architecture engagement. Signed by stakeholders. Not an input to Phase A from outside.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt">📍 <strong>Architecture Contracts:</strong> Drafted in Phase F. Signed and finalised in Phase G. Two types: Design Contracts and Business-IT Interface Contracts.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt">📍 <strong>Requirements Management:</strong> The only phase that runs continuously throughout the entire ADM. Not a discrete phase with a start and end.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt">📍 <strong>ABB vs SBB:</strong> ABB defines what capability is needed (no implementation). SBB is a specific named product or solution implementing that ABB.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt">📍 <strong>Viewpoint vs View:</strong> Viewpoint is the reusable template. View is the specific content produced by applying the viewpoint to this architecture.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt">📍 <strong>Conformance vs Compliance:</strong> Conformance = matches the architecture. Compliance = meets all standards. Conformance is necessary but not sufficient for compliance.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt">📍 <strong>TRM vs III-RM:</strong> TRM = single platform taxonomy (Phase D). III-RM = distributed cross-enterprise information flow. Both are Foundation Architectures.</div></div>
+</div>
+<div class="exam"><div class="exam-s">🎯</div><div class="exam-t">Read each item above and confirm you can explain it clearly in one sentence. Any you hesitate on — review that day's reading before the exam.</div></div>`,
+voice:`Eight final knowledge gap items — each worth re-checking before exam day. One: the Architecture Roadmap. First version in Phase E, refined in Phase F. Phase A produces the Architecture Vision, not the Roadmap. Two: Statement of Architecture Work. Output of Phase A. Formally authorises the engagement. Not an input to Phase A from outside. Three: Architecture Contracts. Drafted in Phase F. Signed and finalised in Phase G. Two types: Design Contracts and Business-IT Interface Contracts. Four: Requirements Management. The only phase that runs continuously throughout the entire ADM. Five: ABB versus SBB. ABB defines what capability is needed. SBB is the specific named implementation. Six: Viewpoint versus View. Viewpoint is the reusable template. View is the specific content for this architecture. Seven: Conformance versus Compliance. Conformance means matches the architecture. Compliance means meets all standards. Conformance is necessary but not sufficient for compliance. Eight: TRM versus III-RM. TRM is a single platform taxonomy used in Phase D. III-RM is for distributed cross-enterprise information flow. Both are Foundation Architectures. Can you explain each of these clearly? Any hesitation — go back to that day's reading.`},
+
+{type:"section",bg:"gold-dark",
+html:`<div class="sec-num">05</div><div class="sec-lbl">Section Five</div><h2 class="sec-h">Exam Day Tips &amp; Time Management</h2><p class="sec-desc">How to walk in confident, manage your time, and walk out certified.</p>`,
+voice:`Section five: exam day. Everything you need to know to walk in confident and perform at your best.`},
+
+{type:"content",
+html:`<div class="clbl">Exam day execution</div><h2 class="ch">Walk In Ready</h2>
+<div class="tip-row"><div class="tip-icon">⏰</div><div class="tip-text"><strong>Time management:</strong> 90 seconds per question is comfortable. Aim to finish your first pass in 45–50 minutes, leaving 10+ minutes for flagged questions. Watch the clock at the halfway mark (20 questions done by 30 min).</div></div>
+<div class="tip-row"><div class="tip-icon">🚩</div><div class="tip-text"><strong>Flag strategy:</strong> If you're uncertain, answer, flag, and keep moving. Don't leave blanks — your first instinct answer is usually better than returning cold. Use remaining time to revisit only flagged questions.</div></div>
+<div class="tip-row"><div class="tip-icon">📖</div><div class="tip-text"><strong>Language matters:</strong> TOGAF has precise vocabulary. "Architecture Vision" and "Architecture Definition Document" are different things. Read carefully and match exactly to what you've studied.</div></div>
+<div class="tip-row"><div class="tip-icon">🧠</div><div class="tip-text"><strong>Trust your preparation:</strong> You've done 20 study sessions. 19 days of reading and revision. Your first instinct on well-prepared topics is usually right. Don't overthink.</div></div>
+<div class="tip-row"><div class="tip-icon">🌙</div><div class="tip-text"><strong>The night before:</strong> Light review only. Don't cram. Review the Day 19 and Day 20 slides. Sleep well — rest improves recall more than last-minute study.</div></div>
+<div class="tip-row"><div class="tip-icon">☕</div><div class="tip-text"><strong>Morning of:</strong> Arrive 15 minutes early. Eat beforehand. No new material on exam morning — trust what you know. Confidence comes from preparation, and you've prepared.</div></div>
+<div class="exam"><div class="exam-s">🏆</div><div class="exam-t"><strong>You have studied every topic. You know the framework. 22 correct answers pass.</strong> Walk in knowing you've done the work. Focus on each question individually. This is yours to pass.</div></div>`,
+voice:`Six exam day execution tips. First: time management. Aim to complete your first pass in 45 to 50 minutes, leaving 10 or more minutes for flagged questions. Check the clock at the halfway mark — 20 questions done by 30 minutes. Second: flag strategy. If uncertain, answer, flag, and keep moving. Don't leave blanks. Your first instinct answer is usually better than returning cold. Third: language matters. TOGAF has precise vocabulary. Architecture Vision and Architecture Definition Document are different things. Read carefully and match exactly to what you've studied. Fourth: trust your preparation. You've done 20 study sessions. Your first instinct on well-prepared topics is usually right. Don't overthink. Fifth: the night before. Light review only — don't cram. Review the Day 19 and Day 20 slides. Sleep well — rest improves recall more than last-minute study. Sixth: morning of. Arrive 15 minutes early. Eat beforehand. No new material on exam morning. Trust what you know. Confidence comes from preparation, and you have prepared. Remember: you need 22 correct answers. You've studied every topic in the syllabus. This is yours to pass.`},
+
+{type:"title",bg:"gold-end",
+html:`<div class="eyebrow">🏆 Day 20 Complete · Week 5 Done · Programme Complete</div>
+<div class="finish-stats">
+  <div class="fs"><div class="fs-num">20</div><div class="fs-lbl">Study sessions completed</div></div>
+  <div class="fs"><div class="fs-num">5</div><div class="fs-lbl">Weeks of study</div></div>
+  <div class="fs"><div class="fs-num">40</div><div class="fs-lbl">Hours of preparation</div></div>
+  <div class="fs"><div class="fs-num">0</div><div class="fs-lbl">Topics uncovered</div></div>
+</div>
+<h1 class="title-h" style="font-size:clamp(22px,5.5vw,36px);margin-bottom:12px">You're ready.<br>Go get certified. 🎓</h1>
+<div class="title-rule" style="background:var(--gold)"></div>
+<p class="title-sub" style="margin-bottom:24px">Complete the Day 20 mock exam quiz, then you're done. Walk into exam day knowing you've covered every topic, every trap, every distinction.</p>
+<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+  <a href="togaf-day20.html" style="display:flex;align-items:center;gap:8px;padding:14px 16px;background:var(--gold);border:none;border-radius:10px;text-decoration:none;color:#0A0800;font-size:15px;font-weight:700"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Take the Day 20 Mock Exam Quiz</a>
+  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--gold2);border:1px solid rgba(240,180,41,.3);border-radius:10px;color:var(--gold);font-size:14px;font-weight:600;cursor:pointer;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 20 done · Programme complete 🏆</button>
+</div>`,
+voice:`Day 20 complete. The programme is complete. You've covered 20 sessions across 5 weeks — the ADM from Preliminary to Phase H, the Content Framework, Enterprise Continuum and Repository, Architecture Governance, Capability Framework, Stakeholder Management and Views, Reference Models, and the full review. Not a single topic on the TOGAF Foundation syllabus has been left uncovered. Take the Day 20 mock exam quiz. Then walk into your exam knowing you've done the work, you understand the framework, and 22 correct answers is very achievable. Mustakim — go get certified. We'll be rooting for you.`},
+];
+
+const BG={gold:"linear-gradient(135deg,#1A1000,#1E1400)","gold-dark":"linear-gradient(135deg,#0E0A00,#1A1200)","gold-end":"linear-gradient(135deg,#0E0800,#1A1000 60%,#0A0E1A)"};
+let cur=0,play=false,spdIdx=1,utt=null,tx=0,anim=false;
+const SPDS=[0.8,1,1.2,1.5];
+const wrap=document.getElementById("slides-wrap");
+document.getElementById("stotal").textContent=SLIDES.length;
+SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="sl"+i;d.style.background=BG[s.bg]||BG["gold-dark"];d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
+function goTo(i,dir){if(anim||i<0||i>=SLIDES.length)return;anim=true;stopSp();const f=document.getElementById("sl"+cur),t=document.getElementById("sl"+i);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");anim=false;cur=i;upUI();if(play)spk();},420);}
+function nextSlide(){if(cur<SLIDES.length-1)goTo(cur+1,1);}function prevSlide(){if(cur>0)goTo(cur-1,-1);}
+function upUI(){document.getElementById("snum").textContent=cur+1;document.getElementById("progress-fill").style.width=((cur+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=cur===0;document.getElementById("btn-next").disabled=cur===SLIDES.length-1;}
+function spk(){stopSp();if(!("speechSynthesis"in window))return;const txt=SLIDES[cur].voice;if(!txt){if(play)setTimeout(nextSlide,800);return;}utt=new SpeechSynthesisUtterance(txt);utt.rate=SPDS[spdIdx];utt.lang="en-GB";const vs=speechSynthesis.getVoices();const p=vs.find(v=>v.lang.startsWith("en")&&(v.name.includes("Daniel")||v.name.includes("Samantha")||v.name.includes("Google UK")))||vs.find(v=>v.lang.startsWith("en"))||vs[0];if(p)utt.voice=p;utt.onstart=()=>setSt("speaking");utt.onend=()=>{setSt("");if(play&&cur<SLIDES.length-1)setTimeout(nextSlide,600);else{play=false;upPlay();}};utt.onerror=()=>setSt("");speechSynthesis.speak(utt);}
+function stopSp(){if("speechSynthesis"in window)speechSynthesis.cancel();utt=null;setSt("");}
+function togglePlay(){play=!play;upPlay();if(play)spk();else stopSp();}
+function upPlay(){document.getElementById("play-icon").innerHTML=play?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
+function setSt(s){const el=document.getElementById("vs");el.innerHTML=s==="speaking"?`<div class="vd"><div class="vdot"></div><div class="vdot"></div><div class="vdot"></div></div><span>Narrating…</span>`:(s||"");}
+function cycleSpeed(){spdIdx=(spdIdx+1)%SPDS.length;document.getElementById("spdbtn").textContent=SPDS[spdIdx]+"×";if(play){stopSp();setTimeout(spk,100);}}
+function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[20]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="rgba(240,180,41,.15)";b.style.borderColor="var(--gold)";b.querySelector("svg").style.stroke="var(--gold)";goTo(SLIDES.length-1,1);}
+document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";upUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{play=true;upPlay();spk();},400);}});
+wrap.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
+</script>
+</body>
+</html>

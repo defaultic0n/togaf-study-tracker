@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 13 — Architecture Content Framework</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#FAFAF7;--ink:#1A1A18;--ink2:#4A4A42;--ink3:#8A8A80;--teal:#0D6E5E;--teal-light:#E6F4F1;--teal-mid:#1A9B86;--amber:#92530A;--amber-light:#FDF3E3;--blue:#1A4A7A;--blue-light:#E8F0F8;--purple:#4A2A7A;--purple-light:#F0EAF8;--green:#1A5A2A;--green-light:#E8F4E8;--coral:#8A2A2A;--coral-light:#F8EAEA;--rule:#E0DFD8;--surface:#FFFFFF;--reading-max:680px}
+html{background:var(--bg);scroll-behavior:smooth}body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100;transition:width 0.1s}
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}.nav-day{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3)}.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;white-space:nowrap}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer}.done-btn.completed{background:#2EAA8A}
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px}.toc-list a:hover{color:var(--teal)}
+.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+.section{margin-bottom:48px}
+.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+p{margin-bottom:16px;color:var(--ink2)}p strong{color:var(--ink);font-weight:600}
+.hl{border-radius:10px;padding:16px 18px;margin:20px 0}
+.hl.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}.hl.amber{background:var(--amber-light);border-left:3px solid #D4860E}.hl.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}.hl.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}.hl.green{background:var(--green-light);border-left:3px solid #2A7A3A}
+.hl-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.hl.teal .hl-lbl{color:var(--teal)}.hl.amber .hl-lbl{color:var(--amber)}.hl.blue .hl-lbl{color:var(--blue)}.hl.purple .hl-lbl{color:var(--purple)}.hl.green .hl-lbl{color:var(--green)}
+.hl p{margin-bottom:0;font-size:15px;line-height:1.65}
+.hl.teal p{color:var(--teal)}.hl.amber p{color:var(--amber)}.hl.blue p{color:var(--blue)}.hl.purple p{color:var(--purple)}.hl.green p{color:var(--green)}
+.def-grid{display:grid;gap:10px;margin:20px 0}
+.def-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.def-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}
+.def-text{font-size:14px;color:var(--ink2);line-height:1.6;margin:0}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:20px 0}
+.type-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;overflow:hidden}
+.type-head{padding:8px 12px;font-size:11px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+.type-head.del{background:var(--teal-light);color:var(--teal)}.type-head.art{background:var(--blue-light);color:var(--blue)}.type-head.bb{background:var(--purple-light);color:var(--purple)}
+.type-body{padding:10px 12px;font-size:12px;color:var(--ink2);line-height:1.55}
+.phase-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:13px}
+.phase-table th{background:var(--teal-light);color:var(--teal);font-weight:600;padding:8px 10px;text-align:left;border:1px solid var(--rule)}
+.phase-table td{padding:7px 10px;border:1px solid var(--rule);color:var(--ink2);vertical-align:top;line-height:1.5}
+.phase-table tr:nth-child(even) td{background:#F7F6F3}
+.bb-compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.bb-box{background:var(--surface);border:1px solid var(--rule);border-radius:10px;overflow:hidden}
+.bb-head{padding:10px 14px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
+.bb-head.abb{background:var(--blue-light);color:var(--blue)}.bb-head.sbb{background:var(--green-light);color:var(--green)}
+.bb-body{padding:10px 14px;font-size:13px;color:var(--ink2);line-height:1.6}
+.bb-body ul{list-style:none;display:flex;flex-direction:column;gap:4px}
+.bb-body ul li{display:flex;gap:6px}.bb-body ul li::before{content:'→';color:var(--teal);flex-shrink:0}
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+.sum-grid{display:grid;gap:10px;margin-top:32px}
+.sum-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.sum-icon{font-size:18px;flex-shrink:0}.sum-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}.sum-body{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}.quiz-reset.show{display:block}
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;box-shadow:0 2px 12px rgba(0,0,0,.15)}.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav class="top-nav">
+  <div class="nav-left"><span class="nav-day">Day 13 · Week 4</span><span class="nav-title">Architecture Content Framework</span></div>
+  <div class="nav-right"><div class="timer-badge">⏱ <span id="read-timer">0:00</span></div><button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button></div>
+</nav>
+<header class="hero">
+  <div class="hero-label">Study Session · Day 13 of 20</div>
+  <h1 class="hero-title">Architecture Content Framework</h1>
+  <div class="hero-meta"><span class="meta-pill">📖 ~30 min read</span><span class="meta-pill">5 topics</span><span class="meta-pill">5 quiz questions</span><span class="meta-pill">Content</span></div>
+  <p class="hero-intro">The Architecture Content Framework defines <em>what</em> an architecture produces — the formal vocabulary of deliverables, artefacts, and building blocks, and the metamodel that connects them all into a coherent whole.</p>
+</header>
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>Deliverables, Artefacts &amp; Building Blocks</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>ABBs vs SBBs</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>The Content Metamodel</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Reusability of Building Blocks</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Key Deliverables Per ADM Phase</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>Knowledge Check</a></li>
+  </ol>
+</nav>
+<article class="article">
+
+  <section class="section" id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">Deliverables, Artefacts &amp; Building Blocks</h2></div>
+    <div class="hl teal"><div class="hl-lbl">Core distinction</div><p>The Architecture Content Framework defines three types of architectural output: <strong>Deliverables</strong> (what is contractually agreed), <strong>Artefacts</strong> (what describes architecture), and <strong>Building Blocks</strong> (what implements architecture). Each has a precise meaning in TOGAF.</p></div>
+    <div class="three-col">
+      <div class="type-card"><div class="type-head del">Deliverable</div><div class="type-body">A work product contractually specified and reviewed/approved. Formally reviewed by the Architecture Board. <br><br>Examples: Architecture Definition Document, Statement of Architecture Work, Architecture Vision.</div></div>
+      <div class="type-card"><div class="type-head art">Artefact</div><div class="type-body">An architectural work product that describes an aspect of the architecture. Catalogues, matrices, and diagrams are all artefacts. Artefacts are part of deliverables.<br><br>Examples: Application Interaction Matrix, Data Dissemination Diagram.</div></div>
+      <div class="type-card"><div class="type-head bb">Building Block</div><div class="type-body">A potentially reusable component of business, IT, or architectural capability that can be combined to deliver architectures and solutions.<br><br>Examples: CRM Service (ABB), Salesforce (SBB).</div></div>
+    </div>
+    <div class="hl blue"><div class="hl-lbl">The relationship</div><p>An <strong>Architecture Definition Document</strong> (deliverable) contains multiple architecture descriptions. Each description uses <strong>catalogues, matrices, and diagrams</strong> (artefacts) to document <strong>building blocks</strong> and their relationships. Deliverables contain artefacts; artefacts describe building blocks.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The most tested distinction: <strong>Deliverable</strong> = contractually agreed and formally reviewed. <strong>Artefact</strong> = architectural work product describing architecture. <strong>Building Block</strong> = reusable component. A deliverable can contain artefacts; an artefact can describe building blocks. They are not interchangeable.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">ABBs vs SBBs</h2></div>
+    <p>Building Blocks come in two varieties: <span class="def-term" style="font-weight:600;color:var(--blue)">Architecture Building Blocks</span> (ABBs) and <span class="def-term" style="font-weight:600;color:var(--green)">Solution Building Blocks</span> (SBBs). The distinction between them is one of the most frequently tested in the TOGAF Foundation exam.</p>
+    <div class="bb-compare">
+      <div class="bb-box"><div class="bb-head abb">Architecture Building Block (ABB)</div><div class="bb-body">
+        <p style="font-size:13px;margin-bottom:8px">Technology-independent. Defines <em>what</em> a capability does — not <em>how</em> it is implemented.</p>
+        <ul><li>Defined during Phases B, C, D of the ADM</li><li>Vendor-neutral and product-agnostic</li><li>Lives in the Architecture Continuum</li><li>Example: "Customer Relationship Management capability"</li><li>Example: "Relational Database Management Service"</li></ul>
+      </div></div>
+      <div class="bb-box"><div class="bb-head sbb">Solution Building Block (SBB)</div><div class="bb-body">
+        <p style="font-size:13px;margin-bottom:8px">Technology-specific. Implements an ABB with a real product or solution.</p>
+        <ul><li>Identified and mapped in Phase E (Opportunities &amp; Solutions)</li><li>Vendor-specific and product-named</li><li>Lives in the Solutions Continuum</li><li>Example: "Salesforce Sales Cloud" implements the CRM ABB</li><li>Example: "Oracle Database 21c" implements the RDBMS ABB</li></ul>
+      </div></div>
+    </div>
+    <div class="hl amber"><div class="hl-lbl">The mapping moment</div><p>ABBs are defined in Phases B–D as technology-independent architecture components. In <strong>Phase E — Opportunities and Solutions</strong>, ABBs are mapped to candidate SBBs for the first time. This is the first moment in the ADM when specific products and technologies are identified.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p><strong>ABBs</strong> are defined in Phases B–D (architecture phases), are technology-independent, and live in the Architecture Continuum. <strong>SBBs</strong> are mapped in Phase E, are technology-specific products, and live in the Solutions Continuum. ABB-to-SBB mapping is a key Phase E activity.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">The Content Metamodel</h2></div>
+    <div class="hl purple"><div class="hl-lbl">Definition</div><p>The <strong>Architecture Content Metamodel</strong> defines the types of architectural entities and the relationships between them. It provides a common vocabulary and structure for all architecture content — ensuring that architecture descriptions across phases are consistent and traceable.</p></div>
+    <p>The metamodel is the <strong>grammar</strong> of architecture description. Just as a grammar defines the rules for constructing sentences, the metamodel defines the rules for constructing architecture descriptions — what entities exist, what properties they have, and how they relate to each other.</p>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Core content metamodel entities</div><p class="def-text">Actor, Role, Business Service, Function, Process, Data Entity, Logical Data Component, Physical Data Component, Logical Application Component, Physical Application Component, Logical Technology Component, Physical Technology Component.</p></div>
+      <div class="def-item"><div class="def-term">Relationships in the metamodel</div><p class="def-text">Entities are connected by defined relationship types: <em>realises</em> (an SBB realises an ABB), <em>supports</em> (an application supports a business function), <em>uses</em> (an actor uses an application), <em>assigns to</em> (a role is assigned to an actor).</p></div>
+      <div class="def-item"><div class="def-term">Traceability through the metamodel</div><p class="def-text">The metamodel enables traceability from high-level business goals down to specific technology implementations. A business goal → requires capability → delivered by function → supported by application → hosted on technology component.</p></div>
+    </div>
+    <div class="hl green"><div class="hl-lbl">Extensions to the metamodel</div><p>The core metamodel can be extended to suit specific organisational needs or industry sectors. TOGAF allows enterprises to add custom entity types and relationships — provided the extension is documented and governed. This keeps the framework flexible without losing the benefits of a common vocabulary.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The Content Metamodel defines the types of entities and relationships used in TOGAF architecture descriptions — it is the <strong>vocabulary and grammar of architecture</strong>. It enables traceability from business goals to technology components. Know that it can be extended but must be documented.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">Reusability of Building Blocks</h2></div>
+    <p>Reusability is the fundamental value proposition of building blocks. TOGAF's entire Enterprise Continuum is built around the principle that well-designed architecture components should not need to be reinvented for every new architecture project.</p>
+    <div class="hl teal"><div class="hl-lbl">What makes a good building block</div><p>A well-designed building block: <strong>addresses a clear business need</strong>, has a <strong>well-defined interface</strong> that hides internal complexity, is <strong>loosely coupled</strong> from other building blocks (can change internally without breaking others), has a <strong>defined specification</strong> that can be tested against, and is <strong>documented</strong> in the Architecture Repository.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Reuse across projects</div><p class="def-text">A building block defined for one architecture project can be referenced by subsequent projects. Rather than redefining the CRM capability for every project, teams reference the existing CRM ABB from the Architecture Repository.</p></div>
+      <div class="def-item"><div class="def-term">Reuse across organisations</div><p class="def-text">Through the Enterprise Continuum, TOGAF-defined reference architectures (like the Technical Reference Model) provide building blocks reusable across any TOGAF-adopting organisation. Industry-standard architectures provide sector-specific reusable blocks.</p></div>
+      <div class="def-item"><div class="def-term">Building block granularity</div><p class="def-text">Building blocks can be coarse-grained (the entire CRM capability) or fine-grained (a specific authentication service). Coarser blocks are easier to reference; finer blocks offer more precise reuse opportunities. The right granularity depends on use context.</p></div>
+    </div>
+    <div class="hl amber"><div class="hl-lbl">Building blocks and the Architecture Repository</div><p>All reusable building blocks are stored in the <strong>Architecture Repository</strong> — specifically in the Architecture Landscape (for organisation-specific BBs) and the Reference Library (for generic/industry BBs). Teams search the repository before creating new BBs to maximise reuse.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Key characteristics of a good building block: clear interface, loosely coupled, well-specified, reusable. Building blocks are stored in the <strong>Architecture Repository</strong>. The Enterprise Continuum enables reuse ranging from generic Foundation Architecture blocks to organisation-specific blocks.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">Key Deliverables Per ADM Phase</h2></div>
+    <p>Every ADM phase produces specific formal deliverables. These are the contractually agreed work products reviewed and approved by the Architecture Board. Knowing which deliverable belongs to which phase is core exam content.</p>
+    <div style="overflow-x:auto;margin:20px 0">
+      <table class="phase-table">
+        <thead><tr><th>Phase</th><th>Primary Deliverable(s)</th><th>Key Artefacts produced</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Preliminary</strong></td><td>Architecture Principles, Tailored Architecture Framework</td><td>Principles catalogue, capability assessment</td></tr>
+          <tr><td><strong>Phase A</strong></td><td>Statement of Architecture Work, Architecture Vision</td><td>Stakeholder map, value chain diagram</td></tr>
+          <tr><td><strong>Phase B</strong></td><td>Architecture Definition Document (Business chapter)</td><td>Org map, Business Interaction Matrix, gap analysis</td></tr>
+          <tr><td><strong>Phase C</strong></td><td>Architecture Definition Document (IS chapter)</td><td>App Interaction Matrix, Data Dissemination Diagram</td></tr>
+          <tr><td><strong>Phase D</strong></td><td>Architecture Definition Document (Technology chapter)</td><td>Technology Portfolio Catalogue, Environments &amp; Locations Diagram</td></tr>
+          <tr><td><strong>Phase E</strong></td><td>Architecture Roadmap (initial), Transition Architecture definitions</td><td>Project Context Diagram, work package definitions</td></tr>
+          <tr><td><strong>Phase F</strong></td><td>Implementation &amp; Migration Plan (final), Architecture Roadmap (final)</td><td>Prioritised work package list, dependency schedule</td></tr>
+          <tr><td><strong>Phase G</strong></td><td>Architecture Contract (signed), Compliance Assessments</td><td>Governance Log entries, dispensation records</td></tr>
+          <tr><td><strong>Phase H</strong></td><td>Architecture Change Request records, updated Architecture Definition Document</td><td>Change impact assessments, updated roadmap</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="hl blue"><div class="hl-lbl">Architecture Definition Document</div><p>The <strong>Architecture Definition Document</strong> is the master deliverable for Phases B, C, and D. It grows chapter by chapter: a Business Architecture chapter from Phase B, an Information Systems chapter from Phase C, and a Technology chapter from Phase D. By the end of Phase D it contains the complete defined architecture.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The <strong>Architecture Definition Document</strong> accumulates across Phases B, C, and D. The <strong>Architecture Roadmap</strong> first appears in Phase E and is finalised in Phase F. The <strong>Statement of Architecture Work</strong> is Phase A's primary output. The <strong>Architecture Contract</strong> is Phase G's primary output.</p></div>
+  </section>
+
+  <div class="divider"></div>
+  <section>
+    <h2 style="font-family:'Lora',serif;font-size:20px;color:var(--ink);margin-bottom:16px">Session summary</h2>
+    <div class="sum-grid">
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Three output types</div><p class="sum-body">Deliverable = contractually agreed. Artefact = describes architecture. Building Block = reusable component. Not interchangeable.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">ABB vs SBB</div><p class="sum-body">ABB = technology-independent (Phases B–D, Architecture Continuum). SBB = specific product (Phase E, Solutions Continuum).</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Content Metamodel</div><p class="sum-body">Defines entity types and relationships. The vocabulary of architecture. Enables full traceability from business goals to technology.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Architecture Definition Document</div><p class="sum-body">Grows chapter by chapter across Phases B, C, D. Complete by end of Phase D.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Architecture Roadmap</div><p class="sum-body">First produced in Phase E. Finalised in Phase F. Never appears before Phase E.</p></div></div>
+    </div>
+  </section>
+  <div class="divider"></div>
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">Knowledge Check</div>
+    <div class="quiz-sub">5 questions · Architecture Content Framework</div>
+    <div class="quiz-q" id="quiz-q1">
+      <div class="quiz-q-text">1. In TOGAF, a "deliverable" is best described as:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. Any diagram or matrix produced during architecture work</button>
+        <button class="quiz-opt" onclick="answer(1,'b')">B. A contractually specified work product that is formally reviewed and approved by the Architecture Board</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. A reusable component that can be combined to build architectures</button>
+        <button class="quiz-opt" onclick="answer(1,'d')">D. A phase output that is automatically archived in the Architecture Repository</button>
+      </div>
+      <div class="quiz-feedback" id="fb1"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q2">
+      <div class="quiz-q-text">2. Architecture Building Blocks (ABBs) are first mapped to Solution Building Blocks (SBBs) in which ADM phase?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. Phase D — Technology Architecture</button>
+        <button class="quiz-opt" onclick="answer(2,'b')">B. Phase C — Information Systems Architecture</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. Phase E — Opportunities and Solutions</button>
+        <button class="quiz-opt" onclick="answer(2,'d')">D. Phase G — Implementation Governance</button>
+      </div>
+      <div class="quiz-feedback" id="fb2"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q3">
+      <div class="quiz-q-text">3. The Architecture Content Metamodel defines:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. The phases and steps of the ADM cycle</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. The types of architectural entities and relationships between them — providing a common vocabulary for architecture descriptions</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. The governance structures that oversee architecture compliance</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. The standards that technology components must comply with</button>
+      </div>
+      <div class="quiz-feedback" id="fb3"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q4">
+      <div class="quiz-q-text">4. The Architecture Definition Document is built across which three ADM phases?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. Phases A, B, and C</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. Phases B, C, and D</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. Phases E, F, and G</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. Phases C, D, and E</button>
+      </div>
+      <div class="quiz-feedback" id="fb4"></div>
+    </div>
+    <div class="quiz-q" id="quiz-q5">
+      <div class="quiz-q-text">5. A key characteristic that distinguishes a Solution Building Block (SBB) from an Architecture Building Block (ABB) is that an SBB:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. Is always smaller and more fine-grained than an ABB</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. Is defined during the architecture design phases (B, C, D) while ABBs are defined later</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. Is technology-specific — a named product or solution that implements an ABB</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. Must be stored in the Reference Library rather than the Architecture Landscape</button>
+      </div>
+      <div class="quiz-feedback" id="fb5"></div>
+    </div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+</article>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+let sec=0;const tEl=document.getElementById("read-timer");const iv=setInterval(()=>{sec++;tEl.textContent=Math.floor(sec/60)+":"+(sec%60<10?"0":"")+sec%60;},1000);
+window.addEventListener("scroll",()=>{const d=document.documentElement;document.getElementById("progress-bar").style.width=Math.min(100,(d.scrollTop/(d.scrollHeight-d.clientHeight))*100)+"%";document.getElementById("scroll-top").classList.toggle("show",d.scrollTop>400);});
+function markDone(){clearInterval(iv);try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[13]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("done-btn");b.textContent="✓ Done!";b.classList.add("completed");}
+const ANS={1:'b',2:'c',3:'b',4:'b',5:'c'};
+const FB={
+  1:{b:"Correct! A deliverable is a contractually specified work product that is formally reviewed and approved. It is distinct from an artefact (which describes architecture) and a building block (which implements it).",x:"Not quite. A deliverable is a contractually specified and formally approved work product — like the Architecture Definition Document or Statement of Architecture Work. Artefacts like matrices and diagrams are components of deliverables."},
+  2:{c:"Correct! ABBs are defined as technology-independent components in Phases B–D. In Phase E — Opportunities and Solutions — they are mapped to candidate SBBs (specific products) for the first time. This ABB-to-SBB mapping is a key Phase E activity.",x:"Not quite. ABBs are mapped to SBBs in Phase E — Opportunities and Solutions. This is the first point in the ADM where specific technology products are identified as implementations of the architecture components."},
+  3:{b:"Correct! The Content Metamodel defines the types of architectural entities (like Actor, Business Service, Data Entity, Application Component) and the relationships between them. It provides the common vocabulary and grammar for all architecture descriptions.",x:"Not quite. The Content Metamodel defines entity types and their relationships — it is the vocabulary of architecture, enabling consistent description and traceability across all ADM phases."},
+  4:{b:"Correct! The Architecture Definition Document grows chapter by chapter: Phase B adds the Business Architecture chapter, Phase C adds the Information Systems chapter, and Phase D adds the Technology Architecture chapter. By the end of Phase D it is substantially complete.",x:"Not quite. The Architecture Definition Document is built across Phases B, C, and D — the three detailed architecture phases. Each phase contributes a new chapter to the document."},
+  5:{c:"Correct! An SBB is technology-specific — it names a real product or solution (like Salesforce, Oracle Database, or AWS) that implements a technology-independent ABB. SBBs live in the Solutions Continuum; ABBs live in the Architecture Continuum.",x:"Not quite. The key distinction is that SBBs are technology-specific named products while ABBs are technology-independent capability definitions. SBBs are identified in Phase E when ABBs are mapped to concrete implementation candidates."}
+};
+let answered={},score=0;
+function answer(q,opt){if(answered[q])return;answered[q]=opt;const ok=opt===ANS[q];if(ok)score++;document.querySelectorAll(`#quiz-q${q} .quiz-opt`).forEach((b,i)=>{const o=['a','b','c','d'][i];b.classList.add(o===ANS[q]?"correct":o===opt&&!ok?"wrong":"reveal");});const fb=document.getElementById("fb"+q);fb.textContent=(ok?"✓ ":"✗ ")+(ok?FB[q][opt]:FB[q].x);fb.className="quiz-feedback show "+(ok?"ok":"no");if(Object.keys(answered).length===5){const msgs=["Keep going!","Getting there!","Good effort!","Strong result!","Perfect score! Ready for Day 14."];document.getElementById("quiz-score").textContent=`You scored ${score}/5. ${msgs[score-1]||msgs[0]}`;document.getElementById("quiz-score").classList.add("show");document.getElementById("quiz-reset").classList.add("show");if(score===5)markDone();}}
+function resetQuiz(){answered={};score=0;document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});document.getElementById("quiz-score").classList.remove("show");document.getElementById("quiz-reset").classList.remove("show");}
+</script>
+</body>
+</html>

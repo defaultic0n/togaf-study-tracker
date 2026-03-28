@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 16 — Architecture Governance</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}:root{--bg:#FAFAF7;--ink:#1A1A18;--ink2:#4A4A42;--ink3:#8A8A80;--teal:#0D6E5E;--teal-light:#E6F4F1;--teal-mid:#1A9B86;--amber:#92530A;--amber-light:#FDF3E3;--blue:#1A4A7A;--blue-light:#E8F0F8;--purple:#4A2A7A;--purple-light:#F0EAF8;--green:#1A5A2A;--green-light:#E8F4E8;--rule:#E0DFD8;--surface:#FFFFFF;--reading-max:680px}
+html{background:var(--bg);scroll-behavior:smooth}body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100}
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}.nav-day{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3)}.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px}.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer}.done-btn.completed{background:#2EAA8A}
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px}.toc-list a:hover{color:var(--teal)}.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+.section{margin-bottom:48px}.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+p{margin-bottom:16px;color:var(--ink2)}p strong{color:var(--ink)}
+.hl{border-radius:10px;padding:16px 18px;margin:20px 0}
+.hl.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}.hl.amber{background:var(--amber-light);border-left:3px solid #D4860E}.hl.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}.hl.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}.hl.green{background:var(--green-light);border-left:3px solid #2A7A3A}
+.hl-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.hl.teal .hl-lbl{color:var(--teal)}.hl.amber .hl-lbl{color:var(--amber)}.hl.blue .hl-lbl{color:var(--blue)}.hl.purple .hl-lbl{color:var(--purple)}.hl.green .hl-lbl{color:var(--green)}
+.hl p{margin-bottom:0;font-size:15px;line-height:1.65}
+.hl.teal p{color:var(--teal)}.hl.amber p{color:var(--amber)}.hl.blue p{color:var(--blue)}.hl.purple p{color:var(--purple)}.hl.green p{color:var(--green)}
+.def-grid{display:grid;gap:10px;margin:20px 0}.def-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.def-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}.def-text{font-size:14px;color:var(--ink2);line-height:1.6;margin:0}
+.gov-levels{display:flex;flex-direction:column;gap:0;border-radius:10px;overflow:hidden;border:1px solid var(--rule);margin:20px 0}
+.gov-row{display:flex;gap:12px;padding:12px 14px;border-bottom:1px solid var(--rule);align-items:flex-start}
+.gov-row:last-child{border-bottom:none}
+.gov-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0;white-space:nowrap;margin-top:2px}
+.gov-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}.gov-desc{font-size:13px;color:var(--ink2);line-height:1.5}
+.compare-table{width:100%;border-collapse:collapse;margin:20px 0;font-size:14px}
+.compare-table th{background:var(--teal-light);color:var(--teal);font-weight:600;padding:9px 12px;text-align:left;border:1px solid var(--rule)}
+.compare-table td{padding:8px 12px;border:1px solid var(--rule);color:var(--ink2);vertical-align:top;line-height:1.5}
+.compare-table tr:nth-child(even) td{background:#F7F6F3}
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+.sum-grid{display:grid;gap:10px;margin-top:32px}
+.sum-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.sum-icon{font-size:18px;flex-shrink:0}.sum-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}.sum-body{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}.quiz-reset.show{display:block}
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;box-shadow:0 2px 12px rgba(0,0,0,.15)}.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav class="top-nav">
+  <div class="nav-left"><span class="nav-day">Day 16 · Week 4</span><span class="nav-title">Architecture Governance</span></div>
+  <div class="nav-right"><div class="timer-badge">⏱ <span id="read-timer">0:00</span></div><button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button></div>
+</nav>
+<header class="hero">
+  <div class="hero-label">Study Session · Day 16 of 20</div>
+  <h1 class="hero-title">Architecture Governance</h1>
+  <div class="hero-meta"><span class="meta-pill">📖 ~30 min read</span><span class="meta-pill">5 topics</span><span class="meta-pill">5 quiz questions</span><span class="meta-pill">Governance</span></div>
+  <p class="hero-intro">Architecture Governance is the practice and orientation by which enterprise architectures are managed and controlled. Today we look at how governance is structured across multiple levels, what the Architecture Board does, and how IT governance differs from architecture governance.</p>
+</header>
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>Governance Definition &amp; Levels</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Architecture Board — Composition &amp; Responsibilities</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>Architecture Contracts — Purpose &amp; Content</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Compliance vs Conformance (revisited)</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>IT Governance vs Architecture Governance</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>Knowledge Check</a></li>
+  </ol>
+</nav>
+<article class="article">
+
+  <section class="section" id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">Governance Definition &amp; Levels</h2></div>
+    <div class="hl teal"><div class="hl-lbl">TOGAF definition</div><p>Architecture Governance is <strong>the practice and orientation by which enterprise architectures and other architectures are managed and controlled at an enterprise-wide level</strong>. It ensures architecture decisions are made consistently, transparently, and in alignment with business strategy.</p></div>
+    <p>TOGAF recognises that governance operates at multiple levels — from corporate governance at the top, through IT governance in the middle, to architecture governance at the detailed level. Each level has different concerns, participants, and decision rights.</p>
+    <div class="gov-levels">
+      <div class="gov-row"><span class="gov-badge" style="background:var(--blue-light);color:var(--blue)">Corporate</span><div><div class="gov-name">Corporate Governance</div><div class="gov-desc">Board-level governance of the entire organisation. Concerned with strategic direction, risk, compliance, and accountability to shareholders and regulators. Sets the context for all lower governance levels.</div></div></div>
+      <div class="gov-row"><span class="gov-badge" style="background:var(--teal-light);color:var(--teal)">Technology</span><div><div class="gov-name">Technology / IT Governance</div><div class="gov-desc">Governance of IT investment, delivery, and operations. Concerned with IT budget, project delivery, IT risk, and ensuring IT serves business needs. Includes frameworks like COBIT and ISO 38500.</div></div></div>
+      <div class="gov-row"><span class="gov-badge" style="background:var(--purple-light);color:var(--purple)">Architecture</span><div><div class="gov-name">Architecture Governance</div><div class="gov-desc">Governance of the enterprise architecture — ensuring architectures are consistent, principles-based, and aligned to strategy. The Architecture Board is the primary governance body at this level.</div></div></div>
+    </div>
+    <div class="hl blue"><div class="hl-lbl">Governance principles in TOGAF</div><p>TOGAF governance is: <strong>Disciplined</strong> (follows defined processes), <strong>Accountable</strong> (clear responsibility for decisions), <strong>Transparent</strong> (decisions are visible and auditable), <strong>Independent</strong> (free from conflicts of interest), and <strong>Effective</strong> (achieves the intended outcome without excessive overhead).</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>TOGAF recognises three governance levels: <strong>Corporate → Technology/IT → Architecture</strong>. Architecture governance sits within the broader IT governance framework, which itself sits within corporate governance. Each level has different scope and participants.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">Architecture Board — Composition &amp; Responsibilities</h2></div>
+    <div class="hl purple"><div class="hl-lbl">The Architecture Board</div><p>The <strong>Architecture Board</strong> is the cross-organisational body responsible for architecture governance. It has the authority to review, approve, and mandate changes to architecture — and to grant or refuse dispensations for non-conforming implementations.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Composition</div><p class="def-text">Typically includes: CIO or IT Director, Chief Architect, senior business representatives from key business units, domain architecture leads (Business, Data, Application, Technology Architects), and external independent members where needed. Composition varies by organisation size.</p></div>
+      <div class="def-item"><div class="def-term">Responsibilities</div><p class="def-text">Review and approve all architecture deliverables. Grant dispensations for non-conforming implementations. Resolve architecture conflicts between projects. Maintain architecture standards and principles. Report to executive leadership on architecture status and risks.</p></div>
+      <div class="def-item"><div class="def-term">Decision rights</div><p class="def-text">The Board has formal authority to: approve or reject architecture deliverables, grant or refuse dispensations, require changes to implementations, and escalate unresolved issues to executive leadership. Its authority is delegated from the executive sponsor.</p></div>
+      <div class="def-item"><div class="def-term">Operating model</div><p class="def-text">The Board typically meets regularly (monthly or quarterly) for routine reviews, and convenes ad hoc for urgent compliance issues or major change requests. Decisions are recorded in the Governance Log.</p></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The Architecture Board's three most important functions: <strong>reviewing and approving architectures</strong>, <strong>granting dispensations</strong>, and <strong>maintaining the Governance Log</strong>. It provides formal governance authority — without it, architecture compliance is only advisory.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">Architecture Contracts — Purpose &amp; Content</h2></div>
+    <div class="hl amber"><div class="hl-lbl">Revisiting Architecture Contracts</div><p>Architecture Contracts formalise the relationship between the architecture team and implementation projects. They define what will be built, what standards apply, and what governance oversight will occur. They give the Architecture Board the formal authority to require conformance.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Purpose</div><p class="def-text">To create a formal, binding agreement between development partners and sponsors on the deliverables, quality, and fitness-for-purpose of the architecture being implemented. Without contracts, governance is advisory only.</p></div>
+      <div class="def-item"><div class="def-term">When produced</div><p class="def-text">Drafted in Phase F (Migration Planning) as part of delivery preparation. Finalised and signed at the start of Phase G (Implementation Governance) before implementation work begins.</p></div>
+      <div class="def-item"><div class="def-term">Types</div><p class="def-text"><strong>Design Contracts</strong> govern the architecture and design work itself. <strong>Business and IT Interface Contracts</strong> govern what IT will deliver to the business and at what quality. Both types may coexist for a single implementation project.</p></div>
+      <div class="def-item"><div class="def-term">Key contents</div><p class="def-text">Architecture to be implemented, conformance requirements, applicable principles and standards, agreed quality levels, exceptions already granted, procedures for requesting dispensations, and governance procedures for the project.</p></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Architecture Contracts are <strong>drafted in Phase F</strong> and <strong>signed in Phase G</strong>. Two types: <strong>Design Contracts</strong> (architecture design work) and <strong>Business and IT Interface Contracts</strong> (IT delivery to business). Without them, the Board has no formal authority to enforce conformance.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">Compliance vs Conformance (revisited)</h2></div>
+    <p>Building on what was introduced in Phase G (Day 9), this section looks at the compliance vs conformance distinction in the broader governance context and how it applies to architecture governance frameworks.</p>
+    <div style="overflow-x:auto;margin:20px 0">
+      <table class="compare-table">
+        <thead><tr><th>Term</th><th>Definition</th><th>Assessed against</th><th>Who decides</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Conformance</strong></td><td>Does the implementation match the approved architecture?</td><td>Architecture Definition Document and Architecture Contracts</td><td>Architecture Board</td></tr>
+          <tr><td><strong>Compliance</strong></td><td>Does the implementation meet all applicable governance requirements — principles, standards, regulations?</td><td>Full architecture governance framework including regulatory requirements</td><td>Architecture Board + Compliance functions</td></tr>
+          <tr><td><strong>Dispensation</strong></td><td>Formal permission to deviate from a specific conformance requirement</td><td>Specific conformance requirement in the Architecture Contract</td><td>Architecture Board (formal approval required)</td></tr>
+          <tr><td><strong>Waiver</strong></td><td>Exemption from a compliance requirement — typically granted for regulatory reasons or documented risk acceptance</td><td>Specific compliance requirement</td><td>Architecture Board + Legal/Compliance</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="hl green"><div class="hl-lbl">Why the distinction matters in governance</div><p>Conformance is the narrower question: does this match the architecture? Compliance is the broader question: does this meet all the rules? A project can be fully conformant to its Architecture Contract but still non-compliant — for example, if the architecture itself failed to incorporate a regulatory requirement. Governance must address both dimensions.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Conformance = matches the architecture. Compliance = meets all governance requirements. A dispensation = permission to deviate from a <em>conformance</em> requirement. Both are formal processes requiring Architecture Board involvement and Governance Log recording.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">IT Governance vs Architecture Governance</h2></div>
+    <div class="hl teal"><div class="hl-lbl">A critical distinction</div><p>IT Governance and Architecture Governance are related but distinct. Understanding the difference — and how they complement each other — is important for the exam and for practice.</p></div>
+    <div style="overflow-x:auto;margin:20px 0">
+      <table class="compare-table">
+        <thead><tr><th>Dimension</th><th>IT Governance</th><th>Architecture Governance</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Primary concern</strong></td><td>IT investment, delivery, and operations</td><td>Architecture coherence, principles, and standards</td></tr>
+          <tr><td><strong>Key framework</strong></td><td>COBIT, ISO 38500</td><td>TOGAF Architecture Governance</td></tr>
+          <tr><td><strong>Governing body</strong></td><td>IT Steering Committee, CIO</td><td>Architecture Board, Chief Architect</td></tr>
+          <tr><td><strong>Key outputs</strong></td><td>IT investment decisions, project approvals, SLA management</td><td>Architecture approvals, dispensations, compliance assessments</td></tr>
+          <tr><td><strong>Primary record</strong></td><td>IT project portfolio, risk register</td><td>Architecture Repository, Governance Log</td></tr>
+          <tr><td><strong>Scope</strong></td><td>All IT investment and operations</td><td>Architecture of IT and business systems</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="hl amber"><div class="hl-lbl">How they work together</div><p>Architecture Governance operates <em>within</em> the broader IT Governance framework. IT Governance approves IT investment budgets; Architecture Governance ensures those investments conform to the enterprise architecture. A project might need approval from both the IT Steering Committee (budget) and the Architecture Board (architectural conformance) before it can proceed.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>IT Governance = concerned with IT investment, delivery, operations. Architecture Governance = concerned with architecture coherence and conformance. Architecture Governance operates <strong>within</strong> IT Governance. They are complementary, not competing.</p></div>
+  </section>
+
+  <div class="divider"></div>
+  <section>
+    <h2 style="font-family:'Lora',serif;font-size:20px;color:var(--ink);margin-bottom:16px">Session summary</h2>
+    <div class="sum-grid">
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Three governance levels</div><p class="sum-body">Corporate → IT/Technology → Architecture. Architecture governance is nested within the broader IT and corporate governance frameworks.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Architecture Board key functions</div><p class="sum-body">Reviews/approves architectures, grants dispensations, maintains Governance Log. Provides formal governance authority.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Contracts: Phase F draft, Phase G sign</div><p class="sum-body">Two types: Design Contracts and Business/IT Interface Contracts. Without them, governance is advisory only.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Conformance ≠ Compliance</div><p class="sum-body">Conformance = matches architecture. Compliance = meets all governance requirements. Both require Board involvement.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">IT gov vs Architecture gov</div><p class="sum-body">IT governance covers investment and delivery. Architecture governance covers coherence and conformance. They are complementary.</p></div></div>
+    </div>
+  </section>
+  <div class="divider"></div>
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">Knowledge Check</div><div class="quiz-sub">5 questions · Architecture Governance</div>
+    <div class="quiz-q" id="quiz-q1"><div class="quiz-q-text">1. TOGAF recognises governance at three levels. Which correctly orders them from most senior to most specific?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. Architecture Governance → IT Governance → Corporate Governance</button>
+        <button class="quiz-opt" onclick="answer(1,'b')">B. Corporate Governance → IT/Technology Governance → Architecture Governance</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. IT Governance → Corporate Governance → Architecture Governance</button>
+        <button class="quiz-opt" onclick="answer(1,'d')">D. Architecture Governance → Corporate Governance → IT Governance</button>
+      </div><div class="quiz-feedback" id="fb1"></div></div>
+    <div class="quiz-q" id="quiz-q2"><div class="quiz-q-text">2. The Architecture Board's authority to require conformance from implementation teams comes primarily from:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. The Architecture Vision document approved in Phase A</button>
+        <button class="quiz-opt" onclick="answer(2,'b')">B. The Governance Log records of previous compliance assessments</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. The signed Architecture Contracts between the Board and implementation project teams</button>
+        <button class="quiz-opt" onclick="answer(2,'d')">D. The IT Steering Committee's delegation of authority</button>
+      </div><div class="quiz-feedback" id="fb2"></div></div>
+    <div class="quiz-q" id="quiz-q3"><div class="quiz-q-text">3. Which of the following best distinguishes Architecture Governance from IT Governance?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. Architecture Governance has higher authority than IT Governance</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. Architecture Governance is concerned with architecture coherence and conformance; IT Governance is concerned with IT investment, delivery, and operations</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. IT Governance uses TOGAF; Architecture Governance uses COBIT</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. Architecture Governance only applies during Phases G and H; IT Governance applies throughout</button>
+      </div><div class="quiz-feedback" id="fb3"></div></div>
+    <div class="quiz-q" id="quiz-q4"><div class="quiz-q-text">4. Architecture Contracts are drafted in Phase F and signed in Phase G. Why is it important that they are finalised before implementation begins?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. To ensure the budget is approved by the IT Steering Committee</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. To give the Architecture Board formal authority to require conformance — without signed contracts, governance is only advisory</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. To document which building blocks will be used in the implementation</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. To enable the Architecture Repository to be updated with new standards</button>
+      </div><div class="quiz-feedback" id="fb4"></div></div>
+    <div class="quiz-q" id="quiz-q5"><div class="quiz-q-text">5. A project is fully conformant to its Architecture Contract but has failed to incorporate a new data protection regulation. This situation illustrates:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. That conformance and compliance are the same concept in practice</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. That conformance does not guarantee compliance — a project can match its approved architecture but still fail to meet all governance requirements</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. That the Architecture Board failed in its dispensation process</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. That the project needs to return to Phase A to update the Architecture Vision</button>
+      </div><div class="quiz-feedback" id="fb5"></div></div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+</article>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+let sec=0;const tEl=document.getElementById("read-timer");const iv=setInterval(()=>{sec++;tEl.textContent=Math.floor(sec/60)+":"+(sec%60<10?"0":"")+sec%60;},1000);
+window.addEventListener("scroll",()=>{const d=document.documentElement;document.getElementById("progress-bar").style.width=Math.min(100,(d.scrollTop/(d.scrollHeight-d.clientHeight))*100)+"%";document.getElementById("scroll-top").classList.toggle("show",d.scrollTop>400);});
+function markDone(){clearInterval(iv);try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[16]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("done-btn");b.textContent="✓ Done!";b.classList.add("completed");}
+const ANS={1:'b',2:'c',3:'b',4:'b',5:'b'};
+const FB={
+  1:{b:"Correct! The three governance levels from most senior to most specific are: Corporate Governance (board-level strategy and accountability) → IT/Technology Governance (IT investment and delivery) → Architecture Governance (architecture coherence and conformance).",x:"Not quite. The correct order from most senior to most specific is: Corporate Governance → IT/Technology Governance → Architecture Governance. Architecture Governance is the most specific level, operating within the broader IT governance framework."},
+  2:{c:"Correct! Signed Architecture Contracts give the Architecture Board formal, binding authority to require conformance from implementation teams. Without signed contracts, the Board's oversight is advisory — delivery teams can technically ignore it.",x:"Not quite. The signed Architecture Contracts give the Board its formal authority to require conformance. The Architecture Vision and Governance Log don't give enforcement authority — only the contract creates the binding obligation."},
+  3:{b:"Correct! Architecture Governance is concerned with architecture coherence, principles, and conformance — ensuring what gets built matches the enterprise architecture. IT Governance is concerned with IT investment decisions, project delivery, and IT operations. They are complementary, with Architecture Governance operating within the IT Governance framework.",x:"Not quite. Architecture Governance = architecture coherence and conformance (Architecture Board). IT Governance = IT investment and delivery (IT Steering Committee). They are complementary; neither supersedes the other."},
+  4:{b:"Correct! Architecture Contracts must be signed before implementation begins because they give the Architecture Board the formal authority to require conformance. Without signed contracts, the Board's oversight role is advisory and delivery teams can disregard architectural requirements.",x:"Not quite. The key reason is that signed contracts give the Architecture Board formal authority to require conformance. Without this formal agreement, governance becomes advisory — delivery teams can technically proceed without architectural oversight."},
+  5:{b:"Correct! This illustrates the distinction between conformance (matching the approved architecture) and compliance (meeting all governance requirements including regulations). A project can be fully conformant to its contract but still non-compliant if the approved architecture itself missed a regulatory requirement.",x:"Not quite. This illustrates that conformance and compliance are different. Conformance = matches the architecture. Compliance = meets all governance requirements. A conformant project can still be non-compliant if the architecture missed a regulatory requirement."}
+};
+let answered={},score=0;
+function answer(q,opt){if(answered[q])return;answered[q]=opt;const ok=opt===ANS[q];if(ok)score++;document.querySelectorAll(`#quiz-q${q} .quiz-opt`).forEach((b,i)=>{const o=['a','b','c','d'][i];b.classList.add(o===ANS[q]?"correct":o===opt&&!ok?"wrong":"reveal");});const fb=document.getElementById("fb"+q);fb.textContent=(ok?"✓ ":"✗ ")+(ok?FB[q][opt]:FB[q].x);fb.className="quiz-feedback show "+(ok?"ok":"no");if(Object.keys(answered).length===5){const msgs=["Keep going!","Getting there!","Good effort!","Strong result!","Perfect score! Week 4 half done!"];document.getElementById("quiz-score").textContent=`You scored ${score}/5. ${msgs[score-1]||msgs[0]}`;document.getElementById("quiz-score").classList.add("show");document.getElementById("quiz-reset").classList.add("show");if(score===5)markDone();}}
+function resetQuiz(){answered={};score=0;document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});document.getElementById("quiz-score").classList.remove("show");document.getElementById("quiz-reset").classList.remove("show");}
+</script>
+</body>
+</html>

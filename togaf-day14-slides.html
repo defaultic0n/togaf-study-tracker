@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 14 Slides — Enterprise Continuum &amp; Repository</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;--teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);--gold:#F0B429;--gold2:rgba(240,180,41,0.15);--slate:#94A3B8;--slate2:#64748B;--slate3:#334155;--white:#F8FAFC;--white2:#E2E8F0;--coral:#FB7185;--coral2:rgba(251,113,133,0.15);--blue:#60A5FA;--blue2:rgba(96,165,250,0.12);--purple:#A78BFA;--purple2:rgba(167,139,250,0.12);--green:#4ADE80;--green2:rgba(74,222,128,0.12);--amber:#FBBF24;--amber2:rgba(251,191,36,0.12)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px}
+.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:.06}
+.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(22px,6vw,40px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;padding:0 8px;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;line-height:1.6;margin-bottom:40px}
+.start-meta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:48px}
+.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
+.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer}
+.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
+#deck{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column;display:none}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.slide.exit-left{animation:exitLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-right{animation:enterRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.exit-right{animation:exitRight .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-left{animation:enterLeft .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes exitLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes enterRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes exitRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
+@keyframes enterLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:18px 18px 0;scrollbar-width:none}
+.slide-body::-webkit-scrollbar{display:none}
+.slide-title .slide-body,.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:28px 24px}
+.title-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+.title-h{font-family:'Playfair Display',serif;font-size:clamp(26px,7vw,48px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:14px}
+.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:18px}
+.title-sub{font-size:14px;color:var(--slate);line-height:1.7;font-weight:300;max-width:420px}
+.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
+.section-num{font-family:'Playfair Display',serif;font-size:68px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
+.section-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.section-h{font-family:'Playfair Display',serif;font-size:clamp(22px,6vw,38px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:14px}
+.section-desc{font-size:14px;color:var(--slate);line-height:1.7;max-width:380px}
+.content-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:8px}
+.content-h{font-family:'Playfair Display',serif;font-size:clamp(17px,4vw,26px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:12px}
+.callout{border-radius:9px;padding:11px 13px;margin-bottom:9px}
+.callout.teal{background:var(--teal3);border-left:3px solid var(--teal)}.callout.gold{background:var(--gold2);border-left:3px solid var(--gold)}.callout.blue{background:var(--blue2);border-left:3px solid var(--blue)}.callout.purple{background:var(--purple2);border-left:3px solid var(--purple)}.callout.green{background:var(--green2);border-left:3px solid var(--green)}.callout.amber{background:var(--amber2);border-left:3px solid var(--amber)}.callout.coral{background:var(--coral2);border-left:3px solid var(--coral)}
+.callout-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px}
+.callout.teal .callout-label{color:var(--teal)}.callout.blue .callout-label{color:var(--blue)}.callout.purple .callout-label{color:var(--purple)}.callout.green .callout-label{color:var(--green)}.callout.amber .callout-label{color:var(--amber)}.callout.coral .callout-label{color:var(--coral)}
+.callout p{font-size:12px;line-height:1.6;margin:0}
+.callout.teal p{color:rgba(45,212,191,.9)}.callout.blue p{color:rgba(96,165,250,.9)}.callout.purple p{color:rgba(167,139,250,.9)}.callout.green p{color:rgba(74,222,128,.9)}.callout.amber p{color:rgba(251,191,36,.9)}.callout.coral p{color:rgba(251,113,133,.9)}
+.bullet-list{display:flex;flex-direction:column;gap:7px;margin-bottom:9px}
+.bullet{display:flex;gap:10px;align-items:flex-start}
+.bullet-dot{width:5px;height:5px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
+.bullet-text{font-size:12px;color:var(--white2);line-height:1.55}
+.bullet-text strong{color:var(--white)}.bullet-text em{color:var(--teal);font-style:normal}
+.exam-bar{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:9px;padding:10px 12px;margin-bottom:9px;display:flex;gap:9px}
+.exam-star{font-size:14px;flex-shrink:0}.exam-text{font-size:11px;color:rgba(240,180,41,.9);line-height:1.6}
+.exam-text strong{color:var(--gold)}
+.def-list{display:flex;flex-direction:column;gap:6px;margin-bottom:9px}
+.def-item{background:var(--navy3);border-radius:6px;padding:8px 10px;border:1px solid rgba(255,255,255,.05)}
+.def-term{font-size:11px;font-weight:700;color:var(--teal);margin-bottom:2px}
+.def-text{font-size:11px;color:var(--slate);line-height:1.45}
+.two-col-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:9px}
+.col-card{background:var(--navy3);border-radius:7px;padding:8px 10px;border:1px solid rgba(255,255,255,.05)}
+.col-head{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.col-body{font-size:11px;color:var(--slate);line-height:1.4}
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:9px}
+.sum-card{background:var(--navy3);border-radius:8px;padding:10px;border:1px solid rgba(255,255,255,.06)}
+.sum-num{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:3px;letter-spacing:1px}
+.sum-text{font-size:11px;color:var(--white2);line-height:1.5}
+.sum-text strong{color:var(--white)}
+#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
+#progress-fill{height:100%;background:var(--teal);transition:width .4s}
+#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
+.ctrl-btn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0;color:var(--white2)}
+.ctrl-btn:active{background:var(--navy4)}.ctrl-btn svg{width:16px;height:16px}
+.ctrl-btn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}.ctrl-btn.primary svg{width:18px;height:18px}
+.ctrl-btn:disabled{opacity:.3;cursor:not-allowed}
+.slide-counter{flex:1;text-align:center;font-size:12px;color:var(--slate2)}.slide-counter strong{color:var(--slate)}
+.voice-status{font-size:11px;color:var(--slate2);text-align:center;padding:3px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
+.voice-dots{display:flex;gap:3px;align-items:center}
+.voice-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vdot 1.2s infinite}
+.voice-dot:nth-child(2){animation-delay:.2s}.voice-dot:nth-child(3){animation-delay:.4s}
+@keyframes vdot{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
+.speed-btn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
+.swipe-hint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+</style>
+</head>
+<body>
+<div id="start-overlay">
+  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="80" cy="120" r="150" fill="#2DD4BF"/><circle cx="360" cy="500" r="130" fill="#60A5FA"/><circle cx="150" cy="650" r="80" fill="#4ADE80"/></svg>
+  <div class="start-logo">TOGAF Foundation · Day 14</div>
+  <div class="start-title">Enterprise Continuum &amp; Repository</div>
+  <p class="start-sub">20 slides with voiceover narration.<br>Week 4 · Tuesday · ~30 minutes.</p>
+  <div class="start-meta"><span class="start-pill">📊 20 slides</span><span class="start-pill">🎙 Narrated</span><span class="start-pill">⭐ Week 4</span></div>
+  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Presentation</button>
+  <p class="start-note">Tap Start to enable voice · Swipe or use controls to navigate</p>
+</div>
+<div id="deck">
+  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
+  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
+  <div style="padding:2px 16px 0"><div class="voice-status" id="voice-status"></div><div class="swipe-hint">swipe left/right to navigate</div></div>
+  <div id="controls">
+    <button class="ctrl-btn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+    <button class="ctrl-btn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
+    <button class="ctrl-btn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+    <div class="slide-counter"><strong id="slide-num">1</strong> / <span id="slide-total">20</span></div>
+    <button class="speed-btn" id="speed-btn" onclick="cycleSpeed()">1×</button>
+    <button class="ctrl-btn" id="btn-done" onclick="markDone()" title="Mark complete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+  </div>
+</div>
+<script>
+const DAY_NUM = 14;
+const SLIDES = [{type:"title",bg:"navy",html:`<div class="title-eyebrow">TOGAF Foundation · Day 14 of 20</div><h1 class="title-h">Enterprise Continuum<br>&amp; Repository</h1><div class="title-rule"></div><p class="title-sub">How TOGAF classifies architecture from the most generic to the most specific — and the Repository that stores it all.</p><div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">⭐ Week 4</span></div>`,voice:`Welcome to Day 14 — Tuesday of Week 4. Today is the Enterprise Continuum and Architecture Repository. The Continuum classifies all architecture from the most generic Foundation models through to your organisation's specific architecture. The Repository stores everything. Together they are the backbone of TOGAF's reuse strategy. We cover the four Continuum levels, the Solutions Continuum, the six Repository components, the three Landscape levels, and deep dives on the Reference Library, Standards Library, and Governance Log. Let's go.`},
+{type:"section",bg:"teal",html:`<div class="section-num">01</div><div class="section-label">Section One</div><h2 class="section-h">Architecture Continuum: Foundation to Organisation</h2><p class="section-desc">Four levels from the most generic to the most tailored.</p>`,voice:`Section one: the Architecture Continuum. Four levels from most generic to most specific.`},
+{type:"content",bg:"navy",html:`<div class="content-label">Four levels</div><h2 class="content-h">Architecture Continuum</h2>
+<div class="def-list">
+  <div class="def-item"><div class="def-term" style="color:var(--green)">Foundation Architecture (Most Generic)</div><div class="def-text">TOGAF's TRM and III-RM. Applies to all organisations regardless of industry or size. The starting point.</div></div>
+  <div class="def-item"><div class="def-term" style="color:var(--blue)">Common Systems Architecture</div><div class="def-text">Architectures applicable across multiple enterprises — cross-enterprise integration patterns, federated identity frameworks.</div></div>
+  <div class="def-item"><div class="def-term" style="color:var(--purple)">Industry Architecture</div><div class="def-text">Architectures specific to a sector — BIAN for banking, HL7 for healthcare, ARTS for retail.</div></div>
+  <div class="def-item"><div class="def-term" style="color:var(--teal)">Organisation-Specific Architecture (Most Specific)</div><div class="def-text">Architecture tailored to one enterprise's needs, constraints, and context. Built by extending and customising the levels above.</div></div>
+</div>
+<div class="callout blue"><div class="callout-label">Direction of development</div><p>Architects work from generic to specific — starting with Foundation, extending toward Organisation-Specific. This prevents reinvention. Always check what already exists before creating new architecture elements.</p></div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Foundation → Common Systems → Industry → Organisation-Specific.</strong> Foundation is most generic; Org-Specific is most tailored. Architecture Continuum contains ABBs.</div></div>`,voice:`The Architecture Continuum has four levels. Foundation Architecture — the TRM and III-RM — applies to all organisations. This is the most generic level. Common Systems Architecture covers patterns applicable across multiple enterprises, like cross-enterprise integration frameworks. Industry Architecture is sector-specific — BIAN for banking, HL7 for healthcare, ARTS for retail. Organisation-Specific Architecture is the most tailored, built by extending and customising everything above. The direction of development is from generic to specific. Always start with Foundation and work toward your organisation's context — this prevents reinvention. The Architecture Continuum contains ABBs, the architecture descriptions.`},
+{type:"section",bg:"blue",html:`<div class="section-num">02</div><div class="section-label">Section Two</div><h2 class="section-h">Solutions Continuum</h2><p class="section-desc">The parallel track of actual implementations — SBBs at every level.</p>`,voice:`Section two: the Solutions Continuum. Parallel to the Architecture Continuum but for implementations.`},
+{type:"content",bg:"navy",html:`<div class="content-label">Implementations parallel to descriptions</div><h2 class="content-h">Architecture vs Solutions Continuum</h2>
+<div class="two-col-grid">
+  <div class="col-card"><div class="col-head" style="color:var(--blue)">Architecture Continuum</div><div class="col-body">Contains <strong>ABBs</strong> — architecture descriptions, patterns, reference models. Answers: what should the architecture look like?</div></div>
+  <div class="col-card"><div class="col-head" style="color:var(--green)">Solutions Continuum</div><div class="col-body">Contains <strong>SBBs</strong> — products, deployed systems, implemented solutions. Answers: what exists to implement the architecture?</div></div>
+</div>
+<div class="bullet-list">
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Both run <strong>Foundation → Common → Industry → Org-Specific</strong></div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Every position in Solutions Continuum <strong>realises</strong> the equivalent in Architecture Continuum</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Foundation Solutions: generic COTS products, open-source tools</div></div>
+  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Org-Specific Solutions: your enterprise's deployed systems and custom software</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Architecture Continuum = descriptions (ABBs). Solutions Continuum = implementations (SBBs).</strong> Parallel structures, both running from Foundation to Org-Specific.</div></div>`,voice:`The Solutions Continuum is the parallel track to the Architecture Continuum. Where the Architecture Continuum contains ABBs — the descriptions of what architecture should look like — the Solutions Continuum contains SBBs — the actual products and deployed systems that implement the architecture. Both run through the same four levels: Foundation, Common Systems, Industry, and Organisation-Specific. Every position in the Solutions Continuum realises the equivalent position in the Architecture Continuum. Foundation Solutions include generic commercial products and open-source tools. Organisation-Specific Solutions are your enterprise's specific deployed systems and custom software.`},
+{type:"section",bg:"purple",html:`<div class="section-num">03</div><div class="section-label">Section Three</div><h2 class="section-h">Architecture Repository — 6 Components</h2><p class="section-desc">The enterprise's single source of truth for all architecture assets.</p>`,voice:`Section three: the Architecture Repository. Six components — each with a distinct purpose.`},
+{type:"content",bg:"navy",html:`<div class="content-label">Six components</div><h2 class="content-h">Architecture Repository</h2>
+<div class="def-list">
+  <div class="def-item"><div class="def-term">1. Architecture Metamodel</div><div class="def-text">The enterprise's customised entity types and relationships used for architecture descriptions.</div></div>
+  <div class="def-item"><div class="def-term">2. Architecture Landscape</div><div class="def-text">Representations of current, transition, and target states at Strategic, Segment, and Capability levels.</div></div>
+  <div class="def-item"><div class="def-term">3. Reference Library</div><div class="def-text">External guidelines, templates, patterns, and reference architectures for reuse.</div></div>
+  <div class="def-item"><div class="def-term">4. Standards Library</div><div class="def-text">Approved technology products, versions, and configurations — constrains Phase D choices.</div></div>
+  <div class="def-item"><div class="def-term">5. Governance Log</div><div class="def-text">Audit trail of all architecture governance decisions — compliance outcomes, dispensations, change requests, risk acceptances.</div></div>
+  <div class="def-item"><div class="def-term">6. Architecture Requirements Repository</div><div class="def-text">All requirements with full traceability, version history, and status tracking.</div></div>
+</div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">Know all 6 components by name. <strong>Standards Library</strong> constrains Phase D. <strong>Governance Log</strong> = audit trail of all Board decisions. <strong>Reference Library</strong> ≠ Standards Library.</div></div>`,voice:`The Architecture Repository has six components. One: the Architecture Metamodel — the customised entity types used for descriptions. Two: the Architecture Landscape — representations of baseline, transition, and target states at three levels. Three: the Reference Library — external patterns, templates, and reference architectures. Four: the Standards Library — approved technology products and configurations that constrain Phase D choices. Five: the Governance Log — the audit trail of every architecture governance decision, including compliance outcomes, dispensations, change requests, and risk acceptances. Six: the Architecture Requirements Repository — all requirements with traceability and version history. Know all six. The most-tested are the Standards Library and Governance Log.`},
+{type:"section",bg:"green",html:`<div class="section-num">04</div><div class="section-label">Section Four</div><h2 class="section-h">Architecture Landscape Levels</h2><p class="section-desc">Strategic, Segment, and Capability — three levels of abstraction for different audiences.</p>`,voice:`Section four: the three Architecture Landscape levels. Different scopes for different audiences.`},
+{type:"content",bg:"navy",html:`<div class="content-label">Three abstraction levels</div><h2 class="content-h">Landscape Levels</h2>
+<div class="def-list">
+  <div class="def-item"><div class="def-term" style="color:var(--blue)">Strategic Architecture (Highest abstraction)</div><div class="def-text">Whole-enterprise view. Audience: C-suite, Board. Scope: 3–5 years. Shows strategic direction without implementation detail.</div></div>
+  <div class="def-item"><div class="def-term" style="color:var(--purple)">Segment Architecture (Middle)</div><div class="def-text">Business unit or functional domain view. Audience: segment leaders, programme managers. Scope: 1–3 years. More detail than Strategic but not full implementation spec.</div></div>
+  <div class="def-item"><div class="def-term" style="color:var(--teal)">Capability Architecture (Lowest abstraction)</div><div class="def-text">Specific capability or solution view. Audience: solution architects, delivery teams. Scope: 0–18 months. Directly supports implementation projects.</div></div>
+</div>
+<div class="callout green"><div class="callout-label">Connection to ADM iteration</div><p>Strategic Architecture updates through full Architecture Iteration cycles. Segment Architecture through Capability Iterations scoped to a business unit. Capability Architecture through standard ADM cycles for specific projects.</p></div>
+<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Strategic</strong> (whole enterprise, 3–5yr) · <strong>Segment</strong> (business unit, 1–3yr) · <strong>Capability</strong> (specific project, 0–18 months). Strategic = highest abstraction.</div></div>`,voice:`The Architecture Landscape has three levels. Strategic Architecture is the whole-enterprise view — for the C-suite and Board, covering a 3 to 5 year horizon. It shows strategic direction without implementation detail. Segment Architecture covers a specific business unit or functional domain — for segment leaders and programme managers, covering 1 to 3 years. Capability Architecture is the most detailed level — for solution architects and delivery teams, covering 0 to 18 months. It directly supports implementation projects. Strategic connects to Architecture Iteration cycles. Segment to Capability Iteration cycles. Capability Architecture to standard ADM cycles for specific projects.`},
+{type:"section",bg:"amber",html:`<div class="section-num">05</div><div class="section-label">Section Five</div><h2 class="section-h">Reference Library, Standards Library &amp; Governance Log</h2><p class="section-desc">The three most exam-tested Repository components in depth.</p>`,voice:`Section five: deep dives on the three most exam-tested Repository components.`},
+{type:"content",bg:"navy",html:`<div class="content-label">The critical three</div><h2 class="content-h">Three Repository Components</h2>
+<div class="callout blue"><div class="callout-label">Reference Library</div><p>Stores reusable guidelines, templates, patterns, and reference architectures from external sources — TOGAF TRM, industry reference architectures, vendor reference architectures. Used to avoid reinvention. Does NOT constrain product choices.</p></div>
+<div class="callout teal"><div class="callout-label">Standards Library</div><p>Stores the enterprise's APPROVED technology products, versions, and configurations. When architects select physical technology components in Phase D, they must choose from this library. Non-standard = dispensation required from Architecture Board.</p></div>
+<div class="callout amber"><div class="callout-label">Governance Log</div><p>The audit trail of ALL Architecture Board decisions: compliance assessment outcomes (Fully/Conditionally/Non-Conformant), all dispensations with rationale, architecture change request outcomes, risk acceptance records. Full accountability and traceability.</p></div>
+<div class="sum-grid">
+  <div class="sum-card"><div class="sum-num">REF LIB</div><div class="sum-text">Patterns &amp; external reference architectures. Reuse, not constraint.</div></div>
+  <div class="sum-card"><div class="sum-num">STD LIB</div><div class="sum-text">Approved products. Constrains Phase D. Non-standard = dispensation.</div></div>
+  <div class="sum-card"><div class="sum-num">GOV LOG</div><div class="sum-text">ALL Board decisions. Compliance, dispensations, change requests, risks.</div></div>
+  <div class="sum-card"><div class="sum-num">EXAM TIP</div><div class="sum-text">Reference Library ≠ Standards Library. Know the difference cold.</div></div>
+</div>`,voice:`Three Repository components to know cold. The Reference Library stores reusable guidelines, templates, patterns, and external reference architectures — from TOGAF's own TRM to industry frameworks like BIAN and HL7. Its purpose is reuse, not constraint. The Standards Library stores the enterprise's approved technology products, versions, and configurations. Its purpose is constraint — when Phase D architects select technology components, they must choose from this approved list. Non-standard selections require a formal dispensation from the Architecture Board. The Governance Log is the audit trail of every Architecture Board decision — compliance outcomes, dispensations with rationale, change request decisions, and risk acceptances. The most common exam mistake: confusing the Reference Library with the Standards Library. Reference Library equals patterns and external architectures. Standards Library equals approved products that constrain Phase D.`},
+{type:"title",bg:"end",html:`<div class="title-eyebrow">Day 14 Complete</div>
+<h1 class="title-h" style="font-size:clamp(22px,5vw,36px)">Day 14 — done.</h1>
+<div class="title-rule"></div>
+<p class="title-sub" style="margin-bottom:24px">Next: Day 15 — Architecture Capability Framework.<br>How to establish the organisational practice that makes EA work.</p>
+<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+  <a href="togaf-day14.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Open reading version · Take the quiz</a>
+  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 14 as done</button>
+</div>`,voice:`Day 14 complete. The Enterprise Continuum runs from Foundation through Common Systems and Industry to Organisation-Specific. The Architecture Continuum has ABBs; the Solutions Continuum has SBBs. The Repository has six components — know them all, especially the Standards Library constraining Phase D and the Governance Log as the audit trail. The three Landscape levels are Strategic, Segment, and Capability. Take the Day 14 quiz. Day 15 is the Architecture Capability Framework — how you actually set up and run an architecture function. See you there.`}];
+
+let cur=0,play=false,spdIdx=1,utt=null,tx=0,anim=false;
+const SPDS=[0.8,1,1.2,1.5];
+const wrap=document.getElementById("slides-wrap");
+document.getElementById("slide-total").textContent=SLIDES.length;
+function getBg(b){const m={navy:"var(--navy2)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",green:"linear-gradient(135deg,#0A1A10,#0D2218)",amber:"linear-gradient(135deg,#1A1000,#251800)",coral:"linear-gradient(135deg,#1A0A0E,#2A0D15)",gold:"linear-gradient(135deg,#1A1200,#251A00)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"};return m[b]||"var(--navy2)";}
+SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="s"+i;d.style.background=getBg(s.bg);d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
+function goTo(i,dir){if(anim||i<0||i>=SLIDES.length)return;anim=true;stopSp();const f=document.getElementById("s"+cur),t=document.getElementById("s"+i);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");anim=false;cur=i;upUI();if(play)spk();},420);}
+function nextSlide(){if(cur<SLIDES.length-1)goTo(cur+1,1);}
+function prevSlide(){if(cur>0)goTo(cur-1,-1);}
+function upUI(){document.getElementById("slide-num").textContent=cur+1;document.getElementById("progress-fill").style.width=((cur+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=cur===0;document.getElementById("btn-next").disabled=cur===SLIDES.length-1;}
+function spk(){stopSp();if(!("speechSynthesis"in window))return;const txt=SLIDES[cur].voice;if(!txt){if(play)setTimeout(nextSlide,800);return;}utt=new SpeechSynthesisUtterance(txt);utt.rate=SPDS[spdIdx];utt.lang="en-GB";const vs=speechSynthesis.getVoices();const p=vs.find(v=>v.lang.startsWith("en")&&(v.name.includes("Daniel")||v.name.includes("Samantha")||v.name.includes("Karen")||v.name.includes("Google UK")))||vs.find(v=>v.lang.startsWith("en"))||vs[0];if(p)utt.voice=p;utt.onstart=()=>setSt("speaking");utt.onend=()=>{setSt("");if(play&&cur<SLIDES.length-1)setTimeout(nextSlide,600);else if(cur===SLIDES.length-1){play=false;upPlay();}};utt.onerror=()=>setSt("");speechSynthesis.speak(utt);}
+function stopSp(){if("speechSynthesis"in window)speechSynthesis.cancel();utt=null;setSt("");}
+function togglePlay(){play=!play;upPlay();if(play)spk();else stopSp();}
+function upPlay(){document.getElementById("play-icon").innerHTML=play?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
+function setSt(s){const el=document.getElementById("voice-status");el.innerHTML=s==="speaking"?`<div class="voice-dots"><div class="voice-dot"></div><div class="voice-dot"></div><div class="voice-dot"></div></div><span>Narrating…</span>`:s||"";}
+function cycleSpeed(){spdIdx=(spdIdx+1)%SPDS.length;document.getElementById("speed-btn").textContent=SPDS[spdIdx]+"×";if(play){stopSp();setTimeout(spk,100);}}
+function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[14]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="var(--teal3)";b.style.borderColor="var(--teal)";b.querySelector("svg").style.stroke="var(--teal)";goTo(SLIDES.length-1,1);}
+document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";upUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{play=true;upPlay();spk();},400);}});
+wrap.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
+if("speechSynthesis"in window)speechSynthesis.onvoiceschanged=()=>{};
+
+</script>
+</body>
+</html>

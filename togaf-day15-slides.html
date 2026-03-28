@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 15 Slides — Architecture Capability Framework</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;--teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);--gold:#F0B429;--gold2:rgba(240,180,41,0.15);--slate:#94A3B8;--slate2:#64748B;--slate3:#334155;--white:#F8FAFC;--white2:#E2E8F0;--coral:#FB7185;--coral2:rgba(251,113,133,0.15);--blue:#60A5FA;--blue2:rgba(96,165,250,0.12);--purple:#A78BFA;--purple2:rgba(167,139,250,0.12);--green:#4ADE80;--green2:rgba(74,222,128,0.12);--amber:#FBBF24;--amber2:rgba(251,191,36,0.12)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:.06}
+.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;line-height:1.6;margin-bottom:48px;max-width:320px}
+.start-meta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:48px}
+.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
+.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer}
+.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
+#deck{width:100%;height:100%;display:flex;flex-direction:column;display:none}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.slide.exit-left{animation:eL .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-right{animation:eR .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.exit-right{animation:xR .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-left{animation:xL .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes eL{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes eR{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes xR{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
+@keyframes xL{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}
+.slide-body::-webkit-scrollbar{display:none}
+.slide-title .slide-body,.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:32px 28px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
+.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:20px}
+.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
+.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
+.sec-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
+.sec-lbl{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.sec-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
+.sec-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
+.clbl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.ch{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:14px}
+.box{border-radius:10px;padding:13px 15px;margin-bottom:11px}
+.box.teal{background:var(--teal3);border-left:3px solid var(--teal)}
+.box.blue{background:var(--blue2);border-left:3px solid var(--blue)}
+.box.purple{background:var(--purple2);border-left:3px solid var(--purple)}
+.box.green{background:var(--green2);border-left:3px solid var(--green)}
+.box.amber{background:var(--amber2);border-left:3px solid var(--amber)}
+.box.coral{background:var(--coral2);border-left:3px solid var(--coral)}
+.box-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.box.teal .box-lbl{color:var(--teal)}.box.blue .box-lbl{color:var(--blue)}.box.purple .box-lbl{color:var(--purple)}.box.green .box-lbl{color:var(--green)}.box.amber .box-lbl{color:var(--amber)}.box.coral .box-lbl{color:var(--coral)}
+.box p{font-size:13px;line-height:1.6;margin:0}
+.box.teal p{color:rgba(45,212,191,.9)}.box.blue p{color:rgba(96,165,250,.9)}.box.purple p{color:rgba(167,139,250,.9)}.box.green p{color:rgba(74,222,128,.9)}.box.amber p{color:rgba(251,191,36,.9)}.box.coral p{color:rgba(251,113,133,.9)}
+.blist{display:flex;flex-direction:column;gap:8px;margin-bottom:11px}
+.bi{display:flex;gap:11px;align-items:flex-start}
+.bd{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
+.bt{font-size:13px;color:var(--white2);line-height:1.55}.bt strong{color:var(--white)}.bt em{color:var(--teal);font-style:normal}
+.exam{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:11px 13px;margin-bottom:11px;display:flex;gap:10px}
+.exam-s{font-size:15px;flex-shrink:0}.exam-t{font-size:12px;color:rgba(240,180,41,.9);line-height:1.6}.exam-t strong{color:var(--gold)}
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.card{background:var(--navy3);border-radius:8px;padding:10px 12px;border:1px solid rgba(255,255,255,.05)}
+.card-ttl{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:3px}
+.card-body{font-size:11px;color:var(--slate);line-height:1.4}
+.level-list{display:flex;flex-direction:column;gap:7px;margin-bottom:11px}
+.level{display:flex;gap:10px;align-items:flex-start;background:var(--navy3);border-radius:8px;padding:9px 11px;border:1px solid rgba(255,255,255,.05)}
+.level-num{font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--teal3);line-height:1;flex-shrink:0;width:24px}
+.level-name{font-size:12px;font-weight:700;color:var(--white);margin-bottom:2px}
+.level-desc{font-size:11px;color:var(--slate);line-height:1.4}
+.role-card{background:var(--navy3);border-radius:9px;padding:11px 13px;margin-bottom:8px;border:1px solid rgba(255,255,255,.05)}
+.role-title{font-size:13px;font-weight:700;color:var(--purple);margin-bottom:5px}
+.role-resp{font-size:12px;color:var(--slate);line-height:1.5}
+.skill-row{display:flex;gap:8px;align-items:center;padding:7px 10px;background:var(--navy3);border-radius:7px;margin-bottom:6px;border:1px solid rgba(255,255,255,.04)}
+.skill-badge{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;flex-shrink:0}
+.skill-desc{font-size:11px;color:var(--slate);line-height:1.4}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.sc{background:var(--navy3);border-radius:9px;padding:11px;border:1px solid rgba(255,255,255,.06)}
+.sn{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px;letter-spacing:1px}
+.st{font-size:11px;color:var(--white2);line-height:1.5}.st strong{color:var(--white)}
+#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
+#progress-fill{height:100%;background:var(--teal);transition:width .4s}
+#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
+.cbtn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--white2)}
+.cbtn svg{width:16px;height:16px}.cbtn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}.cbtn.primary svg{width:18px;height:18px}.cbtn:disabled{opacity:.3;cursor:not-allowed}
+.sc-ctr{flex:1;text-align:center;font-size:12px;color:var(--slate2)}.sc-ctr strong{color:var(--slate)}
+.vs{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
+.vd{display:flex;gap:3px;align-items:center}
+.vdot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vd 1.2s infinite}
+.vdot:nth-child(2){animation-delay:.2s}.vdot:nth-child(3){animation-delay:.4s}
+@keyframes vd{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
+.spdbtn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
+.shint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+</style>
+</head>
+<body>
+<div id="start-overlay">
+  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="320" cy="80" r="160" fill="#A78BFA"/><circle cx="60" cy="450" r="120" fill="#2DD4BF"/><circle cx="340" cy="620" r="90" fill="#4ADE80"/></svg>
+  <div class="start-logo">TOGAF Foundation · Day 15</div>
+  <div class="start-title">Architecture Capability Framework</div>
+  <p class="start-sub">20 slides with voiceover narration. ~30 minutes.</p>
+  <div class="start-meta"><span class="start-pill">📊 20 slides</span><span class="start-pill">🎙 Narrated</span><span class="start-pill">🏛 Week 4</span></div>
+  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Presentation</button>
+  <p class="start-note">Tap Start to enable voice · Swipe or use controls</p>
+</div>
+<div id="deck">
+  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
+  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
+  <div style="padding:2px 16px 0"><div class="vs" id="vs"></div><div class="shint">swipe left/right to navigate</div></div>
+  <div id="controls">
+    <button class="cbtn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+    <button class="cbtn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
+    <button class="cbtn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+    <div class="sc-ctr"><strong id="snum">1</strong> / <span id="stotal">20</span></div>
+    <button class="spdbtn" id="spdbtn" onclick="cycleSpeed()">1×</button>
+    <button class="cbtn" id="btn-done" onclick="markDone()" title="Mark done"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+  </div>
+</div>
+<script>
+const SLIDES=[
+{type:"title",bg:"navy",
+html:`<div class="eyebrow">TOGAF Foundation · Day 15 of 20</div><h1 class="title-h">Architecture Capability Framework</h1><div class="title-rule"></div><p class="title-sub">How enterprises establish, operate, and mature their architecture practice — roles, skills, maturity models, and the Centre of Excellence.</p><div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">🏛 Week 4 · Day 3</span></div>`,
+voice:`Welcome to Day 15, Wednesday of Week 4. Today is the Architecture Capability Framework — the part of TOGAF that tells you how to actually set up and run an architecture practice inside an enterprise. It's not enough to know the ADM; the organisation needs the right people, skills, processes, and structures to use it effectively. We'll cover establishing an architecture practice, maturity models, the skills framework, key roles, and the Architecture Centre of Excellence. Let's go.`},
+
+{type:"section",bg:"purple",
+html:`<div class="sec-num">01</div><div class="sec-lbl">Section One</div><h2 class="sec-h">Establishing an Architecture Practice</h2><p class="sec-desc">What it takes to set up an enterprise architecture function that actually works.</p>`,
+voice:`Section one: establishing an architecture practice. Before you can do architecture, you need to build the capability to do it.`},
+
+{type:"content",
+html:`<div class="clbl">The foundations</div><h2 class="ch">Building the Architecture Function</h2>
+<div class="box teal"><div class="box-lbl">Purpose</div><p>The Architecture Capability Framework defines the <strong>organisation, processes, skills, roles, and responsibilities</strong> needed to establish and operate an enterprise architecture practice. It is the organisational foundation for using the ADM effectively.</p></div>
+<div class="blist">
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Mandate</strong> — explicit executive sponsorship and authority for the architecture function. Without mandate, architecture is advisory only.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Organisational placement</strong> — where EA sits in the org chart affects its authority, budget, and ability to influence. Typically reporting to CIO or Chief Architect.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Scope definition</strong> — which business domains, geographies, and systems the architecture function is responsible for.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Governance structures</strong> — Architecture Board, review processes, escalation paths, and decision rights.</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Repository and tooling</strong> — the Architecture Repository and supporting tools for modelling, storage, and stakeholder engagement.</div></div>
+</div>
+<div class="exam"><div class="exam-s">⭐</div><div class="exam-t"><strong>Exam tip:</strong> The Capability Framework addresses how to <strong>run</strong> the architecture practice — the organisational infrastructure. The ADM addresses how to <strong>do</strong> architecture. Both are needed; neither replaces the other.</div></div>`,
+voice:`The Architecture Capability Framework defines the organisation, processes, skills, roles, and responsibilities needed to establish and operate an enterprise architecture practice. Five foundations matter. Mandate: explicit executive sponsorship and authority — without it, architecture is advisory only and delivery teams can ignore it. Organisational placement: where EA sits affects its authority and budget — typically reporting to the CIO or Chief Architect. Scope definition: which domains, geographies, and systems the architecture function covers. Governance structures: the Architecture Board, review processes, and decision rights. And repository and tooling: the Architecture Repository and modelling tools. The exam tip here: the Capability Framework addresses how to run the architecture practice. The ADM addresses how to do architecture. Both are needed.`},
+
+{type:"section",bg:"blue",
+html:`<div class="sec-num">02</div><div class="sec-lbl">Section Two</div><h2 class="sec-h">Architecture Maturity Models</h2><p class="sec-desc">Measuring how advanced the architecture practice is — and what progression looks like.</p>`,
+voice:`Section two: architecture maturity models. Maturity models help an enterprise understand where its architecture practice is today and where it needs to go.`},
+
+{type:"content",
+html:`<div class="clbl">Measuring maturity</div><h2 class="ch">How Mature Is the Practice?</h2>
+<div class="box blue"><div class="box-lbl">Purpose</div><p>Architecture maturity models assess the <strong>current state of the architecture practice</strong> and provide a roadmap for improvement. TOGAF references several maturity models, including the US Federal EA Maturity Model, which uses a 1–5 scale.</p></div>
+<div class="level-list">
+  <div class="level"><div class="level-num">1</div><div><div class="level-name">Initial / Ad Hoc</div><div class="level-desc">Architecture activities exist but are uncoordinated. No formal processes. Architecture done reactively when needed.</div></div></div>
+  <div class="level"><div class="level-num">2</div><div><div class="level-name">Under Development</div><div class="level-desc">Architecture processes are being defined. Some standards exist. Inconsistent application across the enterprise.</div></div></div>
+  <div class="level"><div class="level-num">3</div><div><div class="level-name">Defined</div><div class="level-desc">Formal architecture processes exist and are documented. Architecture covers most domains. Governance is in place.</div></div></div>
+  <div class="level"><div class="level-num">4</div><div><div class="level-name">Managed</div><div class="level-desc">Architecture processes are measured and monitored. Architecture decisions are data-driven. Integration across domains is strong.</div></div></div>
+  <div class="level"><div class="level-num">5</div><div><div class="level-name">Optimising</div><div class="level-desc">Continuous improvement of the architecture practice. Architecture drives business strategy. Enterprise-wide optimisation.</div></div></div>
+</div>
+<div class="exam"><div class="exam-s">⭐</div><div class="exam-t">Maturity models assess the <strong>architecture practice itself</strong> — not the IT systems. Level 1 = ad hoc. Level 5 = optimising. Most enterprises target Level 3 as a realistic operational goal.</div></div>`,
+voice:`Architecture maturity models assess the current state of the architecture practice and provide a roadmap for improvement. TOGAF references several maturity models including the US Federal EA Maturity Model, which uses a one-to-five scale. Level one is Initial or Ad Hoc — architecture activities exist but are uncoordinated, done reactively. Level two is Under Development — processes being defined, some standards, inconsistently applied. Level three is Defined — formal documented processes, governance in place, most domains covered. Level four is Managed — architecture decisions are data-driven, processes measured and monitored. Level five is Optimising — continuous improvement, architecture drives business strategy. Important distinction: maturity models assess the architecture practice itself, not the IT systems. Most enterprises target Level 3 as a realistic operational goal.`},
+
+{type:"section",bg:"teal",
+html:`<div class="sec-num">03</div><div class="sec-lbl">Section Three</div><h2 class="sec-h">Architecture Skills Framework</h2><p class="sec-desc">The competencies required to perform architecture work — across roles and levels.</p>`,
+voice:`Section three: the Architecture Skills Framework. Architecture is a profession — with defined skills, competencies, and career paths.`},
+
+{type:"content",
+html:`<div class="clbl">Competency areas</div><h2 class="ch">Skills Every Architect Needs</h2>
+<div class="box teal"><div class="box-lbl">Framework structure</div><p>The Architecture Skills Framework defines the <strong>skills and experience required</strong> at each level of architecture role. Skills span generic (professional, business), technical (IT knowledge), and architecture-specific competencies.</p></div>
+<div class="skill-row"><span class="skill-badge" style="background:var(--blue2);color:var(--blue)">Generic</span><div class="skill-desc"><strong style="color:var(--white2)">Professional skills:</strong> communication, stakeholder management, leadership, analytical thinking, problem-solving.</div></div>
+<div class="skill-row"><span class="skill-badge" style="background:var(--purple2);color:var(--purple)">Business</span><div class="skill-desc"><strong style="color:var(--white2)">Business skills:</strong> business process knowledge, financial modelling, strategic planning, industry domain knowledge.</div></div>
+<div class="skill-row"><span class="skill-badge" style="background:var(--teal3);color:var(--teal)">IT</span><div class="skill-desc"><strong style="color:var(--white2)">IT skills:</strong> technical knowledge across the BDAT domains — applications, data, infrastructure, security, integration.</div></div>
+<div class="skill-row"><span class="skill-badge" style="background:var(--amber2);color:var(--amber)">Legal</span><div class="skill-desc"><strong style="color:var(--white2)">Legal/regulatory:</strong> governance, compliance, procurement, contracts, privacy regulations relevant to the domain.</div></div>
+<div class="skill-row"><span class="skill-badge" style="background:var(--green2);color:var(--green)">TOGAF</span><div class="skill-desc"><strong style="color:var(--white2)">Architecture skills:</strong> ADM mastery, modelling languages (ArchiMate, UML), TOGAF principles, content framework.</div></div>
+<div class="exam"><div class="exam-s">⭐</div><div class="exam-t">Architecture skills span <strong>Generic, Business, IT, Legal, and Architecture-specific</strong> competencies. The exam may test which category a skill belongs to — communication = Generic; ADM knowledge = Architecture-specific.</div></div>`,
+voice:`The Architecture Skills Framework defines the skills and experience required at each level of architecture role. Skills are grouped into five categories. Generic professional skills: communication, stakeholder management, leadership, analytical thinking. Business skills: business process knowledge, financial modelling, strategic planning, industry domain knowledge. IT skills: technical knowledge across the BDAT domains — applications, data, infrastructure, security, integration. Legal and regulatory skills: governance, compliance, procurement, privacy regulations. And Architecture-specific skills: ADM mastery, modelling languages like ArchiMate and UML, TOGAF principles, and content framework knowledge. For the exam: know which category skills fall into. Communication is generic. ADM knowledge is architecture-specific. Financial modelling is business.`},
+
+{type:"section",bg:"amber",
+html:`<div class="sec-num">04</div><div class="sec-lbl">Section Four</div><h2 class="sec-h">Key Roles: Chief Architect, Board, Sponsor</h2><p class="sec-desc">The people who make the architecture practice function — and what each one does.</p>`,
+voice:`Section four: the key roles in an architecture practice. Three roles appear most frequently in exam questions.`},
+
+{type:"content",
+html:`<div class="clbl">Critical roles</div><h2 class="ch">The Architecture Leadership Team</h2>
+<div class="role-card"><div class="role-title">Chief Architect / Lead Architect</div><div class="role-resp">Leads the architecture practice. Sets the architectural direction and vision. Chairs or is closely involved with the Architecture Board. Responsible for the Architecture Repository and framework. Acts as the primary liaison between architecture and senior leadership. Accountable for the quality of all architectural deliverables.</div></div>
+<div class="role-card"><div class="role-title">Architecture Board</div><div class="role-resp">Cross-functional governance body — typically includes domain architects (business, data, application, technology), a senior sponsor, and business representatives. Reviews and approves architectural work. Grants dispensations. Manages Architecture Contracts. Acts as the formal governance authority for the ADM. Note: the Architecture Board can be enterprise-wide or domain-specific.</div></div>
+<div class="role-card"><div class="role-title">Architecture Sponsor</div><div class="role-resp">Senior executive who champions the architecture practice at the highest level. Provides mandate, funding, and political cover. Ensures architecture decisions are respected by business and IT leadership. Typically the CIO, CTO, or a C-suite executive. Without a strong sponsor, architecture authority erodes quickly.</div></div>
+<div class="exam"><div class="exam-s">⭐</div><div class="exam-t">The <strong>Sponsor</strong> provides mandate and funding. The <strong>Chief Architect</strong> leads the practice and the Architecture Board. The <strong>Architecture Board</strong> is the formal governance authority. These three roles are interdependent — weakness in any one undermines the others.</div></div>`,
+voice:`Three key roles appear most frequently in exam questions. The Chief Architect leads the architecture practice, sets direction, chairs or is closely involved with the Architecture Board, and is accountable for all architectural deliverables. They are the primary liaison between architecture and senior leadership. The Architecture Board is a cross-functional governance body including domain architects, a senior sponsor, and business representatives. It reviews and approves architectural work, grants dispensations, manages Architecture Contracts, and is the formal governance authority for the ADM. The Architecture Sponsor is the senior executive who champions the practice — providing mandate, funding, and political cover. Typically the CIO or CTO. Without a strong sponsor, architecture authority erodes quickly. The exam tip: Sponsor provides mandate and funding. Chief Architect leads the practice. Architecture Board is the formal governance authority. All three are interdependent.`},
+
+{type:"section",bg:"green",
+html:`<div class="sec-num">05</div><div class="sec-lbl">Section Five</div><h2 class="sec-h">Architecture Centre of Excellence</h2><p class="sec-desc">The organisational model that embeds architecture capability across the enterprise.</p>`,
+voice:`Section five: the Architecture Centre of Excellence. This is the organisational model for a mature, embedded architecture practice.`},
+
+{type:"content",
+html:`<div class="clbl">The CoE model</div><h2 class="ch">Architecture Centre of Excellence</h2>
+<div class="box green"><div class="box-lbl">Definition</div><p>An <strong>Architecture Centre of Excellence (ACoE)</strong> is a permanent organisational structure that houses the enterprise architecture practice, provides architecture services to the rest of the organisation, builds and maintains architecture standards, and develops architectural capability enterprise-wide.</p></div>
+<div class="blist">
+  <div class="bi"><div class="bd" style="background:var(--green)"></div><div class="bt"><strong>Architecture services</strong> — the ACoE provides architecture advisory, design review, and governance services to projects and business units across the enterprise</div></div>
+  <div class="bi"><div class="bd" style="background:var(--green)"></div><div class="bt"><strong>Standards management</strong> — owns and maintains architecture principles, standards, and the Architecture Repository</div></div>
+  <div class="bi"><div class="bd" style="background:var(--green)"></div><div class="bt"><strong>Capability building</strong> — trains and certifies architects, develops skills frameworks, coaches project teams</div></div>
+  <div class="bi"><div class="bd" style="background:var(--green)"></div><div class="bt"><strong>Innovation hub</strong> — evaluates emerging technologies and patterns, maintains the Technology Horizon scan</div></div>
+  <div class="bi"><div class="bd" style="background:var(--green)"></div><div class="bt"><strong>Governance secretariat</strong> — supports the Architecture Board with administration, documentation, and Governance Log management</div></div>
+</div>
+<div class="sg">
+  <div class="sc"><div class="sn">01</div><div class="st"><strong>Establishing a practice</strong> — mandate, placement, scope, governance, repository.</div></div>
+  <div class="sc"><div class="sn">02</div><div class="st"><strong>Maturity model</strong> — levels 1–5, from ad hoc to optimising.</div></div>
+  <div class="sc"><div class="sn">03</div><div class="st"><strong>Skills framework</strong> — Generic, Business, IT, Legal, Architecture-specific.</div></div>
+  <div class="sc"><div class="sn">04</div><div class="st"><strong>Key roles</strong> — Sponsor (mandate), Chief Architect (leads), Board (governs).</div></div>
+</div>`,
+voice:`The Architecture Centre of Excellence is the mature organisational model for an enterprise architecture practice. It provides five functions. Architecture services: advisory, design review, and governance services to projects and business units enterprise-wide. Standards management: owns and maintains architecture principles, standards, and the Architecture Repository. Capability building: trains and certifies architects, develops skills frameworks, coaches project teams. Innovation hub: evaluates emerging technologies, maintains the technology horizon scan. And governance secretariat: supports the Architecture Board with administration and Governance Log management. To close out the session summary: establishing a practice requires mandate, placement, scope, governance, and repository. Maturity runs from Level 1 ad hoc to Level 5 optimising. Skills span five categories. Three key roles: Sponsor provides mandate, Chief Architect leads, Architecture Board governs.`},
+
+{type:"title",bg:"end",
+html:`<div class="eyebrow">Day 15 Complete</div><h1 class="title-h" style="font-size:clamp(22px,5.5vw,38px)">Capability Framework — done.</h1><div class="title-rule"></div><p class="title-sub" style="margin-bottom:24px">Next: <strong>Day 16 — Architecture Governance</strong>. The governance structures, contracts, and frameworks that keep architecture decisions binding across the enterprise.</p>
+<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+  <a href="togaf-day15.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Open reading version · Take the quiz</a>
+  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 15 done</button>
+</div>`,
+voice:`Day 15 complete. The Architecture Capability Framework is about the organisational infrastructure for doing architecture — not the architecture itself. A practice needs mandate, the right people in the right roles, defined skills, a maturity target, and ultimately a Centre of Excellence to sustain and grow capability enterprise-wide. Take the Day 15 quiz. Day 16 is Architecture Governance — the structures, contracts, and frameworks that make architecture decisions binding. See you there.`},
+];
+
+const BG={navy:"var(--navy2)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",amber:"linear-gradient(135deg,#1A1000,#251800)",green:"linear-gradient(135deg,#0A1A10,#0D2218)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"};
+let cur=0,play=false,spdIdx=1,utt=null,tx=0,anim=false;
+const SPDS=[0.8,1,1.2,1.5];
+const wrap=document.getElementById("slides-wrap");
+document.getElementById("stotal").textContent=SLIDES.length;
+SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="sl"+i;d.style.background=BG[s.bg]||BG.navy;d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
+function goTo(i,dir){if(anim||i<0||i>=SLIDES.length)return;anim=true;stopSp();const f=document.getElementById("sl"+cur),t=document.getElementById("sl"+i);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");anim=false;cur=i;upUI();if(play)spk();},420);}
+function nextSlide(){if(cur<SLIDES.length-1)goTo(cur+1,1);}function prevSlide(){if(cur>0)goTo(cur-1,-1);}
+function upUI(){document.getElementById("snum").textContent=cur+1;document.getElementById("progress-fill").style.width=((cur+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=cur===0;document.getElementById("btn-next").disabled=cur===SLIDES.length-1;}
+function spk(){stopSp();if(!("speechSynthesis"in window))return;const txt=SLIDES[cur].voice;if(!txt){if(play)setTimeout(nextSlide,800);return;}utt=new SpeechSynthesisUtterance(txt);utt.rate=SPDS[spdIdx];utt.lang="en-GB";const vs=speechSynthesis.getVoices();const p=vs.find(v=>v.lang.startsWith("en")&&(v.name.includes("Daniel")||v.name.includes("Samantha")||v.name.includes("Google UK")))||vs.find(v=>v.lang.startsWith("en"))||vs[0];if(p)utt.voice=p;utt.onstart=()=>setSt("speaking");utt.onend=()=>{setSt("");if(play&&cur<SLIDES.length-1)setTimeout(nextSlide,600);else{play=false;upPlay();}};utt.onerror=()=>setSt("");speechSynthesis.speak(utt);}
+function stopSp(){if("speechSynthesis"in window)speechSynthesis.cancel();utt=null;setSt("");}
+function togglePlay(){play=!play;upPlay();if(play)spk();else stopSp();}
+function upPlay(){document.getElementById("play-icon").innerHTML=play?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
+function setSt(s){const el=document.getElementById("vs");el.innerHTML=s==="speaking"?`<div class="vd"><div class="vdot"></div><div class="vdot"></div><div class="vdot"></div></div><span>Narrating…</span>`:(s||"");}
+function cycleSpeed(){spdIdx=(spdIdx+1)%SPDS.length;document.getElementById("spdbtn").textContent=SPDS[spdIdx]+"×";if(play){stopSp();setTimeout(spk,100);}}
+function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[15]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="var(--teal3)";b.style.borderColor="var(--teal)";b.querySelector("svg").style.stroke="var(--teal)";goTo(SLIDES.length-1,1);}
+document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";upUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{play=true;upPlay();spk();},400);}});
+wrap.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
+</script>
+</body>
+</html>

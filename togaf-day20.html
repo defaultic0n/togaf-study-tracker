@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 20 — Mock Exam &amp; Exam Strategy</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}:root{--bg:#FAFAF7;--ink:#1A1A18;--ink2:#4A4A42;--ink3:#8A8A80;--teal:#0D6E5E;--teal-light:#E6F4F1;--teal-mid:#1A9B86;--amber:#92530A;--amber-light:#FDF3E3;--blue:#1A4A7A;--blue-light:#E8F0F8;--purple:#4A2A7A;--purple-light:#F0EAF8;--green:#1A5A2A;--green-light:#E8F4E8;--coral:#8A2A2A;--coral-light:#F8EAEA;--rule:#E0DFD8;--surface:#FFFFFF;--reading-max:680px}
+html{background:var(--bg);scroll-behavior:smooth}body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100}
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}.nav-day{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3)}.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px}.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer}.done-btn.completed{background:#2EAA8A}
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px}.toc-list a:hover{color:var(--teal)}.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+.section{margin-bottom:48px}.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+p{margin-bottom:16px;color:var(--ink2)}p strong{color:var(--ink)}
+.hl{border-radius:10px;padding:16px 18px;margin:20px 0}
+.hl.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}.hl.amber{background:var(--amber-light);border-left:3px solid #D4860E}.hl.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}.hl.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}.hl.green{background:var(--green-light);border-left:3px solid #2A7A3A}.hl.coral{background:var(--coral-light);border-left:3px solid #C84A4A}
+.hl-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.hl.teal .hl-lbl{color:var(--teal)}.hl.amber .hl-lbl{color:var(--amber)}.hl.blue .hl-lbl{color:var(--blue)}.hl.purple .hl-lbl{color:var(--purple)}.hl.green .hl-lbl{color:var(--green)}.hl.coral .hl-lbl{color:var(--coral)}
+.hl p{margin-bottom:0;font-size:15px;line-height:1.65}
+.hl.teal p{color:var(--teal)}.hl.amber p{color:var(--amber)}.hl.blue p{color:var(--blue)}.hl.purple p{color:var(--purple)}.hl.green p{color:var(--green)}.hl.coral p{color:var(--coral)}
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0}
+.stat-box{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:16px;text-align:center}
+.stat-num{font-family:'Lora',serif;font-size:32px;font-weight:600;color:var(--teal);line-height:1;margin-bottom:4px}
+.stat-lbl{font-size:12px;color:var(--ink2);line-height:1.4}
+.strategy-list{display:flex;flex-direction:column;gap:10px;margin:20px 0}
+.strat{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start}
+.strat-num{width:26px;height:26px;border-radius:50%;background:var(--teal-light);color:var(--teal);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.strat-title{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}.strat-desc{font-size:13px;color:var(--ink2);line-height:1.55}
+.topic-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:20px 0}
+.topic-card{background:var(--surface);border:1px solid var(--rule);border-radius:7px;padding:10px 12px}
+.topic-name{font-size:12px;font-weight:700;color:var(--teal);margin-bottom:3px}.topic-pct{font-size:11px;color:var(--amber);font-weight:600;margin-bottom:3px}.topic-tips{font-size:11px;color:var(--ink2);line-height:1.4}
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+.complete-banner{background:linear-gradient(135deg,var(--teal),#0D8A7A);border-radius:12px;padding:24px;margin:32px 0;text-align:center;color:#fff}
+.complete-title{font-family:'Lora',serif;font-size:22px;font-weight:600;margin-bottom:8px}
+.complete-body{font-size:14px;opacity:.9;line-height:1.6;max-width:400px;margin:0 auto}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}.quiz-reset.show{display:block}
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;box-shadow:0 2px 12px rgba(0,0,0,.15)}.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav class="top-nav">
+  <div class="nav-left"><span class="nav-day">Day 20 · Week 5</span><span class="nav-title">Mock Exam &amp; Exam Strategy</span></div>
+  <div class="nav-right"><div class="timer-badge">⏱ <span id="read-timer">0:00</span></div><button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button></div>
+</nav>
+<header class="hero">
+  <div class="hero-label">Study Session · Day 20 of 20</div>
+  <h1 class="hero-title">Mock Exam &amp;<br>Exam Strategy</h1>
+  <div class="hero-meta"><span class="meta-pill">🎯 Final session</span><span class="meta-pill">10 mock questions</span><span class="meta-pill">Exam strategy</span><span class="meta-pill">Review</span></div>
+  <p class="hero-intro">The final session. Today we cover what to expect in the real exam room, the strategies that maximise your score, the topics with the highest question frequency — and a 10-question mock to close out the programme.</p>
+</header>
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>Exam Format: 40 Questions, 60 Min, 55% Pass</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Question Strategy: Eliminate Wrong Answers First</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>High-Frequency Topics</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Final Knowledge Gap Review</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Exam Day Tips &amp; Time Management</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>10-Question Mock Exam</a></li>
+  </ol>
+</nav>
+<article class="article">
+
+  <section class="section" id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">Exam Format: 40 Questions, 60 Min, 55% Pass</h2></div>
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-num">40</div><div class="stat-lbl">Multiple choice questions</div></div>
+      <div class="stat-box"><div class="stat-num">60</div><div class="stat-lbl">Minutes to complete</div></div>
+      <div class="stat-box"><div class="stat-num">55%</div><div class="stat-lbl">Pass mark (22/40)</div></div>
+    </div>
+    <div class="hl teal"><div class="hl-lbl">What this means</div><p>You need <strong>22 correct answers out of 40</strong> to pass. That is 55%. You have <strong>90 seconds per question</strong> on average — more than enough for straightforward questions if you use strategy. The exam is closed-book, computer-based (at an approved test centre or online proctored).</p></div>
+    <div class="hl blue"><div class="hl-lbl">Question types</div><p><strong>Definition questions</strong> — "What is X?" These test knowledge of key TOGAF terms. <strong>Phase questions</strong> — "In which phase is Y produced/done?" The most common type. <strong>Purpose questions</strong> — "What is the primary purpose of Z?" Require understanding, not just memorisation. <strong>Scenario questions</strong> — A situation is described and you select the appropriate TOGAF response. Rare at Foundation level.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Key numbers to know</div><p>40 questions · 60 minutes · 55% pass (22/40) · 1.5 minutes per question · Closed book · Multiple choice (4 options, one correct)</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">Question Strategy: Eliminate Wrong Answers First</h2></div>
+    <div class="strategy-list">
+      <div class="strat"><div class="strat-num">1</div><div><div class="strat-title">Read the full question before looking at options</div><div class="strat-desc">Cover the options and formulate your own answer. Then look — if your answer matches one of the options, pick it with confidence.</div></div></div>
+      <div class="strat"><div class="strat-num">2</div><div><div class="strat-title">Eliminate obvious wrong answers first</div><div class="strat-desc">Almost every question has 1–2 clearly wrong options. Eliminating them immediately improves your odds from 25% to 50–67% if you're uncertain.</div></div></div>
+      <div class="strat"><div class="strat-num">3</div><div><div class="strat-title">Watch for absolute language</div><div class="strat-desc">Answers containing "always," "never," "only," or "the only" are often wrong — TOGAF is nuanced. Exception: "Requirements Management is the only continuous phase" — this one is correct.</div></div></div>
+      <div class="strat"><div class="strat-num">4</div><div><div class="strat-title">Watch for "primary" in the question</div><div class="strat-desc">"What is the primary output of Phase X?" means the single most important output — not every output. Pick the most significant deliverable, not an artefact or supporting document.</div></div></div>
+      <div class="strat"><div class="strat-num">5</div><div><div class="strat-title">Don't change your first answer</div><div class="strat-desc">Your instinct is usually right. Only change an answer if you read a later question that makes you realise your first answer was definitely wrong.</div></div></div>
+      <div class="strat"><div class="strat-num">6</div><div><div class="strat-title">Flag and move, don't get stuck</div><div class="strat-desc">If a question stumps you after 60 seconds, mark your best guess, flag it, and move on. Return to flagged questions at the end with remaining time.</div></div></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Pacing strategy</div><p>Aim for the first 30 questions in 35 minutes, leaving 25 minutes for the remaining 10 and flagged review. Never leave a question unanswered — guess if needed. There is no negative marking.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">High-Frequency Topics</h2></div>
+    <p>Based on the official TOGAF Foundation examination blueprint, these topic areas carry the most questions. Revise them in priority order.</p>
+    <div class="topic-grid">
+      <div class="topic-card"><div class="topic-name">ADM Phases</div><div class="topic-pct">~30% of exam</div><div class="topic-tips">Phase purpose, primary output, key inputs, what triggers each phase. Especially Phases A, E, G, H and Requirements Management.</div></div>
+      <div class="topic-card"><div class="topic-name">Content Framework</div><div class="topic-pct">~15% of exam</div><div class="topic-tips">Deliverable vs Artefact vs BB. ABB vs SBB. Which deliverable belongs to which phase. Content Metamodel purpose.</div></div>
+      <div class="topic-card"><div class="topic-name">Enterprise Continuum</div><div class="topic-pct">~15% of exam</div><div class="topic-tips">4 levels. Architecture vs Solutions Continuum. Repository 6 components. Landscape 3 levels. Standards vs Reference Library.</div></div>
+      <div class="topic-card"><div class="topic-name">Architecture Governance</div><div class="topic-pct">~15% of exam</div><div class="topic-tips">Architecture Board role. Contracts. Compliance vs Conformance. Dispensations. Governance levels (Corporate/IT/Architecture).</div></div>
+      <div class="topic-card"><div class="topic-name">Stakeholder Mgmt &amp; Views</div><div class="topic-pct">~10% of exam</div><div class="topic-tips">Stakeholder map. Concern → Viewpoint → View chain. Viewpoint vs View distinction. Communications Plan (Phase A).</div></div>
+      <div class="topic-card"><div class="topic-name">Reference Models</div><div class="topic-pct">~10% of exam</div><div class="topic-tips">TRM 3 layers. TRM taxonomy. III-RM purpose. Boundaryless information flow. Foundation Architecture level.</div></div>
+      <div class="topic-card"><div class="topic-name">Capability Framework</div><div class="topic-pct">~5% of exam</div><div class="topic-tips">Maturity 0–5 scale. Key roles. Architecture Centre of Excellence. Used in Preliminary Phase.</div></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Focus your final revision</div><p>ADM phases alone account for roughly a third of the exam. If short on time, revise: Phase A outputs, Phase E (roadmap, ABB→SBB mapping), Phase G (contracts, conformance), Requirements Management (only continuous phase), and the deliverable-per-phase table.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">Final Knowledge Gap Review</h2></div>
+    <p>A rapid-fire checklist of the facts most often confused. Read each one and check whether you have it solid.</p>
+    <div class="hl teal"><div class="hl-lbl">Phase outputs — the critical ones</div><p>Phase A → <strong>Statement of Architecture Work</strong> (not the Architecture Vision — that is also produced but SoAW is the formal trigger output) · Phase E → <strong>Architecture Roadmap (initial)</strong> · Phase F → <strong>Implementation &amp; Migration Plan + Architecture Roadmap (final)</strong> · Phase G → <strong>signed Architecture Contracts + Compliance Assessments</strong></p></div>
+    <div class="hl blue"><div class="hl-lbl">The "only" facts — each appears in exam questions</div><p>Requirements Management is the <strong>only continuous phase</strong> · ABB→SBB mapping is <strong>first done in Phase E</strong> · The Architecture Roadmap is <strong>first produced in Phase E</strong> · The Preliminary Phase is the <strong>only phase before Phase A</strong> · The Architecture Board is the <strong>only body that can grant dispensations</strong></p></div>
+    <div class="hl purple"><div class="hl-lbl">The twin distinctions — exam favourites</div><p>Deliverable vs Artefact · ABB vs SBB · Viewpoint vs View · Conformance vs Compliance · Reference Library vs Standards Library · Architecture Continuum vs Solutions Continuum · IT Governance vs Architecture Governance</p></div>
+    <div class="hl amber"><div class="hl-lbl">The Continuum — 4 levels in order</div><p>Foundation Architecture → Common Systems Architecture → Industry Architecture → Organisation-Specific Architecture. Foundation = most generic. Org-Specific = most tailored. Architecture Continuum has ABBs; Solutions Continuum has SBBs.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ The night before</div><p>Review the Phase output table and the twin distinctions. Get 8 hours sleep. Don't cram on exam morning. Trust 20 days of preparation.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">Exam Day Tips &amp; Time Management</h2></div>
+    <div class="strategy-list">
+      <div class="strat"><div class="strat-num">✓</div><div><div class="strat-title">Arrive / log in 15 minutes early</div><div class="strat-desc">Whether at a test centre or online-proctored, technical setup takes time. Don't start the exam clock under stress from a late start.</div></div></div>
+      <div class="strat"><div class="strat-num">✓</div><div><div class="strat-title">Read each question fully — twice if needed</div><div class="strat-desc">Many wrong answers come from misreading questions. The TOGAF exam is precise in its language. A question about a "primary" output is different from a question about "any" output.</div></div></div>
+      <div class="strat"><div class="strat-num">✓</div><div><div class="strat-title">Trust the framework — not your instinct</div><div class="strat-desc">If an answer "feels right" but doesn't match what TOGAF says, pick TOGAF. The exam tests knowledge of the framework, not real-world architecture practice.</div></div></div>
+      <div class="strat"><div class="strat-num">✓</div><div><div class="strat-title">Target 22+ — don't aim for perfect</div><div class="strat-desc">You need 55% to pass. A strong candidate should aim for 28–32 (70–80%). Don't waste time agonising over 4–5 genuinely uncertain questions. Make your best guess and move on.</div></div></div>
+      <div class="strat"><div class="strat-num">✓</div><div><div class="strat-title">Use all 60 minutes</div><div class="strat-desc">Don't submit early. Use any remaining time to review flagged questions. A quick re-read often reveals what you missed on first pass.</div></div></div>
+    </div>
+    <div class="complete-banner">
+      <div class="complete-title">🎓 Programme Complete</div>
+      <div class="complete-body">20 sessions · 20 days · Every TOGAF Foundation topic covered. You've built the knowledge — now demonstrate it. Good luck on your exam.</div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">10-Question Mock Exam</div>
+    <div class="quiz-sub">Simulate exam conditions · Mix of all topic areas · 15 minutes target</div>
+    <div class="quiz-q" id="quiz-q1"><div class="quiz-q-text">1. What is the minimum pass mark for the TOGAF Foundation exam?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. 60% (24/40)</button><button class="quiz-opt" onclick="answer(1,'b')">B. 55% (22/40)</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. 50% (20/40)</button><button class="quiz-opt" onclick="answer(1,'d')">D. 65% (26/40)</button>
+      </div><div class="quiz-feedback" id="fb1"></div></div>
+    <div class="quiz-q" id="quiz-q2"><div class="quiz-q-text">2. Which ADM phase first produces Architecture Building Block to Solution Building Block mappings?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. Phase D</button><button class="quiz-opt" onclick="answer(2,'b')">B. Phase C</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. Phase F</button><button class="quiz-opt" onclick="answer(2,'d')">D. Phase E</button>
+      </div><div class="quiz-feedback" id="fb2"></div></div>
+    <div class="quiz-q" id="quiz-q3"><div class="quiz-q-text">3. The Governance Log in the Architecture Repository records which of the following?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. Approved technology products and their versions</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. All architecture governance decisions including compliance outcomes, dispensations, and change request decisions</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. All architecture requirements with traceability and version history</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. External reference architectures and industry standards</button>
+      </div><div class="quiz-feedback" id="fb3"></div></div>
+    <div class="quiz-q" id="quiz-q4"><div class="quiz-q-text">4. TOGAF defines three levels of the Architecture Landscape. Which correctly lists them from highest to lowest abstraction?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. Foundation, Industry, Organisation</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. Business, Information Systems, Technology</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. Strategic, Segment, Capability</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. Baseline, Transition, Target</button>
+      </div><div class="quiz-feedback" id="fb4"></div></div>
+    <div class="quiz-q" id="quiz-q5"><div class="quiz-q-text">5. An Architecture Viewpoint is best described as:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. An architecture description produced for a specific stakeholder group</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. A stakeholder's concern about the architecture</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. A reusable template or specification for constructing an architecture view</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. A diagram contained within the Architecture Definition Document</button>
+      </div><div class="quiz-feedback" id="fb5"></div></div>
+    <div class="quiz-q" id="quiz-q6"><div class="quiz-q-text">6. The Integrated Information Infrastructure Reference Model (III-RM) addresses which primary need?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(6,'a')">A. Defining the taxonomy of application platform services within a single enterprise</button>
+        <button class="quiz-opt" onclick="answer(6,'b')">B. Cross-enterprise information sharing in networked and distributed environments</button>
+        <button class="quiz-opt" onclick="answer(6,'c')">C. Industry-specific architecture patterns for financial services organisations</button>
+        <button class="quiz-opt" onclick="answer(6,'d')">D. The classification of architecture building blocks in the Architecture Repository</button>
+      </div><div class="quiz-feedback" id="fb6"></div></div>
+    <div class="quiz-q" id="quiz-q7"><div class="quiz-q-text">7. Which statement about Architecture Contracts is correct?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(7,'a')">A. They are produced in Phase A and updated throughout the ADM cycle</button>
+        <button class="quiz-opt" onclick="answer(7,'b')">B. They are drafted in Phase F and signed in Phase G, giving the Architecture Board formal authority to require conformance</button>
+        <button class="quiz-opt" onclick="answer(7,'c')">C. They are produced in Phase G and must be approved by the IT Steering Committee</button>
+        <button class="quiz-opt" onclick="answer(7,'d')">D. They are optional for low-risk projects where the Architecture Board grants a dispensation</button>
+      </div><div class="quiz-feedback" id="fb7"></div></div>
+    <div class="quiz-q" id="quiz-q8"><div class="quiz-q-text">8. At which maturity level is an organisation's architecture process considered "Defined" — the minimum effective level?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(8,'a')">A. Level 1</button><button class="quiz-opt" onclick="answer(8,'b')">B. Level 2</button>
+        <button class="quiz-opt" onclick="answer(8,'c')">C. Level 3</button><button class="quiz-opt" onclick="answer(8,'d')">D. Level 4</button>
+      </div><div class="quiz-feedback" id="fb8"></div></div>
+    <div class="quiz-q" id="quiz-q9"><div class="quiz-q-text">9. The Business Transformation Readiness Assessment is used in which two ADM phases?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(9,'a')">A. Phase B and Phase D</button><button class="quiz-opt" onclick="answer(9,'b')">B. Phase F and Phase G</button>
+        <button class="quiz-opt" onclick="answer(9,'c')">C. Phase A and Phase E</button><button class="quiz-opt" onclick="answer(9,'d')">D. Phase H and the Preliminary Phase</button>
+      </div><div class="quiz-feedback" id="fb9"></div></div>
+    <div class="quiz-q" id="quiz-q10"><div class="quiz-q-text">10. Which of the following correctly describes the relationship between the Architecture Continuum and Solutions Continuum?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(10,'a')">A. They are identical structures with different names used for different audiences</button>
+        <button class="quiz-opt" onclick="answer(10,'b')">B. The Architecture Continuum contains ABBs (descriptions); the Solutions Continuum contains SBBs (implementations) — both run from generic to organisation-specific</button>
+        <button class="quiz-opt" onclick="answer(10,'c')">C. The Architecture Continuum covers Phases A–D; the Solutions Continuum covers Phases E–H</button>
+        <button class="quiz-opt" onclick="answer(10,'d')">D. The Solutions Continuum is used only when implementing Foundation Architecture reference models</button>
+      </div><div class="quiz-feedback" id="fb10"></div></div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+</article>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+let sec=0;const tEl=document.getElementById("read-timer");const iv=setInterval(()=>{sec++;tEl.textContent=Math.floor(sec/60)+":"+(sec%60<10?"0":"")+sec%60;},1000);
+window.addEventListener("scroll",()=>{const d=document.documentElement;document.getElementById("progress-bar").style.width=Math.min(100,(d.scrollTop/(d.scrollHeight-d.clientHeight))*100)+"%";document.getElementById("scroll-top").classList.toggle("show",d.scrollTop>400);});
+function markDone(){clearInterval(iv);try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[20]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("done-btn");b.textContent="✓ Done!";b.classList.add("completed");}
+const ANS={1:'b',2:'d',3:'b',4:'c',5:'c',6:'b',7:'b',8:'c',9:'c',10:'b'};
+const FB={
+  1:{b:"Correct! 55% — you need 22 out of 40 questions correct to pass the TOGAF Foundation exam.",x:"Not quite. The pass mark is 55% — 22 out of 40 correct answers."},
+  2:{d:"Correct! ABB→SBB mapping first occurs in Phase E — Opportunities and Solutions. This is when specific technology products are first identified as implementations of the architecture components.",x:"Not quite. ABBs are mapped to SBBs for the first time in Phase E — Opportunities and Solutions. Phases B, C, D define ABBs; Phase E maps them to specific product implementations (SBBs)."},
+  3:{b:"Correct! The Governance Log records all architecture governance decisions — compliance assessment outcomes (Fully Conformant/Conditionally Conformant/Non-Conformant), dispensations granted, change request decisions, and risk acceptances.",x:"Not quite. The Governance Log records all governance decisions — compliance outcomes, dispensations, change requests, risk acceptances. The Standards Library stores approved technology products; the Requirements Repository stores requirements."},
+  4:{c:"Correct! The three Architecture Landscape levels from highest to lowest abstraction are: Strategic (whole enterprise, C-suite), Segment (business unit), Capability (specific project). Foundation/Industry/Organisation describes the Enterprise Continuum levels.",x:"Not quite. The three Architecture Landscape levels are Strategic, Segment, and Capability — from highest to lowest abstraction."},
+  5:{c:"Correct! A Viewpoint is a reusable template or specification for constructing an architecture view. A View is the actual content produced by applying a viewpoint to a specific architecture.",x:"Not quite. A Viewpoint is a reusable template (how to construct a view). A View is the actual content produced for a specific architecture."},
+  6:{b:"Correct! The III-RM addresses cross-enterprise information sharing in networked and distributed environments — the infrastructure for 'boundaryless information flow.' The TRM covers platform services within a single enterprise.",x:"Not quite. The III-RM addresses cross-enterprise information sharing — the infrastructure needed when business applications need to exchange information across organisational boundaries. The TRM covers platform services within a single enterprise."},
+  7:{b:"Correct! Architecture Contracts are drafted in Phase F (Migration Planning) and signed in Phase G (Implementation Governance). Without signed contracts, the Architecture Board's oversight is advisory only.",x:"Not quite. Architecture Contracts are drafted in Phase F and signed in Phase G. They give the Architecture Board formal authority to require conformance from implementation teams."},
+  8:{c:"Correct! Level 3 is 'Defined' — architecture processes are documented, standardised, and consistently applied. This is considered the minimum effective maturity level for an architecture practice.",x:"Not quite. Level 3 is 'Defined' — the minimum effective maturity. Level 1 is 'Initial' (informal), Level 2 is 'Under Development', Level 4 is 'Managed' (measured), Level 5 is 'Optimising'."},
+  9:{c:"Correct! The Business Transformation Readiness Assessment is used in Phase A (to inform scope and constraints of the Architecture Vision) and Phase E (where readiness gaps become explicit work packages in the implementation plan).",x:"Not quite. The Readiness Assessment is used in Phase A (scope/constraints) and Phase E (readiness gaps become work packages). It assesses the organisation's capacity to undertake and sustain transformation."},
+  10:{b:"Correct! The Architecture Continuum contains architecture descriptions and ABBs; the Solutions Continuum contains implementations and SBBs. Both run from most generic (Foundation) to most specific (Organisation-Specific). They are parallel, complementary structures.",x:"Not quite. The Architecture Continuum has ABBs (descriptions); the Solutions Continuum has SBBs (implementations). They are parallel structures both running from Foundation to Organisation-Specific."}
+};
+let answered={},score=0,total=10;
+function answer(q,opt){if(answered[q])return;answered[q]=opt;const ok=opt===ANS[q];if(ok)score++;document.querySelectorAll(`#quiz-q${q} .quiz-opt`).forEach((b,i)=>{const o=['a','b','c','d'][i];b.classList.add(o===ANS[q]?"correct":o===opt&&!ok?"wrong":"reveal");});const fb=document.getElementById("fb"+q);fb.textContent=(ok?"✓ ":"✗ ")+(ok?FB[q][opt]:FB[q].x);fb.className="quiz-feedback show "+(ok?"ok":"no");if(Object.keys(answered).length===total){const pct=Math.round(score/total*100);let msg=pct>=80?"Excellent — well above pass mark. You're ready! 🎉":pct>=55?"Above pass mark. A bit more revision and you'll be solid.":"Below pass mark. Review the traps from Day 19 and try again.";document.getElementById("quiz-score").textContent=`You scored ${score}/${total} (${pct}%). ${msg}`;document.getElementById("quiz-score").classList.add("show");document.getElementById("quiz-reset").classList.add("show");if(score>=8)markDone();}}
+function resetQuiz(){answered={};score=0;document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});document.getElementById("quiz-score").classList.remove("show");document.getElementById("quiz-reset").classList.remove("show");}
+</script>
+</body>
+</html>

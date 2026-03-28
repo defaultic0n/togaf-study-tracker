@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 15 — Architecture Capability Framework</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}:root{--bg:#FAFAF7;--ink:#1A1A18;--ink2:#4A4A42;--ink3:#8A8A80;--teal:#0D6E5E;--teal-light:#E6F4F1;--teal-mid:#1A9B86;--amber:#92530A;--amber-light:#FDF3E3;--blue:#1A4A7A;--blue-light:#E8F0F8;--purple:#4A2A7A;--purple-light:#F0EAF8;--green:#1A5A2A;--green-light:#E8F4E8;--rule:#E0DFD8;--surface:#FFFFFF;--reading-max:680px}
+html{background:var(--bg);scroll-behavior:smooth}body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100}
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}.nav-day{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3)}.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px}.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer}.done-btn.completed{background:#2EAA8A}
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px}.toc-list a:hover{color:var(--teal)}.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+.section{margin-bottom:48px}.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+p{margin-bottom:16px;color:var(--ink2)}p strong{color:var(--ink)}
+.hl{border-radius:10px;padding:16px 18px;margin:20px 0}
+.hl.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}.hl.amber{background:var(--amber-light);border-left:3px solid #D4860E}.hl.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}.hl.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}.hl.green{background:var(--green-light);border-left:3px solid #2A7A3A}
+.hl-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.hl.teal .hl-lbl{color:var(--teal)}.hl.amber .hl-lbl{color:var(--amber)}.hl.blue .hl-lbl{color:var(--blue)}.hl.purple .hl-lbl{color:var(--purple)}.hl.green .hl-lbl{color:var(--green)}
+.hl p{margin-bottom:0;font-size:15px;line-height:1.65}
+.hl.teal p{color:var(--teal)}.hl.amber p{color:var(--amber)}.hl.blue p{color:var(--blue)}.hl.purple p{color:var(--purple)}.hl.green p{color:var(--green)}
+.def-grid{display:grid;gap:10px;margin:20px 0}.def-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.def-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}.def-text{font-size:14px;color:var(--ink2);line-height:1.6;margin:0}
+.maturity-levels{display:flex;flex-direction:column;gap:0;border-radius:10px;overflow:hidden;border:1px solid var(--rule);margin:20px 0}
+.mat-row{display:flex;gap:12px;align-items:flex-start;padding:10px 14px;border-bottom:1px solid var(--rule)}
+.mat-row:last-child{border-bottom:none}.mat-num{font-size:18px;font-weight:700;width:24px;flex-shrink:0;color:var(--teal)}
+.mat-name{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:2px}.mat-desc{font-size:13px;color:var(--ink2);line-height:1.5}
+.role-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:20px 0}
+.role-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:12px}
+.role-title{font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.role-desc{font-size:13px;color:var(--ink2);line-height:1.55}
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+.sum-grid{display:grid;gap:10px;margin-top:32px}
+.sum-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.sum-icon{font-size:18px;flex-shrink:0}.sum-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}.sum-body{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}.quiz-reset.show{display:block}
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;box-shadow:0 2px 12px rgba(0,0,0,.15)}.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav class="top-nav">
+  <div class="nav-left"><span class="nav-day">Day 15 · Week 4</span><span class="nav-title">Architecture Capability Framework</span></div>
+  <div class="nav-right"><div class="timer-badge">⏱ <span id="read-timer">0:00</span></div><button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button></div>
+</nav>
+<header class="hero">
+  <div class="hero-label">Study Session · Day 15 of 20</div>
+  <h1 class="hero-title">Architecture Capability Framework</h1>
+  <div class="hero-meta"><span class="meta-pill">📖 ~30 min read</span><span class="meta-pill">5 topics</span><span class="meta-pill">5 quiz questions</span><span class="meta-pill">Governance</span></div>
+  <p class="hero-intro">Before running the ADM, an organisation needs an architecture capability — the people, processes, and structures that make enterprise architecture work. The Architecture Capability Framework defines how to establish, operate, and mature this capability.</p>
+</header>
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>Establishing an Architecture Practice</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Architecture Maturity Models</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>Architecture Skills Framework</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>Key Roles: Chief Architect, Board, Sponsor</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Architecture Centre of Excellence</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>Knowledge Check</a></li>
+  </ol>
+</nav>
+<article class="article">
+
+  <section class="section" id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">Establishing an Architecture Practice</h2></div>
+    <div class="hl teal"><div class="hl-lbl">What the Capability Framework addresses</div><p>The <strong>Architecture Capability Framework</strong> covers how to establish and operate the organisational structures, processes, roles, and responsibilities needed to successfully run enterprise architecture using TOGAF. It answers: "How do you make EA happen in your organisation?"</p></div>
+    <p>Running the ADM requires more than just following the process. It requires the right people in the right roles, the right governance structures, the right tools and repositories, and the right level of organisational commitment. The Capability Framework provides a blueprint for establishing all of this.</p>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Architecture Organisation</div><p class="def-text">The formal team and structures through which architecture work is conducted — including the Architecture Board, Architecture Review Committees, and the architecture function within IT and business units.</p></div>
+      <div class="def-item"><div class="def-term">Architecture Processes</div><p class="def-text">The defined, repeatable processes for conducting architecture work — the ADM cycle, governance processes, review processes, and change management processes that architecture teams follow.</p></div>
+      <div class="def-item"><div class="def-term">Architecture Skills</div><p class="def-text">The competencies and skills required of individuals working in architecture roles — business analysis, technology understanding, communication, leadership, and governance expertise.</p></div>
+      <div class="def-item"><div class="def-term">Architecture Principles</div><p class="def-text">The fundamental rules and guidelines that all architecture work must adhere to — established in the Preliminary Phase and underpinning all ADM decisions.</p></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The Capability Framework is about establishing the <strong>capability to do architecture</strong> — not about doing the architecture itself. It covers the organisation, processes, skills, and principles needed to run the ADM effectively. The Preliminary Phase establishes the architecture capability using the Capability Framework.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">Architecture Maturity Models</h2></div>
+    <div class="hl blue"><div class="hl-lbl">Purpose</div><p>Architecture maturity models assess how well-developed an organisation's architecture capability is — and provide a roadmap for improvement. They help organisations understand where they are now and what they need to do to reach a higher level of capability.</p></div>
+    <p>TOGAF references several maturity models, including the US Department of Commerce ACMM (Architecture Capability Maturity Model). Most follow a similar 0–5 scale:</p>
+    <div class="maturity-levels">
+      <div class="mat-row"><span class="mat-num">0</span><div><div class="mat-name">None</div><div class="mat-desc">No architecture capability exists. Architecture work is ad hoc and undocumented.</div></div></div>
+      <div class="mat-row"><span class="mat-num">1</span><div><div class="mat-name">Initial</div><div class="mat-desc">Architecture processes exist but are informal and person-dependent. Not consistently applied.</div></div></div>
+      <div class="mat-row"><span class="mat-num">2</span><div><div class="mat-name">Under Development</div><div class="mat-desc">Architecture processes are being defined and documented. Partial governance in place.</div></div></div>
+      <div class="mat-row"><span class="mat-num">3</span><div><div class="mat-name">Defined</div><div class="mat-desc">Architecture processes are documented, standardised, and consistently applied across the organisation.</div></div></div>
+      <div class="mat-row"><span class="mat-num">4</span><div><div class="mat-name">Managed</div><div class="mat-desc">Architecture processes are measured, monitored, and actively managed. Quantitative metrics used.</div></div></div>
+      <div class="mat-row"><span class="mat-num">5</span><div><div class="mat-name">Optimising</div><div class="mat-desc">Continuous improvement is built into the architecture process. Innovation and best-practice adoption are routine.</div></div></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Architecture maturity is assessed on a <strong>0–5 scale</strong>: 0 (None) → 1 (Initial) → 2 (Under Development) → 3 (Defined) → 4 (Managed) → 5 (Optimising). Most organisations start at level 1 when adopting TOGAF and target level 3 as the minimum effective maturity.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">Architecture Skills Framework</h2></div>
+    <div class="hl purple"><div class="hl-lbl">Purpose</div><p>The <strong>Architecture Skills Framework</strong> defines the competencies and skills required for different architecture roles — providing a basis for recruitment, training, and career development of architecture professionals.</p></div>
+    <p>TOGAF's Skills Framework organises architecture competencies into several skill categories:</p>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Generic Skills</div><p class="def-text">Communication, leadership, stakeholder management, negotiation, and presentation skills. Essential at all levels — architecture is fundamentally a people-facing discipline.</p></div>
+      <div class="def-item"><div class="def-term">Business Skills and Methods</div><p class="def-text">Business analysis, strategy, financial management, organisational change management. Architects must understand business, not just technology.</p></div>
+      <div class="def-item"><div class="def-term">Enterprise Architecture Skills</div><p class="def-text">Architecture frameworks (TOGAF), modelling methods, architecture patterns, governance, and the specific technical knowledge for each BDAT domain.</p></div>
+      <div class="def-item"><div class="def-term">Program and Project Management</div><p class="def-text">Understanding of programme management, project planning, benefits realisation, and change delivery. Architects must work alongside delivery teams effectively.</p></div>
+      <div class="def-item"><div class="def-term">IT General Knowledge</div><p class="def-text">Broad technology literacy — infrastructure, cloud, security, data, software development, integration. Not expert-level in all areas but sufficient to have informed technical conversations.</p></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The Skills Framework defines competencies for architecture roles. Key point for the exam: <strong>generic and business skills are as important as technical skills</strong> for architects. TOGAF does not define architecture as a purely technical role — communication, stakeholder management, and business acumen are core competencies.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">Key Roles: Chief Architect, Architecture Board, Sponsor</h2></div>
+    <div class="role-grid">
+      <div class="role-card"><div class="role-title">Chief Architect</div><div class="role-desc">Leads the architecture function. Accountable for the quality and consistency of the enterprise architecture. Chairs or reports to the Architecture Board. Sets the architectural direction and enforces architecture principles.</div></div>
+      <div class="role-card"><div class="role-title">Architecture Board</div><div class="role-desc">Cross-organisational governance body. Reviews and approves architectures, grants dispensations, resolves conflicts. Provides the formal authority for architecture governance. Typically includes the CIO, Chief Architect, and senior stakeholders.</div></div>
+      <div class="role-card"><div class="role-title">Architecture Sponsor</div><div class="role-desc">Senior executive who sponsors and funds the architecture function and specific architecture engagements. Issues the Request for Architecture Work. Provides organisational authority and resources.</div></div>
+      <div class="role-card"><div class="role-title">Enterprise Architect</div><div class="role-desc">Conducts the architecture work — running ADM phases, producing deliverables, engaging stakeholders. May specialise in Business, Data, Application, or Technology architecture domains.</div></div>
+      <div class="role-card"><div class="role-title">Domain Architects</div><div class="role-desc">Specialists within a BDAT domain — Business Architect, Data Architect, Application Architect, Technology Architect. Provide depth of expertise within their domain during ADM phases B, C, and D.</div></div>
+      <div class="role-card"><div class="role-title">Solution Architect</div><div class="role-desc">Works at the project level, designing solutions that conform to the enterprise architecture. Operates within the constraints defined by Enterprise Architects and the Architecture Board.</div></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The <strong>Architecture Board</strong> provides governance authority. The <strong>Architecture Sponsor</strong> provides funding and issues the Request for Architecture Work. The <strong>Chief Architect</strong> leads the architecture function. These three roles are the most frequently tested in the Capability Framework section.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">Architecture Centre of Excellence</h2></div>
+    <div class="hl green"><div class="hl-lbl">What an ACE is</div><p>An <strong>Architecture Centre of Excellence (ACE)</strong> — sometimes called an Enterprise Architecture Centre of Excellence — is a dedicated organisational unit that houses the architecture function, develops architecture capability, and provides architecture services to the rest of the organisation.</p></div>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Architecture Practice Development</div><p class="def-text">The ACE develops and maintains the architecture framework, methods, templates, and patterns used by architecture teams. It owns the Architecture Repository and ensures its currency and quality.</p></div>
+      <div class="def-item"><div class="def-term">Architecture Services</div><p class="def-text">The ACE provides architecture services to business units and project teams — architecture advice, compliance reviews, stakeholder engagement, and architecture risk assessment.</p></div>
+      <div class="def-item"><div class="def-term">Capability Building</div><p class="def-text">The ACE develops architecture skills across the organisation — training, mentoring, certification support, and embedding architecture thinking in business and IT teams.</p></div>
+      <div class="def-item"><div class="def-term">Architecture Governance Support</div><p class="def-text">The ACE supports the Architecture Board — preparing materials, tracking compliance, maintaining the Governance Log, and providing analytical support for governance decisions.</p></div>
+    </div>
+    <div class="hl amber"><div class="hl-lbl">ACE placement in the organisation</div><p>The ACE is typically placed close to the CIO or CTO function to ensure it has authority and access. In some organisations it reports directly to the CEO. Placement signals organisational commitment — an ACE buried deep in IT is less effective than one with direct executive access and cross-business mandate.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The Architecture Centre of Excellence is the <strong>organisational home of the architecture function</strong>. It develops capability, provides services, and supports governance. Know that its placement close to executive leadership is important for effectiveness and authority.</p></div>
+  </section>
+
+  <div class="divider"></div>
+  <section>
+    <h2 style="font-family:'Lora',serif;font-size:20px;color:var(--ink);margin-bottom:16px">Session summary</h2>
+    <div class="sum-grid">
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Capability Framework = how to do EA</div><p class="sum-body">Covers organisation, processes, skills, and principles needed to run the ADM. Established in the Preliminary Phase.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Maturity: 0–5 scale</div><p class="sum-body">0 (None) → 3 (Defined, minimum effective) → 5 (Optimising). Most adopt TOGAF at level 1.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Skills: generic + business + technical</div><p class="sum-body">Architecture requires communication, business, and technical competencies. Not purely a technical role.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Three key roles</div><p class="sum-body">Architecture Board (governance authority) · Sponsor (funding, issues Request) · Chief Architect (leads function).</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">ACE = home of the EA function</div><p class="sum-body">Develops capability, provides services, supports governance. Placement close to executive leadership matters.</p></div></div>
+    </div>
+  </section>
+  <div class="divider"></div>
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">Knowledge Check</div><div class="quiz-sub">5 questions · Architecture Capability Framework</div>
+    <div class="quiz-q" id="quiz-q1"><div class="quiz-q-text">1. At what maturity level is an organisation's architecture process "Defined" — documented, standardised, and consistently applied?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. Level 1</button><button class="quiz-opt" onclick="answer(1,'b')">B. Level 2</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. Level 3</button><button class="quiz-opt" onclick="answer(1,'d')">D. Level 4</button>
+      </div><div class="quiz-feedback" id="fb1"></div></div>
+    <div class="quiz-q" id="quiz-q2"><div class="quiz-q-text">2. Which role issues the Request for Architecture Work and provides funding for architecture engagements?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. Chief Architect</button><button class="quiz-opt" onclick="answer(2,'b')">B. Architecture Board</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. Architecture Sponsor</button><button class="quiz-opt" onclick="answer(2,'d')">D. Enterprise Architect</button>
+      </div><div class="quiz-feedback" id="fb2"></div></div>
+    <div class="quiz-q" id="quiz-q3"><div class="quiz-q-text">3. According to TOGAF's Architecture Skills Framework, which category of skill is as important as technical expertise for architects?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. Vendor certification and product knowledge</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. Generic skills such as communication, leadership, and stakeholder management</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. Project management methodology certification</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. Security architecture specialisation</button>
+      </div><div class="quiz-feedback" id="fb3"></div></div>
+    <div class="quiz-q" id="quiz-q4"><div class="quiz-q-text">4. What is an Architecture Centre of Excellence (ACE)?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. A governance body that reviews and approves architectures</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. A dedicated organisational unit that houses the architecture function and provides architecture services to the organisation</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. A repository for storing approved architecture building blocks</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. An industry body that certifies TOGAF practitioners</button>
+      </div><div class="quiz-feedback" id="fb4"></div></div>
+    <div class="quiz-q" id="quiz-q5"><div class="quiz-q-text">5. The Architecture Capability Framework is primarily used in which ADM phase to establish the architecture practice?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. Phase A — Architecture Vision</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. Phase B — Business Architecture</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. Phase G — Implementation Governance</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. The Preliminary Phase</button>
+      </div><div class="quiz-feedback" id="fb5"></div></div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+</article>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+let sec=0;const tEl=document.getElementById("read-timer");const iv=setInterval(()=>{sec++;tEl.textContent=Math.floor(sec/60)+":"+(sec%60<10?"0":"")+sec%60;},1000);
+window.addEventListener("scroll",()=>{const d=document.documentElement;document.getElementById("progress-bar").style.width=Math.min(100,(d.scrollTop/(d.scrollHeight-d.clientHeight))*100)+"%";document.getElementById("scroll-top").classList.toggle("show",d.scrollTop>400);});
+function markDone(){clearInterval(iv);try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[15]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("done-btn");b.textContent="✓ Done!";b.classList.add("completed");}
+const ANS={1:'c',2:'c',3:'b',4:'b',5:'d'};
+const FB={
+  1:{c:"Correct! Level 3 is 'Defined' — architecture processes are documented, standardised, and consistently applied across the organisation. This is considered the minimum effective maturity level for an architecture practice.",x:"Not quite. Level 3 is 'Defined'. Level 1 is 'Initial' (informal, person-dependent), Level 2 is 'Under Development', Level 4 is 'Managed' (measured and monitored), Level 5 is 'Optimising'."},
+  2:{c:"Correct! The Architecture Sponsor issues the Request for Architecture Work (which triggers Phase A) and provides the funding and organisational authority for architecture engagements. The Sponsor is the executive who champions the architecture function.",x:"Not quite. The Architecture Sponsor issues the Request for Architecture Work and provides funding. The Chief Architect leads the function. The Architecture Board provides governance authority."},
+  3:{b:"Correct! TOGAF's Skills Framework explicitly includes generic skills — communication, leadership, stakeholder management, negotiation — as core competencies for architects. Architecture is a people-facing discipline and technical skill alone is insufficient.",x:"Not quite. TOGAF's Skills Framework emphasises that generic skills like communication, leadership, and stakeholder management are as important as technical expertise. Architecture requires bridging business and technology, which demands strong interpersonal capabilities."},
+  4:{b:"Correct! An Architecture Centre of Excellence is a dedicated organisational unit that houses the architecture function, develops architecture capability, provides architecture services, and supports governance. It is the institutional home of enterprise architecture.",x:"Not quite. An Architecture Centre of Excellence is a dedicated organisational unit for the architecture function — it develops capability, provides services, and supports governance. The Architecture Board provides governance authority; the Repository stores building blocks."},
+  5:{d:"Correct! The Preliminary Phase uses the Architecture Capability Framework to establish the organisation's architecture practice — defining the team structure, governance, processes, principles, and repository needed to run the ADM effectively.",x:"Not quite. The Preliminary Phase is where the architecture capability is established using the Capability Framework. Phase A begins the actual architecture work once the capability is in place."}
+};
+let answered={},score=0;
+function answer(q,opt){if(answered[q])return;answered[q]=opt;const ok=opt===ANS[q];if(ok)score++;document.querySelectorAll(`#quiz-q${q} .quiz-opt`).forEach((b,i)=>{const o=['a','b','c','d'][i];b.classList.add(o===ANS[q]?"correct":o===opt&&!ok?"wrong":"reveal");});const fb=document.getElementById("fb"+q);fb.textContent=(ok?"✓ ":"✗ ")+(ok?FB[q][opt]:FB[q].x);fb.className="quiz-feedback show "+(ok?"ok":"no");if(Object.keys(answered).length===5){const msgs=["Keep going!","Getting there!","Good effort!","Strong result!","Perfect score! Ready for Day 16."];document.getElementById("quiz-score").textContent=`You scored ${score}/5. ${msgs[score-1]||msgs[0]}`;document.getElementById("quiz-score").classList.add("show");document.getElementById("quiz-reset").classList.add("show");if(score===5)markDone();}}
+function resetQuiz(){answered={};score=0;document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});document.getElementById("quiz-score").classList.remove("show");document.getElementById("quiz-reset").classList.remove("show");}
+</script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 16 Slides — Architecture Governance</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;--teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);--gold:#F0B429;--gold2:rgba(240,180,41,0.15);--slate:#94A3B8;--slate2:#64748B;--slate3:#334155;--white:#F8FAFC;--white2:#E2E8F0;--coral:#FB7185;--coral2:rgba(251,113,133,0.15);--blue:#60A5FA;--blue2:rgba(96,165,250,0.12);--purple:#A78BFA;--purple2:rgba(167,139,250,0.12);--green:#4ADE80;--green2:rgba(74,222,128,0.12);--amber:#FBBF24;--amber2:rgba(251,191,36,0.12)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:.06}
+.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;line-height:1.6;margin-bottom:48px;max-width:320px}
+.start-meta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:48px}
+.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
+.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer}
+.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
+#deck{width:100%;height:100%;display:flex;flex-direction:column;display:none}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.slide.exit-left{animation:eL .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-right{animation:eR .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.exit-right{animation:xR .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.enter-left{animation:xL .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes eL{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes eR{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes xR{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
+@keyframes xL{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}
+.slide-body::-webkit-scrollbar{display:none}
+.slide-title .slide-body,.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:32px 28px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
+.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:20px}
+.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
+.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
+.sec-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
+.sec-lbl{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.sec-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
+.sec-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
+.clbl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.ch{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:14px}
+.box{border-radius:10px;padding:13px 15px;margin-bottom:11px}
+.box.teal{background:var(--teal3);border-left:3px solid var(--teal)}.box.blue{background:var(--blue2);border-left:3px solid var(--blue)}.box.purple{background:var(--purple2);border-left:3px solid var(--purple)}.box.green{background:var(--green2);border-left:3px solid var(--green)}.box.amber{background:var(--amber2);border-left:3px solid var(--amber)}.box.coral{background:var(--coral2);border-left:3px solid var(--coral)}
+.box-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.box.teal .box-lbl{color:var(--teal)}.box.blue .box-lbl{color:var(--blue)}.box.purple .box-lbl{color:var(--purple)}.box.green .box-lbl{color:var(--green)}.box.amber .box-lbl{color:var(--amber)}.box.coral .box-lbl{color:var(--coral)}
+.box p{font-size:13px;line-height:1.6;margin:0}
+.box.teal p{color:rgba(45,212,191,.9)}.box.blue p{color:rgba(96,165,250,.9)}.box.purple p{color:rgba(167,139,250,.9)}.box.green p{color:rgba(74,222,128,.9)}.box.amber p{color:rgba(251,191,36,.9)}.box.coral p{color:rgba(251,113,133,.9)}
+.blist{display:flex;flex-direction:column;gap:8px;margin-bottom:11px}
+.bi{display:flex;gap:11px;align-items:flex-start}
+.bd{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
+.bt{font-size:13px;color:var(--white2);line-height:1.55}.bt strong{color:var(--white)}
+.exam{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:11px 13px;margin-bottom:11px;display:flex;gap:10px}
+.exam-s{font-size:15px;flex-shrink:0}.exam-t{font-size:12px;color:rgba(240,180,41,.9);line-height:1.6}.exam-t strong{color:var(--gold)}
+.gov-level{background:var(--navy3);border-radius:9px;padding:11px 13px;margin-bottom:8px;border:1px solid rgba(255,255,255,.05)}
+.gov-name{font-size:13px;font-weight:700;color:var(--blue);margin-bottom:4px}
+.gov-desc{font-size:12px;color:var(--slate);line-height:1.5}
+.board-card{background:var(--navy3);border-radius:9px;padding:11px 13px;margin-bottom:8px;border:1px solid rgba(255,255,255,.05)}
+.board-role{font-size:12px;font-weight:700;color:var(--purple);margin-bottom:4px;text-transform:uppercase;letter-spacing:.4px}
+.board-desc{font-size:12px;color:var(--slate);line-height:1.5}
+.contract-row{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;background:var(--navy3);border-radius:7px;margin-bottom:6px;border:1px solid rgba(255,255,255,.04)}
+.cr-icon{font-size:14px;flex-shrink:0;margin-top:1px}
+.cr-text{font-size:12px;color:var(--slate);line-height:1.45}
+.cr-text strong{color:var(--white2)}
+.compare-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:11px}
+.compare-box{background:var(--navy3);border-radius:9px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
+.compare-hd{padding:9px 12px;font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.compare-hd.a{background:var(--teal3);color:var(--teal)}.compare-hd.b{background:var(--blue2);color:var(--blue)}
+.compare-body{padding:9px 12px;font-size:11px;color:var(--slate);line-height:1.5}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.sc{background:var(--navy3);border-radius:9px;padding:11px;border:1px solid rgba(255,255,255,.06)}
+.sn{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px;letter-spacing:1px}
+.st{font-size:11px;color:var(--white2);line-height:1.5}.st strong{color:var(--white)}
+#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
+#progress-fill{height:100%;background:var(--teal);transition:width .4s}
+#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
+.cbtn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--white2)}
+.cbtn svg{width:16px;height:16px}.cbtn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}.cbtn.primary svg{width:18px;height:18px}.cbtn:disabled{opacity:.3;cursor:not-allowed}
+.sc-ctr{flex:1;text-align:center;font-size:12px;color:var(--slate2)}.sc-ctr strong{color:var(--slate)}
+.vs{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
+.vd{display:flex;gap:3px;align-items:center}.vdot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vdA 1.2s infinite}
+.vdot:nth-child(2){animation-delay:.2s}.vdot:nth-child(3){animation-delay:.4s}
+@keyframes vdA{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
+.spdbtn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
+.shint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+</style>
+</head>
+<body>
+<div id="start-overlay">
+  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="200" cy="80" r="200" fill="#60A5FA"/><circle cx="350" cy="500" r="150" fill="#A78BFA"/><circle cx="50" cy="600" r="80" fill="#2DD4BF"/></svg>
+  <div class="start-logo">TOGAF Foundation · Day 16</div>
+  <div class="start-title">Architecture Governance</div>
+  <p class="start-sub">20 slides with voiceover narration. Week 4 finale. ~30 minutes.</p>
+  <div class="start-meta"><span class="start-pill">📊 20 slides</span><span class="start-pill">🎙 Narrated</span><span class="start-pill">🏁 Week 4</span></div>
+  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Presentation</button>
+  <p class="start-note">Tap Start to enable voice · Swipe or use controls</p>
+</div>
+<div id="deck">
+  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
+  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
+  <div style="padding:2px 16px 0"><div class="vs" id="vs"></div><div class="shint">swipe left/right to navigate</div></div>
+  <div id="controls">
+    <button class="cbtn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+    <button class="cbtn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
+    <button class="cbtn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+    <div class="sc-ctr"><strong id="snum">1</strong> / <span id="stotal">20</span></div>
+    <button class="spdbtn" id="spdbtn" onclick="cycleSpeed()">1×</button>
+    <button class="cbtn" id="btn-done" onclick="markDone()" title="Mark done"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+  </div>
+</div>
+<script>
+const SLIDES=[
+{type:"title",bg:"navy",
+html:`<div class="eyebrow">TOGAF Foundation · Day 16 of 20</div><h1 class="title-h">Architecture Governance</h1><div class="title-rule"></div><p class="title-sub">The structures, authorities, contracts, and processes that keep architecture decisions binding — from board composition to compliance frameworks.</p><div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">🏁 Week 4 finale</span></div>`,
+voice:`Welcome to Day 16 — Thursday of Week 4, and the final session of Week 4. Today is Architecture Governance — the mechanisms that ensure architecture decisions actually stick. Understanding governance is essential for the exam because it ties together the Architecture Board, Architecture Contracts, the Compliance framework, and the distinction between IT governance and architecture governance. Let's close out Week 4.`},
+
+{type:"section",bg:"blue",
+html:`<div class="sec-num">01</div><div class="sec-lbl">Section One</div><h2 class="sec-h">Governance Definition &amp; Levels</h2><p class="sec-desc">What architecture governance is and the hierarchy of governance levels it operates within.</p>`,
+voice:`Section one: governance definition and levels. Governance is one of those terms that means different things in different contexts — TOGAF is precise about it.`},
+
+{type:"content",
+html:`<div class="clbl">What governance means</div><h2 class="ch">Governance in TOGAF</h2>
+<div class="box blue"><div class="box-lbl">Definition</div><p>Architecture Governance is the <strong>practice and orientation by which enterprise architectures and other architectures are managed and controlled</strong>. It ensures architectural decisions are made consistently, are formally recorded, and are enforced across the enterprise.</p></div>
+<div class="gov-level"><div class="gov-name">Corporate Governance</div><div class="gov-desc">The highest level — board-level oversight of the entire organisation. Sets the strategic direction, risk appetite, and accountability structures within which all other governance operates.</div></div>
+<div class="gov-level"><div class="gov-name">Technology Governance</div><div class="gov-desc">Governs how technology is acquired, deployed, and managed. Includes IT governance frameworks like COBIT. Ensures technology investments align with corporate strategy.</div></div>
+<div class="gov-level"><div class="gov-name">IT Governance</div><div class="gov-desc">Operationalises technology governance — covering IT service management, project governance, vendor management, and security compliance across the IT function.</div></div>
+<div class="gov-level"><div class="gov-name">Architecture Governance</div><div class="gov-desc">The most specific level for TOGAF — governing how architectural decisions are made, recorded, and enforced. Operates within and supports the three higher levels.</div></div>
+<div class="exam"><div class="exam-s">⭐</div><div class="exam-t">The hierarchy is: <strong>Corporate → Technology → IT → Architecture</strong>. Architecture governance is at the bottom — the most specific — but it supports and is accountable to all levels above it.</div></div>`,
+voice:`TOGAF defines architecture governance as the practice and orientation by which enterprise architectures are managed and controlled. Governance in TOGAF operates within a four-level hierarchy. Corporate Governance at the top — board-level oversight, strategic direction, risk appetite. Technology Governance — how technology is acquired and deployed, aligned with corporate strategy. IT Governance — operationalises technology governance across IT service management, projects, vendors, and security. And Architecture Governance at the bottom — the most specific level, governing how architectural decisions are made, recorded, and enforced. The exam hierarchy to remember: Corporate, Technology, IT, Architecture — from broadest to most specific. Architecture governance operates within and supports all three levels above it.`},
+
+{type:"section",bg:"purple",
+html:`<div class="sec-num">02</div><div class="sec-lbl">Section Two</div><h2 class="sec-h">Architecture Board: Composition &amp; Responsibilities</h2><p class="sec-desc">Who sits on the Architecture Board and what it is actually responsible for.</p>`,
+voice:`Section two: the Architecture Board. The Board is the heart of architecture governance — understanding its composition and responsibilities is essential for the exam.`},
+
+{type:"content",
+html:`<div class="clbl">The governance body</div><h2 class="ch">Architecture Board</h2>
+<div class="box purple"><div class="box-lbl">What it is</div><p>The Architecture Board is the <strong>cross-functional governance body</strong> responsible for reviewing and maintaining the overall direction and management of all enterprise architectures. It is the primary authority for all architectural decisions in the enterprise.</p></div>
+<div class="board-card"><div class="board-role">Typical Members</div><div class="board-desc">Chief Architect (usually chairs) · Domain architects (Business, Data, Application, Technology) · Architecture Sponsor (CIO/CTO or delegate) · Business unit representatives · External advisors where relevant. May be enterprise-wide or specific to a domain or programme.</div></div>
+<div class="board-card"><div class="board-role">Core Responsibilities</div><div class="board-desc">Approve and maintain Architecture Principles · Review and approve Target Architecture documents · Manage Architecture Contracts · Conduct architecture compliance reviews · Grant or refuse dispensations · Resolve architecture conflicts between projects · Escalate governance breaches to senior leadership · Maintain the Governance Log</div></div>
+<div class="board-card"><div class="board-role">What the Board is NOT</div><div class="board-desc">Not a design team — the Board reviews and approves, it doesn't design architectures. Not a project steering committee — that's separate. Not a rubber stamp — the Board has real authority to reject non-conforming work.</div></div>
+<div class="exam"><div class="exam-s">⭐</div><div class="exam-t">The Architecture Board has <strong>real governance authority</strong> — it can reject work, require changes, and grant or refuse dispensations. It is not advisory. Its decisions are binding within the scope of the Architecture Contract.</div></div>`,
+voice:`The Architecture Board is the cross-functional governance body responsible for reviewing and maintaining all enterprise architectures. Typical membership includes the Chief Architect who usually chairs, domain architects for Business, Data, Application, and Technology, the Architecture Sponsor as the CIO or delegate, business unit representatives, and external advisors where relevant. Core responsibilities: approve and maintain Architecture Principles, review and approve Target Architecture documents, manage Architecture Contracts, conduct compliance reviews, grant or refuse dispensations, resolve architecture conflicts between projects, escalate governance breaches, and maintain the Governance Log. Three things the Board is NOT: not a design team — it reviews and approves, it doesn't design. Not a project steering committee. And not a rubber stamp — it has real authority to reject non-conforming work. Exam tip: the Board has real governance authority. Its decisions are binding within the scope of the Architecture Contract.`},
+
+{type:"section",bg:"amber",
+html:`<div class="sec-num">03</div><div class="sec-lbl">Section Three</div><h2 class="sec-h">Architecture Contracts: Purpose &amp; Content</h2><p class="sec-desc">The formal agreement that gives the Architecture Board its authority over implementation.</p>`,
+voice:`Section three: Architecture Contracts. We covered these briefly in Phase G — here we go deeper on what they contain and why they matter.`},
+
+{type:"content",
+html:`<div class="clbl">The governance anchor</div><h2 class="ch">Architecture Contracts</h2>
+<div class="box amber"><div class="box-lbl">Definition</div><p>An Architecture Contract is a <strong>joint agreement between development partners and sponsors</strong> on the deliverables, quality, and fitness-for-purpose of an architecture. It gives the Architecture Board formal authority to require conformance.</p></div>
+<div class="contract-row"><div class="cr-icon">📋</div><div class="cr-text"><strong>Architectural statement</strong> — what architecture will be implemented; which Target Architecture applies.</div></div>
+<div class="contract-row"><div class="cr-icon">✅</div><div class="cr-text"><strong>Conformance requirements</strong> — specific standards, principles, and architecture elements the implementation must comply with.</div></div>
+<div class="contract-row"><div class="cr-icon">📏</div><div class="cr-text"><strong>Service levels and quality criteria</strong> — performance, availability, security, and usability requirements the solution must meet.</div></div>
+<div class="contract-row"><div class="cr-icon">⚠️</div><div class="cr-text"><strong>Dispensations already granted</strong> — any approved deviations from conformance requirements, with conditions attached.</div></div>
+<div class="contract-row"><div class="cr-icon">🔄</div><div class="cr-text"><strong>Change control procedures</strong> — how new dispensations are requested; how the contract itself is amended.</div></div>
+<div class="contract-row"><div class="cr-icon">👁</div><div class="cr-text"><strong>Governance procedures</strong> — review schedule, milestone gates, reporting requirements, and escalation path.</div></div>
+<div class="exam"><div class="exam-s">⭐</div><div class="exam-t">Contracts are <strong>drafted in Phase F</strong>, finalised and signed in <strong>Phase G</strong>. Two types: <strong>Design Contracts</strong> (governing architecture work) and <strong>Business and IT Interface Contracts</strong> (governing IT delivery to the business).</div></div>`,
+voice:`Architecture Contracts are formal joint agreements between development partners and sponsors. Six key contents to know. The architectural statement: what architecture will be implemented. Conformance requirements: specific standards and principles the implementation must meet. Service levels and quality criteria: performance, security, availability requirements. Dispensations already granted: approved deviations with conditions. Change control procedures: how new dispensations are requested and how the contract is amended. And governance procedures: the review schedule, milestone gates, and escalation path. Two exam points. Contracts are drafted in Phase F and finalised in Phase G. And there are two types: Design Contracts governing architecture work, and Business and IT Interface Contracts governing IT delivery to the business.`},
+
+{type:"section",bg:"teal",
+html:`<div class="sec-num">04</div><div class="sec-lbl">Section Four</div><h2 class="sec-h">Compliance vs Conformance Revisited</h2><p class="sec-desc">The precise TOGAF distinction between these two closely related terms.</p>`,
+voice:`Section four: compliance versus conformance. This distinction appeared in Phase G — here we nail it down precisely because the exam tests it directly.`},
+
+{type:"content",
+html:`<div class="clbl">Two related but distinct concepts</div><h2 class="ch">Compliance vs Conformance</h2>
+<div class="compare-grid">
+  <div class="compare-box"><div class="compare-hd a">Conformance</div><div class="compare-body"><strong style="color:var(--white2)">Question asked:</strong> Does this match the approved architecture?<br><br><strong style="color:var(--white2)">Scope:</strong> Architectural designs and decisions<br><br><strong style="color:var(--white2)">Assessed by:</strong> Architecture Board<br><br><strong style="color:var(--white2)">Focus:</strong> Is this building what the architecture specified?</div></div>
+  <div class="compare-box"><div class="compare-hd b">Compliance</div><div class="compare-body"><strong style="color:var(--white2)">Question asked:</strong> Does this meet all applicable standards?<br><br><strong style="color:var(--white2)">Scope:</strong> Standards, regulations, contracts, principles<br><br><strong style="color:var(--white2)">Assessed by:</strong> Board + governance functions<br><br><strong style="color:var(--white2)">Focus:</strong> Is this meeting all required obligations?</div></div>
+</div>
+<div class="blist">
+  <div class="bi"><div class="bd"></div><div class="bt">A non-conforming implementation <strong>cannot be compliant</strong> — conformance is a prerequisite for compliance</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt">A conforming implementation may still be <strong>non-compliant</strong> if it fails to meet regulatory or contractual obligations outside the architecture</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Dispensations</strong> allow a specific non-conformance to proceed — formally approved by the Architecture Board and recorded in the Governance Log</div></div>
+</div>
+<div class="exam"><div class="exam-s">⭐</div><div class="exam-t"><strong>Conformance = matches the architecture. Compliance = meets all standards and obligations.</strong> Conformance is necessary but not sufficient for compliance. A dispensation permits a specific non-conformance — it doesn't change the architecture.</div></div>`,
+voice:`The distinction between compliance and conformance is tested directly on the exam. Conformance asks: does this match the approved architecture? It covers architectural designs and decisions, assessed by the Architecture Board. Compliance asks: does this meet all applicable standards and obligations? It covers standards, regulations, Architecture Contracts, and principles — assessed by the Board plus other governance functions. Three critical relationships. A non-conforming implementation cannot be compliant — conformance is a prerequisite. A conforming implementation may still be non-compliant if it fails regulatory or contractual obligations outside the architecture. And dispensations allow a specific non-conformance to proceed — formally approved by the Architecture Board and recorded in the Governance Log. The exam summary: conformance equals matches the architecture. Compliance equals meets all standards and obligations.`},
+
+{type:"section",bg:"green",
+html:`<div class="sec-num">05</div><div class="sec-lbl">Section Five</div><h2 class="sec-h">IT Governance vs Architecture Governance</h2><p class="sec-desc">How these two governance frameworks relate — and where they differ.</p>`,
+voice:`Section five: IT governance versus architecture governance. These are complementary frameworks — understanding how they differ prevents exam confusion.`},
+
+{type:"content",
+html:`<div class="clbl">Two governance frameworks</div><h2 class="ch">IT Governance vs Architecture Governance</h2>
+<div class="compare-grid">
+  <div class="compare-box"><div class="compare-hd a">IT Governance</div><div class="compare-body">Frameworks: COBIT, ITIL, ISO 38500<br><br>Focus: IT service delivery, risk management, compliance, vendor management, project portfolio<br><br>Scope: How IT operates day-to-day and delivers services<br><br>Authority: IT leadership, IT steering committee</div></div>
+  <div class="compare-box"><div class="compare-hd b">Architecture Governance</div><div class="compare-body">Frameworks: TOGAF, SABSA, Zachman<br><br>Focus: Architecture quality, design decisions, standards conformance, strategic alignment<br><br>Scope: What gets built and how it aligns to the target architecture<br><br>Authority: Architecture Board, Chief Architect</div></div>
+</div>
+<div class="box green"><div class="box-lbl">How they work together</div><p>IT Governance and Architecture Governance are <strong>complementary, not competing</strong>. Architecture Governance ensures the right things are designed. IT Governance ensures those things are built, operated, and managed correctly. A project needs both — architectural conformance approval from the Architecture Board, and IT governance approval from the IT steering committee.</p></div>
+<div class="sg">
+  <div class="sc"><div class="sn">01</div><div class="st"><strong>4 governance levels</strong> — Corporate → Technology → IT → Architecture.</div></div>
+  <div class="sc"><div class="sn">02</div><div class="st"><strong>Architecture Board</strong> — cross-functional, real authority, not advisory.</div></div>
+  <div class="sc"><div class="sn">03</div><div class="st"><strong>Contracts</strong> — drafted Phase F, signed Phase G. Two types.</div></div>
+  <div class="sc"><div class="sn">04</div><div class="st"><strong>Conformance ≠ Compliance</strong> — conformance is necessary but not sufficient.</div></div>
+</div>`,
+voice:`IT governance and architecture governance are complementary frameworks, not competing ones. IT governance — using frameworks like COBIT, ITIL, and ISO 38500 — focuses on IT service delivery, risk management, vendor management, and project portfolio. It governs how IT operates day-to-day. Architecture governance — using TOGAF, SABSA, or Zachman — focuses on architecture quality, design decisions, standards conformance, and strategic alignment. It governs what gets built and how it aligns to the target architecture. They work together: architecture governance ensures the right things are designed. IT governance ensures those things are built, operated, and managed correctly. A project needs both: architectural conformance approval from the Architecture Board, and IT governance approval from the IT steering committee. Week 4 summary: four governance levels from Corporate down to Architecture. Architecture Board has real, binding authority. Contracts drafted in Phase F, signed in Phase G. And conformance is necessary but not sufficient for compliance.`},
+
+{type:"title",bg:"end",
+html:`<div class="eyebrow">Day 16 Complete · Week 4 Done! 🎉</div><h1 class="title-h" style="font-size:clamp(22px,5.5vw,38px)">Governance — done.<br>Week 4 — done!</h1><div class="title-rule"></div><p class="title-sub" style="margin-bottom:24px">Week 5 covers Stakeholder Management, Reference Models (TRM &amp; III-RM), then Full Review and Mock Exam. You're nearly there!</p>
+<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+  <a href="togaf-day16.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Open reading version · Take the quiz</a>
+  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 16 done</button>
+</div>`,
+voice:`Day 16 and Week 4 are complete. You've now covered all the TOGAF structural frameworks: the Content Framework, Enterprise Continuum and Repository, Architecture Capability, and Architecture Governance. Week 5 is the final push — Stakeholder Management and Views, the Reference Models, a full review of all domains, and the Mock Exam. Four sessions standing between you and exam day. Take the Day 16 quiz, then get ready for Week 5. See you Monday.`},
+];
+
+const BG={navy:"var(--navy2)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",amber:"linear-gradient(135deg,#1A1000,#251800)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",green:"linear-gradient(135deg,#0A1A10,#0D2218)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"};
+let cur=0,play=false,spdIdx=1,utt=null,tx=0,anim=false;
+const SPDS=[0.8,1,1.2,1.5];
+const wrap=document.getElementById("slides-wrap");
+document.getElementById("stotal").textContent=SLIDES.length;
+SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="sl"+i;d.style.background=BG[s.bg]||BG.navy;d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
+function goTo(i,dir){if(anim||i<0||i>=SLIDES.length)return;anim=true;stopSp();const f=document.getElementById("sl"+cur),t=document.getElementById("sl"+i);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");anim=false;cur=i;upUI();if(play)spk();},420);}
+function nextSlide(){if(cur<SLIDES.length-1)goTo(cur+1,1);}function prevSlide(){if(cur>0)goTo(cur-1,-1);}
+function upUI(){document.getElementById("snum").textContent=cur+1;document.getElementById("progress-fill").style.width=((cur+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=cur===0;document.getElementById("btn-next").disabled=cur===SLIDES.length-1;}
+function spk(){stopSp();if(!("speechSynthesis"in window))return;const txt=SLIDES[cur].voice;if(!txt){if(play)setTimeout(nextSlide,800);return;}utt=new SpeechSynthesisUtterance(txt);utt.rate=SPDS[spdIdx];utt.lang="en-GB";const vs=speechSynthesis.getVoices();const p=vs.find(v=>v.lang.startsWith("en")&&(v.name.includes("Daniel")||v.name.includes("Samantha")||v.name.includes("Google UK")))||vs.find(v=>v.lang.startsWith("en"))||vs[0];if(p)utt.voice=p;utt.onstart=()=>setSt("speaking");utt.onend=()=>{setSt("");if(play&&cur<SLIDES.length-1)setTimeout(nextSlide,600);else{play=false;upPlay();}};utt.onerror=()=>setSt("");speechSynthesis.speak(utt);}
+function stopSp(){if("speechSynthesis"in window)speechSynthesis.cancel();utt=null;setSt("");}
+function togglePlay(){play=!play;upPlay();if(play)spk();else stopSp();}
+function upPlay(){document.getElementById("play-icon").innerHTML=play?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
+function setSt(s){const el=document.getElementById("vs");el.innerHTML=s==="speaking"?`<div class="vd"><div class="vdot"></div><div class="vdot"></div><div class="vdot"></div></div><span>Narrating…</span>`:(s||"");}
+function cycleSpeed(){spdIdx=(spdIdx+1)%SPDS.length;document.getElementById("spdbtn").textContent=SPDS[spdIdx]+"×";if(play){stopSp();setTimeout(spk,100);}}
+function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[16]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="var(--teal3)";b.style.borderColor="var(--teal)";b.querySelector("svg").style.stroke="var(--teal)";goTo(SLIDES.length-1,1);}
+document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";upUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{play=true;upPlay();spk();},400);}});
+wrap.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
+</script>
+</body>
+</html>

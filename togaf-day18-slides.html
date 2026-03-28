@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 18 Slides — Reference Models: TRM &amp; III-RM</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;--teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);--gold:#F0B429;--gold2:rgba(240,180,41,0.15);--slate:#94A3B8;--slate2:#64748B;--slate3:#334155;--white:#F8FAFC;--white2:#E2E8F0;--coral:#FB7185;--coral2:rgba(251,113,133,0.15);--blue:#60A5FA;--blue2:rgba(96,165,250,0.12);--purple:#A78BFA;--purple2:rgba(167,139,250,0.12);--green:#4ADE80;--green2:rgba(74,222,128,0.12);--amber:#FBBF24;--amber2:rgba(251,191,36,0.12)}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:.06}
+.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;line-height:1.6;margin-bottom:48px;max-width:320px}
+.start-meta{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-bottom:48px}
+.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
+.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer}
+.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
+#deck{width:100%;height:100%;display:flex;flex-direction:column;display:none}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+.slide.active{opacity:1;pointer-events:all}
+.slide.exit-left{animation:eL .4s cubic-bezier(.4,0,.2,1) forwards}.slide.enter-right{animation:eR .4s cubic-bezier(.4,0,.2,1) forwards}
+.slide.exit-right{animation:xR .4s cubic-bezier(.4,0,.2,1) forwards}.slide.enter-left{animation:xL .4s cubic-bezier(.4,0,.2,1) forwards}
+@keyframes eL{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
+@keyframes eR{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
+@keyframes xR{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
+@keyframes xL{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
+.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}.slide-body::-webkit-scrollbar{display:none}
+.slide-title .slide-body,.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:32px 28px}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
+.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
+.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:20px}
+.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
+.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
+.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
+.sec-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
+.sec-lbl{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.sec-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
+.sec-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
+.clbl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.ch{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:14px}
+.box{border-radius:10px;padding:13px 15px;margin-bottom:11px}
+.box.teal{background:var(--teal3);border-left:3px solid var(--teal)}.box.blue{background:var(--blue2);border-left:3px solid var(--blue)}.box.purple{background:var(--purple2);border-left:3px solid var(--purple)}.box.green{background:var(--green2);border-left:3px solid var(--green)}.box.amber{background:var(--amber2);border-left:3px solid var(--amber)}.box.coral{background:var(--coral2);border-left:3px solid var(--coral)}
+.box-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
+.box.teal .box-lbl{color:var(--teal)}.box.blue .box-lbl{color:var(--blue)}.box.purple .box-lbl{color:var(--purple)}.box.green .box-lbl{color:var(--green)}.box.amber .box-lbl{color:var(--amber)}.box.coral .box-lbl{color:var(--coral)}
+.box p{font-size:13px;line-height:1.6;margin:0}
+.box.teal p{color:rgba(45,212,191,.9)}.box.blue p{color:rgba(96,165,250,.9)}.box.purple p{color:rgba(167,139,250,.9)}.box.green p{color:rgba(74,222,128,.9)}.box.amber p{color:rgba(251,191,36,.9)}.box.coral p{color:rgba(251,113,133,.9)}
+.blist{display:flex;flex-direction:column;gap:8px;margin-bottom:11px}
+.bi{display:flex;gap:11px;align-items:flex-start}
+.bd{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
+.bt{font-size:13px;color:var(--white2);line-height:1.55}.bt strong{color:var(--white)}
+.exam{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:11px 13px;margin-bottom:11px;display:flex;gap:10px}
+.exam-s{font-size:15px;flex-shrink:0}.exam-t{font-size:12px;color:rgba(240,180,41,.9);line-height:1.6}.exam-t strong{color:var(--gold)}
+.trm-diagram{border:1px solid rgba(255,255,255,.07);border-radius:10px;overflow:hidden;margin-bottom:11px}
+.trm-top{background:var(--blue2);padding:9px 12px;text-align:center;border-bottom:1px solid rgba(255,255,255,.06)}
+.trm-top-lbl{font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.5px}
+.trm-top-desc{font-size:10px;color:var(--slate);margin-top:2px}
+.trm-mid{background:var(--teal3);padding:9px 12px;text-align:center;border-bottom:1px solid rgba(255,255,255,.06)}
+.trm-mid-lbl{font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px}
+.trm-mid-desc{font-size:10px;color:rgba(45,212,191,.7);margin-top:2px}
+.trm-services{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;padding:7px}
+.trm-svc{background:var(--navy4);border-radius:5px;padding:5px 6px;text-align:center;font-size:9px;font-weight:600;color:var(--slate);line-height:1.3}
+.iiirm-card{background:var(--navy3);border-radius:9px;padding:11px 13px;margin-bottom:8px;border:1px solid rgba(255,255,255,.05)}
+.iiirm-title{font-size:13px;font-weight:700;color:var(--purple);margin-bottom:4px}
+.iiirm-desc{font-size:12px;color:var(--slate);line-height:1.5}
+.continuum-row{display:flex;gap:6px;margin-bottom:11px;overflow-x:auto;padding-bottom:2px}
+.cont-box{flex:1;min-width:70px;border-radius:8px;padding:8px 10px;text-align:center;border:1px solid rgba(255,255,255,.05)}
+.cont-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.cont-desc{font-size:9px;color:var(--slate);line-height:1.3}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
+.sc{background:var(--navy3);border-radius:9px;padding:11px;border:1px solid rgba(255,255,255,.06)}
+.sn{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px;letter-spacing:1px}
+.st{font-size:11px;color:var(--white2);line-height:1.5}.st strong{color:var(--white)}
+#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
+#progress-fill{height:100%;background:var(--teal);transition:width .4s}
+#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
+.cbtn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;color:var(--white2)}
+.cbtn svg{width:16px;height:16px}.cbtn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}.cbtn.primary svg{width:18px;height:18px}.cbtn:disabled{opacity:.3;cursor:not-allowed}
+.sc-ctr{flex:1;text-align:center;font-size:12px;color:var(--slate2)}.sc-ctr strong{color:var(--slate)}
+.vs{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
+.vd{display:flex;gap:3px;align-items:center}.vdot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vdC 1.2s infinite}
+.vdot:nth-child(2){animation-delay:.2s}.vdot:nth-child(3){animation-delay:.4s}
+@keyframes vdC{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
+.spdbtn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
+.shint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+</style>
+</head>
+<body>
+<div id="start-overlay">
+  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="300" cy="150" r="180" fill="#60A5FA"/><circle cx="60" cy="500" r="140" fill="#2DD4BF"/><circle cx="350" cy="600" r="80" fill="#FBBF24"/></svg>
+  <div class="start-logo">TOGAF Foundation · Day 18</div>
+  <div class="start-title">Reference Models: TRM &amp; III-RM</div>
+  <p class="start-sub">20 slides with voiceover. TOGAF's Foundation Architecture reference models. ~30 minutes.</p>
+  <div class="start-meta"><span class="start-pill">📊 20 slides</span><span class="start-pill">🎙 Narrated</span><span class="start-pill">⭐ Week 5</span></div>
+  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Presentation</button>
+  <p class="start-note">Tap Start to enable voice · Swipe or use controls</p>
+</div>
+<div id="deck">
+  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
+  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
+  <div style="padding:2px 16px 0"><div class="vs" id="vs"></div><div class="shint">swipe left/right to navigate</div></div>
+  <div id="controls">
+    <button class="cbtn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
+    <button class="cbtn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
+    <button class="cbtn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
+    <div class="sc-ctr"><strong id="snum">1</strong> / <span id="stotal">20</span></div>
+    <button class="spdbtn" id="spdbtn" onclick="cycleSpeed()">1×</button>
+    <button class="cbtn" id="btn-done" onclick="markDone()" title="Mark done"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+  </div>
+</div>
+<script>
+const SLIDES=[
+{type:"title",bg:"navy",
+html:`<div class="eyebrow">TOGAF Foundation · Day 18 of 20</div><h1 class="title-h">Reference Models:<br>TRM &amp; III-RM</h1><div class="title-rule"></div><p class="title-sub">TOGAF's two Foundation Architecture reference models — the Technical Reference Model and the Integrated Information Infrastructure Reference Model.</p><div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">⭐ Week 5 · Day 2</span></div>`,
+voice:`Welcome to Day 18 — Tuesday of Week 5. Today we cover TOGAF's two built-in reference models: the Technical Reference Model, known as the TRM, and the Integrated Information Infrastructure Reference Model, known as the III-RM. These are Foundation Architectures in the Enterprise Continuum — pre-built reference points that every enterprise can use as a starting point for their own architecture. Understanding both models is key for the TOGAF Foundation exam.`},
+
+{type:"section",bg:"blue",
+html:`<div class="sec-num">01</div><div class="sec-lbl">Section One</div><h2 class="sec-h">Technical Reference Model (TRM) Overview</h2><p class="sec-desc">What the TRM is, where it sits in the Enterprise Continuum, and why it matters.</p>`,
+voice:`Section one: the Technical Reference Model overview. The TRM is TOGAF's most detailed built-in reference architecture.`},
+
+{type:"content",
+html:`<div class="clbl">The foundation model</div><h2 class="ch">Technical Reference Model</h2>
+<div class="box blue"><div class="box-lbl">Definition</div><p>The <strong>Technical Reference Model (TRM)</strong> provides a fundamental taxonomy and set of generic platform service categories for describing an Application Platform. It is a <strong>Foundation Architecture</strong> in the Enterprise Continuum — the most generic, universally applicable starting point for technology architecture.</p></div>
+<div class="blist">
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Foundation Architecture</strong> — sits at the far left of the Enterprise Continuum, applicable to any enterprise, any industry</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Two-layer model</strong> — Application Software (what the business uses) sits on top of an Application Platform (the services that support it)</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Taxonomy</strong> — the TRM provides a standard vocabulary for describing and classifying platform services, enabling consistent communication across teams</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Primary use in Phase D</strong> — architects use the TRM taxonomy when designing or evaluating the Technology Architecture</div></div>
+</div>
+<div class="continuum-row">
+  <div class="cont-box" style="background:var(--blue2)"><div class="cont-lbl" style="color:var(--blue)">Foundation</div><div class="cont-desc">TRM, III-RM — generic, universal</div></div>
+  <div class="cont-box" style="background:var(--teal3)"><div class="cont-lbl" style="color:var(--teal)">Common Systems</div><div class="cont-desc">Reusable patterns across industries</div></div>
+  <div class="cont-box" style="background:var(--purple2)"><div class="cont-lbl" style="color:var(--purple)">Industry</div><div class="cont-desc">Industry-specific architectures</div></div>
+  <div class="cont-box" style="background:var(--amber2)"><div class="cont-lbl" style="color:var(--amber)">Organisation</div><div class="cont-desc">Enterprise-specific architectures</div></div>
+</div>
+<div class="exam"><div class="exam-s">⭐</div><div class="exam-t">The TRM is a <strong>Foundation Architecture</strong> — the most generic level of the Enterprise Continuum. It is used primarily in <strong>Phase D (Technology Architecture)</strong> to describe and classify platform services.</div></div>`,
+voice:`The Technical Reference Model provides a fundamental taxonomy and set of generic platform service categories for describing an Application Platform. Three things to know. First, it's a Foundation Architecture — sitting at the far left of the Enterprise Continuum, applicable to any enterprise in any industry. Second, it's a two-layer model: Application Software — what the business uses — sits on top of an Application Platform — the services that support it. Third, it provides a standard taxonomy — a shared vocabulary for describing and classifying platform services consistently across teams. The TRM sits at the Foundation level of the Enterprise Continuum: Foundation → Common Systems → Industry → Organisation-Specific. And its primary use is in Phase D, when architects design or evaluate the Technology Architecture.`},
+
+{type:"section",bg:"teal",
+html:`<div class="sec-num">02</div><div class="sec-lbl">Section Two</div><h2 class="sec-h">TRM Taxonomy &amp; Application Platform Services</h2><p class="sec-desc">The categories of services that make up the TRM's Application Platform.</p>`,
+voice:`Section two: the TRM taxonomy. This is the detailed classification of platform services — the heart of the TRM.`},
+
+{type:"content",
+html:`<div class="clbl">The platform services</div><h2 class="ch">TRM Application Platform Taxonomy</h2>
+<div class="box teal"><div class="box-lbl">The two layers</div><p>The TRM's <strong>Application Software</strong> layer is where business applications sit — the ERP, CRM, analytics, and custom applications. The <strong>Application Platform</strong> beneath it provides the infrastructure services that all applications use — communication, data, security, and operating environment.</p></div>
+<div class="trm-diagram">
+  <div class="trm-top"><div class="trm-top-lbl">Application Software</div><div class="trm-top-desc">Business applications, ERP, CRM, analytics, custom apps</div></div>
+  <div class="trm-mid"><div class="trm-mid-lbl">Application Platform Interface (API)</div><div class="trm-mid-desc">The boundary between applications and platform services</div></div>
+  <div class="trm-services">
+    <div class="trm-svc">Data Interchange</div>
+    <div class="trm-svc">Data Management</div>
+    <div class="trm-svc">Data Interchange</div>
+    <div class="trm-svc">Security</div>
+    <div class="trm-svc">OS Services</div>
+    <div class="trm-svc">Network Services</div>
+    <div class="trm-svc">Location &amp; Directory</div>
+    <div class="trm-svc">Transaction Processing</div>
+    <div class="trm-svc">User Interface</div>
+  </div>
+</div>
+<div class="blist">
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Data Interchange services</strong> — data exchange, messaging, EDI between applications</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Data Management services</strong> — database management, data warehouse, file access</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Security services</strong> — identity management, access control, encryption, audit</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Network services</strong> — communications protocols, remote access, bandwidth management</div></div>
+  <div class="bi"><div class="bd"></div><div class="bt"><strong>Location and Directory services</strong> — naming, directory services, geographic services</div></div>
+</div>
+<div class="exam"><div class="exam-s">⭐</div><div class="exam-t">Know the <strong>two TRM layers</strong>: Application Software (top) and Application Platform (bottom). The Application Platform Interface separates them. Key service categories: Data Interchange, Data Management, Security, Network, OS, Location/Directory.</div></div>`,
+voice:`The TRM has two layers separated by the Application Platform Interface. Above the API sits the Application Software layer — business applications, ERP, CRM, analytics, and custom applications. Below the API is the Application Platform — the infrastructure services all applications consume. The key platform service categories to know: Data Interchange services for data exchange, messaging, and EDI between applications. Data Management services for database management, data warehouse, and file access. Security services for identity management, access control, encryption, and audit. Network services for communications protocols and remote access. Operating system services for process management and memory. Location and directory services for naming and geographic services. And transaction processing and user interface services. For the exam: know the two layers — Application Software on top, Application Platform below, separated by the Application Platform Interface.`},
+
+{type:"section",bg:"purple",
+html:`<div class="sec-num">03</div><div class="sec-lbl">Section Three</div><h2 class="sec-h">Integrated Information Infrastructure Reference Model</h2><p class="sec-desc">The III-RM — TOGAF's second Foundation Architecture for networked, distributed environments.</p>`,
+voice:`Section three: the III-RM. Where the TRM describes a single platform, the III-RM addresses how multiple systems communicate across an enterprise and beyond.`},
+
+{type:"content",
+html:`<div class="clbl">The second reference model</div><h2 class="ch">III-RM</h2>
+<div class="box purple"><div class="box-lbl">Definition</div><p>The <strong>Integrated Information Infrastructure Reference Model (III-RM)</strong> is a Foundation Architecture that addresses the <strong>seamless flow of information</strong> across heterogeneous systems and organisations. It extends the TRM to the distributed, networked enterprise.</p></div>
+<div class="iiirm-card"><div class="iiirm-title">Origins and purpose</div><div class="iiirm-desc">The III-RM originated from the Open Group's work on open distributed processing. Its primary purpose is to enable different systems, from different vendors, in different organisations, to share information without barriers — the concept of "boundaryless information flow."</div></div>
+<div class="iiirm-card"><div class="iiirm-title">Three functional areas</div><div class="iiirm-desc"><strong style="color:var(--white2)">Brokerage services</strong> — find and connect information providers to consumers. Includes directories, traders, and registration services. <strong style="color:var(--white2)">Connectivity services</strong> — the communication infrastructure enabling systems to interoperate. <strong style="color:var(--white2)">Application platform services</strong> — extends the TRM platform services to the distributed context.</div></div>
+<div class="iiirm-card"><div class="iiirm-title">Relationship to TRM</div><div class="iiirm-desc">The III-RM builds on the TRM — it uses TRM's Application Platform Services as a foundation and extends them for distributed, multi-vendor, cross-enterprise information sharing. Both are Foundation Architectures in the Enterprise Continuum.</div></div>
+<div class="exam"><div class="exam-s">⭐</div><div class="exam-t">III-RM = distributed information sharing across heterogeneous systems. <strong>TRM = single platform services. III-RM = cross-enterprise information flow.</strong> Both are Foundation Architectures. III-RM extends and builds on TRM.</div></div>`,
+voice:`The III-RM — Integrated Information Infrastructure Reference Model — is the second Foundation Architecture in the Enterprise Continuum. Where the TRM describes the services within a single Application Platform, the III-RM addresses how information flows across multiple platforms, vendors, and organisations. It has three functional areas. Brokerage services: finding and connecting information providers to consumers — directories, traders, registration services. Connectivity services: the communication infrastructure enabling systems to interoperate. And Application Platform services: extending the TRM services to the distributed context. The relationship between them: the III-RM builds on the TRM, using TRM's Application Platform Services as its foundation and extending them for cross-enterprise information sharing. Exam shortcut: TRM equals single platform services. III-RM equals cross-enterprise distributed information flow. III-RM extends TRM. Both are Foundation Architectures.`},
+
+{type:"section",bg:"amber",
+html:`<div class="sec-num">04</div><div class="sec-lbl">Section Four</div><h2 class="sec-h">Boundaryless Information Flow</h2><p class="sec-desc">The key concept underpinning the III-RM — and why it matters for enterprise architecture.</p>`,
+voice:`Section four: boundaryless information flow. This is the conceptual goal that the III-RM is designed to achieve.`},
+
+{type:"content",
+html:`<div class="clbl">The core concept</div><h2 class="ch">Boundaryless Information Flow</h2>
+<div class="box amber"><div class="box-lbl">Definition</div><p><strong>Boundaryless information flow</strong> is the Open Group's vision for the ideal information environment: any person can access any information they are entitled to, from any application, at any time, using any device — regardless of the underlying technology or organisational boundary.</p></div>
+<div class="blist">
+  <div class="bi"><div class="bd" style="background:var(--amber)"></div><div class="bt"><strong>Any person</strong> — people, automated processes, and systems acting as consumers of information</div></div>
+  <div class="bi"><div class="bd" style="background:var(--amber)"></div><div class="bt"><strong>Authorised access</strong> — "entitled to" means security and privacy are built in — boundaryless doesn't mean unsecured</div></div>
+  <div class="bi"><div class="bd" style="background:var(--amber)"></div><div class="bt"><strong>Any application</strong> — information is not locked in silos; it flows freely across application boundaries</div></div>
+  <div class="bi"><div class="bd" style="background:var(--amber)"></div><div class="bt"><strong>Any time</strong> — real-time or near-real-time availability, not constrained by batch processes or business hours</div></div>
+  <div class="bi"><div class="bd" style="background:var(--amber)"></div><div class="bt"><strong>Any device</strong> — device-independent access, from desktop to mobile to embedded systems</div></div>
+</div>
+<div class="box teal"><div class="box-lbl">Why it matters for architecture</div><p>Boundaryless information flow is the <strong>aspirational target state</strong> for enterprise information architecture. Every integration decision, data architecture choice, and technology platform selection should be evaluated against this goal. It explains why the III-RM focuses on open standards, interoperability, and broker-mediated access.</p></div>
+<div class="exam"><div class="exam-s">⭐</div><div class="exam-t"><strong>Boundaryless information flow</strong> is the Open Group's vision — and the conceptual foundation of the III-RM. It means authorised access to any information, from anywhere, at any time, on any device. Security is implicit — "authorised" means it's not uncontrolled.</div></div>`,
+voice:`Boundaryless information flow is the Open Group's vision for the ideal information environment — and the conceptual foundation of the III-RM. It has five dimensions. Any person — or automated process or system acting as a consumer of information. Authorised access — "entitled to" is critical here. Boundaryless doesn't mean unsecured — security and privacy are built in. Any application — information isn't locked in silos; it flows freely across application boundaries. Any time — real-time or near-real-time, not constrained by batch processes. And any device — device-independent access from desktop to mobile to embedded systems. This is the aspirational target state for enterprise information architecture. Every integration decision, data architecture choice, and technology selection should be evaluated against this goal. The exam key: boundaryless information flow means authorised, any-time, any-device access to any information. Security is implicit — it's not unlimited access.`},
+
+{type:"section",bg:"green",
+html:`<div class="sec-num">05</div><div class="sec-lbl">Section Five</div><h2 class="sec-h">Using Reference Models in Phase D</h2><p class="sec-desc">How architects practically apply the TRM and III-RM when designing Technology Architecture.</p>`,
+voice:`Section five: using reference models in Phase D. Knowing the models is one thing — knowing how to apply them is what the exam tests.`},
+
+{type:"content",
+html:`<div class="clbl">Practical application</div><h2 class="ch">Applying TRM and III-RM in Phase D</h2>
+<div class="box green"><div class="box-lbl">The application pattern</div><p>In Phase D, architects use the TRM as a <strong>taxonomy and checklist</strong> — systematically working through the Application Platform service categories to ensure the Technology Architecture covers all required services. The III-RM guides decisions about <strong>cross-system integration and information exchange</strong>.</p></div>
+<div class="blist">
+  <div class="bi"><div class="bd" style="background:var(--green)"></div><div class="bt"><strong>Step 1:</strong> Use TRM service categories as a structured checklist — have we addressed Data Management? Security? Network services? Each category prompts analysis of what services are needed.</div></div>
+  <div class="bi"><div class="bd" style="background:var(--green)"></div><div class="bt"><strong>Step 2:</strong> Use III-RM to assess cross-system integration requirements — how will systems exchange information? What brokerage and connectivity services are needed?</div></div>
+  <div class="bi"><div class="bd" style="background:var(--green)"></div><div class="bt"><strong>Step 3:</strong> Map existing technology to TRM categories — identifying gaps where services are missing or duplicated (technology rationalisation)</div></div>
+  <div class="bi"><div class="bd" style="background:var(--green)"></div><div class="bt"><strong>Step 4:</strong> Select or recommend technologies that satisfy the required platform services — using the taxonomy as an evaluation framework</div></div>
+</div>
+<div class="sg">
+  <div class="sc"><div class="sn">01</div><div class="st"><strong>TRM</strong> — two layers, Foundation Architecture, taxonomy for Phase D platform design.</div></div>
+  <div class="sc"><div class="sn">02</div><div class="st"><strong>III-RM</strong> — distributed cross-enterprise flow, extends TRM, three functional areas.</div></div>
+  <div class="sc"><div class="sn">03</div><div class="st"><strong>Boundaryless flow</strong> — authorised, any-time, any-device, any-application access.</div></div>
+  <div class="sc"><div class="sn">04</div><div class="st"><strong>Used in Phase D</strong> — TRM as checklist, III-RM for integration architecture.</div></div>
+</div>`,
+voice:`In Phase D, architects use the TRM as a taxonomy and systematic checklist. Step one: work through TRM service categories to ensure the Technology Architecture covers all required services. Have we addressed Data Management? Security? Network services? Each category prompts structured analysis. Step two: use the III-RM to assess cross-system integration — how will systems exchange information? What brokerage and connectivity services are needed to support boundaryless information flow? Step three: map existing technology to TRM categories, identifying gaps where services are missing or duplicated — this is technology rationalisation. Step four: select or recommend technologies that satisfy the required platform services, using the TRM taxonomy as the evaluation framework. Session summary: TRM has two layers and is a Foundation Architecture used as a taxonomy checklist in Phase D. The III-RM addresses distributed cross-enterprise information flow, extends the TRM, and has three functional areas: brokerage, connectivity, and application platform services. Boundaryless information flow is the conceptual goal. And both models are applied in Phase D.`},
+
+{type:"title",bg:"end",
+html:`<div class="eyebrow">Day 18 Complete</div><h1 class="title-h" style="font-size:clamp(22px,5.5vw,38px)">TRM &amp; III-RM — done.</h1><div class="title-rule"></div><p class="title-sub" style="margin-bottom:24px">Next: <strong>Day 19 — Full Review</strong>. A comprehensive recap of all domains — ADM phases, Content Framework, Enterprise Continuum, Governance, and the most common exam traps.</p>
+<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
+  <a href="togaf-day18.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Open reading version · Take the quiz</a>
+  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 18 done</button>
+</div>`,
+voice:`Day 18 complete. The TRM and III-RM are TOGAF's two built-in Foundation Architectures. The TRM provides a two-layer model and a taxonomy of platform services for Phase D. The III-RM extends it for distributed cross-enterprise information flow, built around the concept of boundaryless information flow. Together they give enterprise architects a proven starting point for technology architecture without building from scratch. Take the quiz. Day 19 is the Full Review — all domains, all key distinctions, all common exam traps. See you there.`},
+];
+
+const BG={navy:"var(--navy2)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",amber:"linear-gradient(135deg,#1A1000,#251800)",green:"linear-gradient(135deg,#0A1A10,#0D2218)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"};
+let cur=0,play=false,spdIdx=1,utt=null,tx=0,anim=false;
+const SPDS=[0.8,1,1.2,1.5];
+const wrap=document.getElementById("slides-wrap");
+document.getElementById("stotal").textContent=SLIDES.length;
+SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="sl"+i;d.style.background=BG[s.bg]||BG.navy;d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
+function goTo(i,dir){if(anim||i<0||i>=SLIDES.length)return;anim=true;stopSp();const f=document.getElementById("sl"+cur),t=document.getElementById("sl"+i);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");anim=false;cur=i;upUI();if(play)spk();},420);}
+function nextSlide(){if(cur<SLIDES.length-1)goTo(cur+1,1);}function prevSlide(){if(cur>0)goTo(cur-1,-1);}
+function upUI(){document.getElementById("snum").textContent=cur+1;document.getElementById("progress-fill").style.width=((cur+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=cur===0;document.getElementById("btn-next").disabled=cur===SLIDES.length-1;}
+function spk(){stopSp();if(!("speechSynthesis"in window))return;const txt=SLIDES[cur].voice;if(!txt){if(play)setTimeout(nextSlide,800);return;}utt=new SpeechSynthesisUtterance(txt);utt.rate=SPDS[spdIdx];utt.lang="en-GB";const vs=speechSynthesis.getVoices();const p=vs.find(v=>v.lang.startsWith("en")&&(v.name.includes("Daniel")||v.name.includes("Samantha")||v.name.includes("Google UK")))||vs.find(v=>v.lang.startsWith("en"))||vs[0];if(p)utt.voice=p;utt.onstart=()=>setSt("speaking");utt.onend=()=>{setSt("");if(play&&cur<SLIDES.length-1)setTimeout(nextSlide,600);else{play=false;upPlay();}};utt.onerror=()=>setSt("");speechSynthesis.speak(utt);}
+function stopSp(){if("speechSynthesis"in window)speechSynthesis.cancel();utt=null;setSt("");}
+function togglePlay(){play=!play;upPlay();if(play)spk();else stopSp();}
+function upPlay(){document.getElementById("play-icon").innerHTML=play?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
+function setSt(s){const el=document.getElementById("vs");el.innerHTML=s==="speaking"?`<div class="vd"><div class="vdot"></div><div class="vdot"></div><div class="vdot"></div></div><span>Narrating…</span>`:(s||"");}
+function cycleSpeed(){spdIdx=(spdIdx+1)%SPDS.length;document.getElementById("spdbtn").textContent=SPDS[spdIdx]+"×";if(play){stopSp();setTimeout(spk,100);}}
+function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[18]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="var(--teal3)";b.style.borderColor="var(--teal)";b.querySelector("svg").style.stroke="var(--teal)";goTo(SLIDES.length-1,1);}
+document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";upUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{play=true;upPlay();spk();},400);}});
+wrap.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
+document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
+</script>
+</body>
+</html>

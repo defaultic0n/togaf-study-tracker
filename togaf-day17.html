@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Day 17 — Stakeholder Management &amp; Views</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}:root{--bg:#FAFAF7;--ink:#1A1A18;--ink2:#4A4A42;--ink3:#8A8A80;--teal:#0D6E5E;--teal-light:#E6F4F1;--teal-mid:#1A9B86;--amber:#92530A;--amber-light:#FDF3E3;--blue:#1A4A7A;--blue-light:#E8F0F8;--purple:#4A2A7A;--purple-light:#F0EAF8;--green:#1A5A2A;--green-light:#E8F4E8;--rule:#E0DFD8;--surface:#FFFFFF;--reading-max:680px}
+html{background:var(--bg);scroll-behavior:smooth}body{font-family:'Source Sans 3',sans-serif;color:var(--ink);font-size:17px;line-height:1.75;background:var(--bg)}
+#progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--teal-mid);width:0%;z-index:100}
+.top-nav{position:sticky;top:0;z-index:50;background:rgba(250,250,247,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--rule);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nav-left{display:flex;flex-direction:column}.nav-day{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3)}.nav-title{font-size:13px;font-weight:500;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.nav-right{display:flex;align-items:center;gap:8px}.timer-badge{background:var(--teal-light);color:var(--teal);font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px}
+.done-btn{background:var(--teal);color:#fff;font-size:12px;font-weight:600;padding:6px 14px;border-radius:6px;border:none;cursor:pointer}.done-btn.completed{background:#2EAA8A}
+.hero{padding:40px 20px 32px;max-width:var(--reading-max);margin:0 auto}
+.hero-label{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
+.hero-title{font-family:'Lora',serif;font-size:clamp(26px,5vw,36px);line-height:1.2;color:var(--ink);margin-bottom:16px}
+.hero-meta{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}.meta-pill{font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--rule);color:var(--ink3)}
+.hero-intro{font-size:18px;line-height:1.7;color:var(--ink2);font-weight:300;border-left:3px solid var(--teal-mid);padding-left:16px}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin:0 20px 32px;max-width:calc(var(--reading-max) - 40px);margin-left:auto;margin-right:auto}
+.toc-label{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--ink3);margin-bottom:12px}
+.toc-list{list-style:none}.toc-list li{padding:5px 0;border-bottom:1px solid var(--rule)}.toc-list li:last-child{border-bottom:none}
+.toc-list a{text-decoration:none;color:var(--ink2);font-size:14px;display:flex;align-items:center;gap:8px}.toc-list a:hover{color:var(--teal)}.toc-num{font-size:11px;color:var(--ink3);font-weight:600;min-width:20px}
+.article{max-width:var(--reading-max);margin:0 auto;padding:0 20px 60px}
+.section{margin-bottom:48px}.section-header{display:flex;align-items:center;gap:12px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--rule)}
+.section-num{font-family:'Lora',serif;font-size:28px;color:var(--rule);font-weight:400;line-height:1;flex-shrink:0}
+.section-title{font-family:'Lora',serif;font-size:22px;color:var(--ink);line-height:1.2}
+p{margin-bottom:16px;color:var(--ink2)}p strong{color:var(--ink)}
+.hl{border-radius:10px;padding:16px 18px;margin:20px 0}
+.hl.teal{background:var(--teal-light);border-left:3px solid var(--teal-mid)}.hl.amber{background:var(--amber-light);border-left:3px solid #D4860E}.hl.blue{background:var(--blue-light);border-left:3px solid #2A6DB5}.hl.purple{background:var(--purple-light);border-left:3px solid #7A4ABF}.hl.green{background:var(--green-light);border-left:3px solid #2A7A3A}
+.hl-lbl{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:6px}
+.hl.teal .hl-lbl{color:var(--teal)}.hl.amber .hl-lbl{color:var(--amber)}.hl.blue .hl-lbl{color:var(--blue)}.hl.purple .hl-lbl{color:var(--purple)}.hl.green .hl-lbl{color:var(--green)}
+.hl p{margin-bottom:0;font-size:15px;line-height:1.65}
+.hl.teal p{color:var(--teal)}.hl.amber p{color:var(--amber)}.hl.blue p{color:var(--blue)}.hl.purple p{color:var(--purple)}.hl.green p{color:var(--green)}
+.def-grid{display:grid;gap:10px;margin:20px 0}.def-item{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px}
+.def-term{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:4px}.def-text{font-size:14px;color:var(--ink2);line-height:1.6;margin:0}
+.chain-steps{display:flex;flex-direction:column;gap:0;margin:20px 0;border-radius:10px;overflow:hidden;border:1px solid var(--rule)}
+.chain-step{padding:11px 14px;border-bottom:1px solid var(--rule);display:flex;gap:12px;align-items:flex-start}
+.chain-step:last-child{border-bottom:none}
+.chain-badge{font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;flex-shrink:0;white-space:nowrap;margin-top:2px}
+.chain-name{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}.chain-desc{font-size:13px;color:var(--ink2);line-height:1.5}
+.exam-tip{background:linear-gradient(135deg,#FFFAED,#FEF5D8);border:1px solid #F0D070;border-radius:10px;padding:14px 16px;margin:20px 0}
+.exam-tip-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:#92700A;margin-bottom:6px}
+.exam-tip p{font-size:14px;color:#6A4E0A;margin:0;line-height:1.6}
+.sum-grid{display:grid;gap:10px;margin-top:32px}
+.sum-card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:14px 16px;display:flex;gap:10px;align-items:flex-start}
+.sum-icon{font-size:18px;flex-shrink:0}.sum-head{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:2px}.sum-body{font-size:13px;color:var(--ink2);line-height:1.55;margin:0}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+.quiz-section{background:var(--surface);border:1px solid var(--rule);border-radius:12px;padding:20px;margin-top:48px}
+.quiz-title{font-family:'Lora',serif;font-size:18px;color:var(--ink);margin-bottom:4px}.quiz-sub{font-size:13px;color:var(--ink3);margin-bottom:20px}
+.quiz-q{margin-bottom:20px}.quiz-q-text{font-size:15px;font-weight:500;color:var(--ink);margin-bottom:10px;line-height:1.5}
+.quiz-options{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:10px 14px;border-radius:8px;border:1px solid var(--rule);font-size:14px;color:var(--ink2);cursor:pointer;background:var(--bg);text-align:left;line-height:1.45}
+.quiz-opt.correct{background:#E6F4F0;border-color:#2EAA8A;color:#0D6E5E;font-weight:500}.quiz-opt.wrong{background:#FAE8E8;border-color:#C85A5A;color:#8A2A2A}.quiz-opt.reveal{background:#F4F4F0;border-color:#D0D0C8;color:var(--ink3)}
+.quiz-feedback{font-size:13px;margin-top:8px;padding:10px 12px;border-radius:6px;line-height:1.55;display:none}
+.quiz-feedback.show{display:block}.quiz-feedback.ok{background:#E6F4F0;color:#0D6E5E}.quiz-feedback.no{background:#FAE8E8;color:#8A2A2A}
+.quiz-score{display:none;text-align:center;padding:16px;background:var(--teal-light);border-radius:8px;color:var(--teal);font-weight:600;font-size:15px}.quiz-score.show{display:block}
+.quiz-reset{display:none;margin:12px auto 0;background:var(--teal);color:#fff;padding:9px 24px;border-radius:8px;border:none;font-size:14px;cursor:pointer;font-weight:500}.quiz-reset.show{display:block}
+.scroll-top{position:fixed;bottom:24px;right:20px;width:40px;height:40px;background:var(--teal);color:#fff;border:none;border-radius:50%;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;box-shadow:0 2px 12px rgba(0,0,0,.15)}.scroll-top.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="progress-bar"></div>
+<nav class="top-nav">
+  <div class="nav-left"><span class="nav-day">Day 17 · Week 5</span><span class="nav-title">Stakeholder Management &amp; Views</span></div>
+  <div class="nav-right"><div class="timer-badge">⏱ <span id="read-timer">0:00</span></div><button class="done-btn" id="done-btn" onclick="markDone()">Mark Done</button></div>
+</nav>
+<header class="hero">
+  <div class="hero-label">Study Session · Day 17 of 20</div>
+  <h1 class="hero-title">Stakeholder Management<br>&amp; Views</h1>
+  <div class="hero-meta"><span class="meta-pill">📖 ~30 min read</span><span class="meta-pill">5 topics</span><span class="meta-pill">5 quiz questions</span><span class="meta-pill">Core</span></div>
+  <p class="hero-intro">Stakeholder management is the thread connecting everything in TOGAF. From the initial identification of concerns in Phase A to the views produced in Phases B, C, and D, effective stakeholder engagement determines whether the architecture succeeds or sits on a shelf.</p>
+</header>
+<nav class="toc">
+  <div class="toc-label">In this session</div>
+  <ol class="toc-list">
+    <li><a href="#s1"><span class="toc-num">01</span>Stakeholder Map &amp; Analysis Technique</a></li>
+    <li><a href="#s2"><span class="toc-num">02</span>Architecture Concerns &amp; Viewpoints</a></li>
+    <li><a href="#s3"><span class="toc-num">03</span>Architecture Views vs Viewpoints</a></li>
+    <li><a href="#s4"><span class="toc-num">04</span>The Communications Plan</a></li>
+    <li><a href="#s5"><span class="toc-num">05</span>Stakeholder Engagement Across ADM Phases</a></li>
+    <li><a href="#quiz"><span class="toc-num">✎</span>Knowledge Check</a></li>
+  </ol>
+</nav>
+<article class="article">
+
+  <section class="section" id="s1">
+    <div class="section-header"><span class="section-num">01</span><h2 class="section-title">Stakeholder Map &amp; Analysis Technique</h2></div>
+    <div class="hl teal"><div class="hl-lbl">Stakeholder defined</div><p>A <strong>stakeholder</strong> is an individual, team, or organisation (or class thereof) with an interest in or concern about the outcome of the architecture. Stakeholders can be internal (business units, IT) or external (regulators, customers, partners).</p></div>
+    <p>The Stakeholder Map is a key Phase A output — a structured view of all stakeholders, their interests, and their level of influence. TOGAF recommends plotting stakeholders on a two-by-two matrix using <strong>level of interest</strong> (how much they care about the architecture outcome) against <strong>level of influence</strong> (how much power they have to affect it).</p>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">High Interest / High Influence</div><p class="def-text">Most critical stakeholders — require deep engagement, regular communication, and active management. Examples: CEO, CIO, key business sponsors. These are "key players" who can make or break the architecture.</p></div>
+      <div class="def-item"><div class="def-term">High Interest / Low Influence</div><p class="def-text">Care deeply about the outcome but can't directly affect it. Examples: End users, compliance teams. Keep informed and make sure their concerns are captured. If ignored, they become sources of resistance.</p></div>
+      <div class="def-item"><div class="def-term">Low Interest / High Influence</div><p class="def-text">Can significantly affect the architecture but aren't deeply engaged. Examples: CFO, Procurement. Keep satisfied and engage when decisions touch their domain. A single intervention from this group can reshape the architecture.</p></div>
+      <div class="def-item"><div class="def-term">Low Interest / Low Influence</div><p class="def-text">Minimal engagement needed. Monitor and inform as needed. Don't waste high-value architecture team time on this quadrant.</p></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The Stakeholder Map plots stakeholders on <strong>Interest vs Influence</strong>. High Interest + High Influence = key players requiring deepest engagement. The map is produced in <strong>Phase A</strong> as part of stakeholder analysis.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s2">
+    <div class="section-header"><span class="section-num">02</span><h2 class="section-title">Architecture Concerns &amp; Viewpoints</h2></div>
+    <div class="hl blue"><div class="hl-lbl">The concern → viewpoint chain</div><p>In TOGAF, a stakeholder <strong>concern</strong> is a specific worry or interest about the architecture — performance, security, cost, reliability. Each concern leads to a <strong>viewpoint</strong> — the perspective from which that concern is addressed. Viewpoints are templates for producing architecture views.</p></div>
+    <p>This chain — stakeholder → concern → viewpoint → view — is fundamental to TOGAF's approach to architecture communication. It ensures that every stakeholder gets an architectural view that directly addresses their specific concerns, rather than receiving generic documents that may not speak to their interests.</p>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Concern</div><p class="def-text">A specific interest or worry a stakeholder has about the architecture. Examples: "How will the new system affect our response times?", "Will this comply with GDPR?", "What will this cost to run?" Concerns are documented during Phase A stakeholder analysis.</p></div>
+      <div class="def-item"><div class="def-term">Viewpoint</div><p class="def-text">A pattern or template defining how to construct a view that addresses a set of concerns. A viewpoint specifies: which architecture elements to include, which relationships to show, which notation to use, and which stakeholders the view is for. IEEE 42010 formalises this concept.</p></div>
+      <div class="def-item"><div class="def-term">Standard TOGAF Viewpoints</div><p class="def-text">TOGAF provides several standard viewpoints: Organisation viewpoint (who are the actors?), Information viewpoint (what data matters?), Functional viewpoint (what does the system do?), Infrastructure viewpoint (how is it deployed?). Organisations can define custom viewpoints for specific needs.</p></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The chain is: <strong>Stakeholder → Concern → Viewpoint → View</strong>. A concern is the worry. A viewpoint is the template for addressing it. A view is the resulting architecture description. This chain runs from Phase A (concerns) through Phases B, C, D (views produced).</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s3">
+    <div class="section-header"><span class="section-num">03</span><h2 class="section-title">Architecture Views vs Viewpoints</h2></div>
+    <div class="hl purple"><div class="hl-lbl">The key distinction</div><p>A <strong>Viewpoint</strong> is a template — it defines <em>how</em> to construct a view. A <strong>View</strong> is the actual content — what you see when the viewpoint is applied to a specific architecture. Viewpoints are reusable; views are specific to one architecture.</p></div>
+    <p>Think of it this way: a viewpoint is like a camera lens — it defines the perspective. A view is the photograph taken with that lens — the actual captured image of a specific scene. The same lens (viewpoint) can be used to photograph many different scenes (architectures), producing different photographs (views).</p>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Architecture View</div><p class="def-text">A representation of a system from the perspective of a related set of concerns. Produced by applying a viewpoint to the architecture. Examples: a security view, a cost view, a deployment view. Views are what stakeholders actually read and review.</p></div>
+      <div class="def-item"><div class="def-term">Architecture Viewpoint</div><p class="def-text">A specification of the conventions for constructing and interpreting an architecture view. It documents: the stakeholders it addresses, the concerns it covers, the model kinds used, and the consistency requirements between views.</p></div>
+      <div class="def-item"><div class="def-term">View Correspondence</div><p class="def-text">The relationships between different architecture views — ensuring they are consistent with each other. For example, the technology view and the application view must be consistent: each application component must have a corresponding technology component to run on.</p></div>
+    </div>
+    <div class="hl amber"><div class="hl-lbl">The 4+1 View Model (context)</div><p>TOGAF does not mandate a specific view model, but references the concept of well-known models like Kruchten's 4+1 View Model. Organisations may use any consistent set of viewpoints and views — TOGAF provides standard viewpoints as a starting point.</p></div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p><strong>Viewpoint</strong> = template/specification (reusable, defines how). <strong>View</strong> = actual content (specific to one architecture, what stakeholders see). Viewpoints are defined generically; views are produced specifically for each architecture engagement.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s4">
+    <div class="section-header"><span class="section-num">04</span><h2 class="section-title">The Communications Plan</h2></div>
+    <div class="hl teal"><div class="hl-lbl">Purpose</div><p>The <strong>Communications Plan</strong> is a Phase A output that defines how the architecture team will communicate with each stakeholder group throughout the ADM cycle — what they receive, how frequently, and in what format.</p></div>
+    <p>Good architecture work can be undermined by poor communication. The Communications Plan ensures that the right people get the right information at the right time — preventing surprise, building support, and maintaining stakeholder engagement throughout what can be a long architecture programme.</p>
+    <div class="def-grid">
+      <div class="def-item"><div class="def-term">Communication frequency</div><p class="def-text">Different stakeholders need different cadences. C-suite may receive monthly briefings at major milestones. Business unit heads may receive bi-weekly updates during their relevant phases. Technical teams may receive continuous detailed documentation.</p></div>
+      <div class="def-item"><div class="def-term">Communication format</div><p class="def-text">Executive summaries for senior leaders. Detailed architecture views for technical teams. Impact assessments for affected business areas. Governance reports for the Architecture Board. Format is tailored to the audience.</p></div>
+      <div class="def-item"><div class="def-term">Communication owner</div><p class="def-text">Each stakeholder communication has a named owner — who is responsible for preparing and delivering it. Typically the architect lead for technical communications; a project manager or business analyst for business stakeholder communications.</p></div>
+      <div class="def-item"><div class="def-term">Two-way communication</div><p class="def-text">The Communications Plan is not just about pushing information out. It also defines how stakeholder feedback is captured and incorporated — review meetings, sign-off gates, feedback loops, and escalation paths.</p></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>The Communications Plan is produced in <strong>Phase A</strong> as part of stakeholder management — not as an afterthought later in the ADM. It is a formal deliverable, not an informal list of people to call. Know that it covers frequency, format, owner, and two-way feedback mechanisms.</p></div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section class="section" id="s5">
+    <div class="section-header"><span class="section-num">05</span><h2 class="section-title">Stakeholder Engagement Across ADM Phases</h2></div>
+    <p>Stakeholder management begins in Phase A and continues throughout the entire ADM cycle. Different stakeholders are most relevant at different phases.</p>
+    <div class="chain-steps">
+      <div class="chain-step"><span class="chain-badge" style="background:var(--teal-light);color:var(--teal)">Phase A</span><div><div class="chain-name">Identify &amp; Map</div><div class="chain-desc">All stakeholders identified. Concerns documented. Stakeholder Map produced. Communications Plan created. This is the foundation for all subsequent engagement.</div></div></div>
+      <div class="chain-step"><span class="chain-badge" style="background:var(--blue-light);color:var(--blue)">Phase B</span><div><div class="chain-name">Business Stakeholders</div><div class="chain-desc">Business unit leaders, process owners, capability owners engaged in detail. Business architecture views produced and reviewed with them. Sign-off on business gap analysis.</div></div></div>
+      <div class="chain-step"><span class="chain-badge" style="background:var(--purple-light);color:var(--purple)">Phase C</span><div><div class="chain-name">Data &amp; App Owners</div><div class="chain-desc">Data owners, application owners, integration specialists engaged. IS architecture views reviewed. Application portfolio rationalisation decisions require business sign-off.</div></div></div>
+      <div class="chain-step"><span class="chain-badge" style="background:var(--amber-light);color:var(--amber)">Phase D</span><div><div class="chain-name">Technology &amp; Security</div><div class="chain-desc">CTO, infrastructure leads, security team engaged. Technology standards reviewed. Compliance and security stakeholders confirm requirements are addressed.</div></div></div>
+      <div class="chain-step"><span class="chain-badge" style="background:var(--green-light);color:var(--green)">Phases E/F</span><div><div class="chain-name">Programme Stakeholders</div><div class="chain-desc">CFO (cost), PMO (delivery), HR (change management) engaged. Roadmap and migration plan reviewed and approved. Transformation readiness assessed.</div></div></div>
+      <div class="chain-step"><span class="chain-badge" style="background:var(--coral-light);color:#8A2A2A">Phases G/H</span><div><div class="chain-name">Governance &amp; Delivery</div><div class="chain-desc">Project sponsors, delivery teams, Architecture Board engaged continuously. Compliance reviews involve affected teams. Change management communicated broadly.</div></div></div>
+    </div>
+    <div class="exam-tip"><div class="exam-tip-label">⭐ Exam tip</div><p>Stakeholder management is <strong>continuous throughout the ADM</strong> — not just Phase A. Different stakeholders are primary at different phases but all stakeholders receive ongoing communication per the Communications Plan. Stakeholder engagement failures are one of the most common reasons architecture programmes fail.</p></div>
+  </section>
+
+  <div class="divider"></div>
+  <section>
+    <h2 style="font-family:'Lora',serif;font-size:20px;color:var(--ink);margin-bottom:16px">Session summary</h2>
+    <div class="sum-grid">
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Stakeholder Map: Interest × Influence</div><p class="sum-body">High Interest + High Influence = key players needing deepest engagement. Produced in Phase A.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Stakeholder → Concern → Viewpoint → View</div><p class="sum-body">The fundamental chain. Concerns drive which viewpoints are needed; viewpoints produce views in Phases B, C, D.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Viewpoint ≠ View</div><p class="sum-body">Viewpoint = reusable template. View = specific content produced by applying a viewpoint to an architecture.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Communications Plan = Phase A output</div><p class="sum-body">Defines frequency, format, owner, and feedback for each stakeholder group. Covers the full ADM cycle.</p></div></div>
+      <div class="sum-card"><span class="sum-icon">📌</span><div><div class="sum-head">Engagement is continuous</div><p class="sum-body">Different stakeholders are primary at different phases, but all receive ongoing communication throughout the ADM.</p></div></div>
+    </div>
+  </section>
+  <div class="divider"></div>
+  <section id="quiz" class="quiz-section">
+    <div class="quiz-title">Knowledge Check</div><div class="quiz-sub">5 questions · Stakeholder Management &amp; Views</div>
+    <div class="quiz-q" id="quiz-q1"><div class="quiz-q-text">1. In TOGAF's Stakeholder Map, stakeholders with high interest and high influence are described as:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(1,'a')">A. Low priority — they already support the architecture</button>
+        <button class="quiz-opt" onclick="answer(1,'b')">B. Key players requiring the deepest and most active engagement</button>
+        <button class="quiz-opt" onclick="answer(1,'c')">C. Informational only — they need regular updates but minimal consultation</button>
+        <button class="quiz-opt" onclick="answer(1,'d')">D. Potential blockers who should be managed by limiting their involvement</button>
+      </div><div class="quiz-feedback" id="fb1"></div></div>
+    <div class="quiz-q" id="quiz-q2"><div class="quiz-q-text">2. What is the correct chain linking stakeholders to architecture views?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(2,'a')">A. Stakeholder → View → Viewpoint → Concern</button>
+        <button class="quiz-opt" onclick="answer(2,'b')">B. Concern → Stakeholder → View → Viewpoint</button>
+        <button class="quiz-opt" onclick="answer(2,'c')">C. Stakeholder → Concern → Viewpoint → View</button>
+        <button class="quiz-opt" onclick="answer(2,'d')">D. Viewpoint → Stakeholder → Concern → View</button>
+      </div><div class="quiz-feedback" id="fb2"></div></div>
+    <div class="quiz-q" id="quiz-q3"><div class="quiz-q-text">3. An Architecture Viewpoint differs from an Architecture View in that a Viewpoint is:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(3,'a')">A. A specific architecture description produced for a particular stakeholder group</button>
+        <button class="quiz-opt" onclick="answer(3,'b')">B. A reusable template or specification that defines how to construct a view to address a set of concerns</button>
+        <button class="quiz-opt" onclick="answer(3,'c')">C. A summary of all stakeholder concerns captured during Phase A</button>
+        <button class="quiz-opt" onclick="answer(3,'d')">D. An abstract architectural concept without concrete content</button>
+      </div><div class="quiz-feedback" id="fb3"></div></div>
+    <div class="quiz-q" id="quiz-q4"><div class="quiz-q-text">4. The Communications Plan is produced in which ADM phase?</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(4,'a')">A. Phase B — Business Architecture</button>
+        <button class="quiz-opt" onclick="answer(4,'b')">B. Phase F — Migration Planning</button>
+        <button class="quiz-opt" onclick="answer(4,'c')">C. Phase A — Architecture Vision</button>
+        <button class="quiz-opt" onclick="answer(4,'d')">D. The Preliminary Phase</button>
+      </div><div class="quiz-feedback" id="fb4"></div></div>
+    <div class="quiz-q" id="quiz-q5"><div class="quiz-q-text">5. Stakeholder management in the ADM is:</div>
+      <div class="quiz-options">
+        <button class="quiz-opt" onclick="answer(5,'a')">A. A Phase A activity only — once the Stakeholder Map is produced, formal engagement is complete</button>
+        <button class="quiz-opt" onclick="answer(5,'b')">B. A continuous activity throughout the entire ADM cycle, with different stakeholders being primary at different phases</button>
+        <button class="quiz-opt" onclick="answer(5,'c')">C. Delegated to the project manager once Phase A is complete</button>
+        <button class="quiz-opt" onclick="answer(5,'d')">D. Only required when architecture compliance reviews are conducted in Phase G</button>
+      </div><div class="quiz-feedback" id="fb5"></div></div>
+    <div class="quiz-score" id="quiz-score"></div>
+    <button class="quiz-reset" id="quiz-reset" onclick="resetQuiz()">Try again</button>
+  </section>
+</article>
+<button class="scroll-top" id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+let sec=0;const tEl=document.getElementById("read-timer");const iv=setInterval(()=>{sec++;tEl.textContent=Math.floor(sec/60)+":"+(sec%60<10?"0":"")+sec%60;},1000);
+window.addEventListener("scroll",()=>{const d=document.documentElement;document.getElementById("progress-bar").style.width=Math.min(100,(d.scrollTop/(d.scrollHeight-d.clientHeight))*100)+"%";document.getElementById("scroll-top").classList.toggle("show",d.scrollTop>400);});
+function markDone(){clearInterval(iv);try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[17]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("done-btn");b.textContent="✓ Done!";b.classList.add("completed");}
+const ANS={1:'b',2:'c',3:'b',4:'c',5:'b'};
+const FB={
+  1:{b:"Correct! High interest + high influence stakeholders are the 'key players' — they care about the outcome and can shape it. They require the deepest, most active, and most continuous engagement throughout the ADM.",x:"Not quite. High interest + high influence = key players requiring the deepest engagement. They both care deeply and can affect the outcome — ignoring or underserving this group is the most dangerous stakeholder management mistake."},
+  2:{c:"Correct! The chain is: Stakeholder → Concern → Viewpoint → View. The stakeholder has a concern; the concern leads to a viewpoint (template); applying the viewpoint produces a view. This chain runs from Phase A (concerns identified) through Phases B/C/D (views produced).",x:"Not quite. The correct chain is Stakeholder → Concern → Viewpoint → View. Stakeholders have concerns; concerns determine which viewpoints are needed; viewpoints are templates used to produce views."},
+  3:{b:"Correct! A Viewpoint is a reusable template or specification that defines how to construct an architecture view. A View is the actual content — the specific architectural description produced by applying a viewpoint to a particular architecture.",x:"Not quite. A Viewpoint is a reusable template (how to construct a view); a View is the actual content produced for a specific architecture by applying that template. The same viewpoint can be applied to many architectures to produce different views."},
+  4:{c:"Correct! The Communications Plan is produced in Phase A — Architecture Vision — as part of stakeholder management. It defines how the architecture team will communicate with each stakeholder group throughout the entire ADM cycle.",x:"Not quite. The Communications Plan is a Phase A output — it is produced early in the ADM to guide stakeholder engagement throughout the entire cycle. Producing it in Phase F would be too late to influence Phases B through E."},
+  5:{b:"Correct! Stakeholder management is continuous throughout the ADM — not just Phase A. Different stakeholders are primary at different phases (business leaders in B, IT in C/D, programme stakeholders in E/F, delivery teams in G) but all receive ongoing communication per the Communications Plan.",x:"Not quite. Stakeholder management is continuous throughout the ADM. Phase A identifies and maps stakeholders and creates the Communications Plan, but active engagement continues through all phases. Stakeholder engagement failures mid-programme are a major cause of architecture programme failure."}
+};
+let answered={},score=0;
+function answer(q,opt){if(answered[q])return;answered[q]=opt;const ok=opt===ANS[q];if(ok)score++;document.querySelectorAll(`#quiz-q${q} .quiz-opt`).forEach((b,i)=>{const o=['a','b','c','d'][i];b.classList.add(o===ANS[q]?"correct":o===opt&&!ok?"wrong":"reveal");});const fb=document.getElementById("fb"+q);fb.textContent=(ok?"✓ ":"✗ ")+(ok?FB[q][opt]:FB[q].x);fb.className="quiz-feedback show "+(ok?"ok":"no");if(Object.keys(answered).length===5){const msgs=["Keep going!","Getting there!","Good effort!","Strong result!","Perfect score! Ready for Day 18."];document.getElementById("quiz-score").textContent=`You scored ${score}/5. ${msgs[score-1]||msgs[0]}`;document.getElementById("quiz-score").classList.add("show");document.getElementById("quiz-reset").classList.add("show");if(score===5)markDone();}}
+function resetQuiz(){answered={};score=0;document.querySelectorAll(".quiz-opt").forEach(b=>b.className="quiz-opt");document.querySelectorAll(".quiz-feedback").forEach(f=>{f.className="quiz-feedback";f.textContent="";});document.getElementById("quiz-score").classList.remove("show");document.getElementById("quiz-reset").classList.remove("show");}
+</script>
+</body>
+</html>
