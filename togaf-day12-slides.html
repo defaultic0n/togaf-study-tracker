@@ -3,257 +3,391 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Day 12 Slides — ADM Guidelines &amp; Techniques</title>
+<title>Day 12 Slides — ADM Guidelines: Iteration, Classes of Engagement & Patterns</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;--teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);--gold:#F0B429;--gold2:rgba(240,180,41,0.15);--slate:#94A3B8;--slate2:#64748B;--slate3:#334155;--white:#F8FAFC;--white2:#E2E8F0;--coral:#FB7185;--coral2:rgba(251,113,133,0.15);--blue:#60A5FA;--blue2:rgba(96,165,250,0.12);--purple:#A78BFA;--purple2:rgba(167,139,250,0.12);--green:#4ADE80;--green2:rgba(74,222,128,0.12);--amber:#FBBF24;--amber2:rgba(251,191,36,0.12)}
+:root{
+  --navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;
+  --teal:#2DD4BF;--teal2:#1BA898;--teal3:rgba(45,212,191,0.15);--teal4:rgba(45,212,191,0.08);
+  --gold:#F0B429;--gold2:rgba(240,180,41,0.15);
+  --slate:#94A3B8;--slate2:#64748B;--slate3:#334155;
+  --white:#F8FAFC;--white2:#E2E8F0;--white3:#CBD5E1;
+  --coral:#FB7185;--coral2:rgba(251,113,133,0.15);
+  --blue:#60A5FA;--blue2:rgba(96,165,250,0.12);
+  --purple:#A78BFA;--purple2:rgba(167,139,250,0.12);
+  --green:#4ADE80;--green2:rgba(74,222,128,0.12);
+  --amber:#FCD34D;--amber2:rgba(252,211,77,0.12);
+}
 html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
-#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center}
-.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:.06}
-.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:.8}
-.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;padding:0 24px;margin-bottom:12px}
-.start-sub{font-size:14px;color:var(--slate);text-align:center;padding:0 32px;line-height:1.6;margin-bottom:48px}
-.start-meta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:56px}
-.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
-.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer}
-.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
-#deck{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column;display:none}
-.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.start-logo{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:40px;opacity:0.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(20px,4.5vw,36px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;padding:0 24px;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;padding:0 32px;line-height:1.6;margin-bottom:40px}
+.start-meta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:48px}
+.start-pill{font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate)}
+.start-btn{display:flex;align-items:center;gap:10px;padding:14px 32px;border-radius:12px;background:var(--gold);color:var(--navy);font-size:15px;font-weight:600;border:none;cursor:pointer;transition:transform .15s,opacity .15s}
+.start-btn:hover{opacity:0.9;transform:scale(1.02)}
+#deck{width:100%;height:100%;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;padding:clamp(16px,3vw,36px);display:flex;flex-direction:column;justify-content:center;opacity:0;transition:opacity .35s;pointer-events:none;overflow-y:auto}
 .slide.active{opacity:1;pointer-events:all}
-.slide.exit-left{animation:exitLeft .4s cubic-bezier(.4,0,.2,1) forwards}
-.slide.enter-right{animation:enterRight .4s cubic-bezier(.4,0,.2,1) forwards}
-.slide.exit-right{animation:exitRight .4s cubic-bezier(.4,0,.2,1) forwards}
-.slide.enter-left{animation:enterLeft .4s cubic-bezier(.4,0,.2,1) forwards}
-@keyframes exitLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
-@keyframes enterRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
-@keyframes exitRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
-@keyframes enterLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
-.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}
-.slide-body::-webkit-scrollbar{display:none}
-.slide-title .slide-body,.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:32px 28px}
-.title-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
-.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
-.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:20px}
-.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
-.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
-.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
-.section-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
-.section-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
-.section-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
-.section-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
-.content-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
-.content-h{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:14px}
-.callout{border-radius:10px;padding:13px 15px;margin-bottom:11px}
-.callout.teal{background:var(--teal3);border-left:3px solid var(--teal)}.callout.gold{background:var(--gold2);border-left:3px solid var(--gold)}.callout.blue{background:var(--blue2);border-left:3px solid var(--blue)}.callout.purple{background:var(--purple2);border-left:3px solid var(--purple)}.callout.green{background:var(--green2);border-left:3px solid var(--green)}.callout.amber{background:var(--amber2);border-left:3px solid var(--amber)}.callout.coral{background:var(--coral2);border-left:3px solid var(--coral)}
-.callout-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
-.callout.teal .callout-label{color:var(--teal)}.callout.blue .callout-label{color:var(--blue)}.callout.purple .callout-label{color:var(--purple)}.callout.green .callout-label{color:var(--green)}.callout.amber .callout-label{color:var(--amber)}.callout.coral .callout-label{color:var(--coral)}
-.callout p{font-size:13px;line-height:1.6;margin:0}
-.callout.teal p{color:rgba(45,212,191,.9)}.callout.blue p{color:rgba(96,165,250,.9)}.callout.purple p{color:rgba(167,139,250,.9)}.callout.green p{color:rgba(74,222,128,.9)}.callout.amber p{color:rgba(251,191,36,.9)}.callout.coral p{color:rgba(251,113,133,.9)}
-.bullet-list{display:flex;flex-direction:column;gap:8px;margin-bottom:11px}
-.bullet{display:flex;gap:11px;align-items:flex-start}
-.bullet-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
-.bullet-text{font-size:13px;color:var(--white2);line-height:1.55}
-.bullet-text strong{color:var(--white)}.bullet-text em{color:var(--teal);font-style:normal}
-.exam-bar{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:11px 13px;margin-bottom:11px;display:flex;gap:10px}
-.exam-star{font-size:15px;flex-shrink:0}.exam-text{font-size:12px;color:rgba(240,180,41,.9);line-height:1.6}
-.exam-text strong{color:var(--gold)}
-.iter-list{display:flex;flex-direction:column;gap:8px;margin-bottom:11px}
-.iter-card{background:var(--navy3);border-radius:9px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
-.iter-head{padding:8px 12px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
-.iter-head.arch{background:var(--blue2);color:var(--blue)}.iter-head.trans{background:var(--teal3);color:var(--teal)}.iter-head.cap{background:var(--purple2);color:var(--purple)}
-.iter-body{padding:8px 12px;font-size:12px;color:var(--slate);line-height:1.5}
-.sec-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
-.sec-card{background:var(--navy3);border-radius:7px;padding:9px 11px;border:1px solid rgba(255,255,255,.05)}
-.sec-phase{font-size:10px;font-weight:700;color:var(--teal);margin-bottom:3px;text-transform:uppercase;letter-spacing:.4px}
-.sec-desc{font-size:11px;color:var(--slate);line-height:1.4}
-.soa-list{display:flex;flex-direction:column;gap:7px;margin-bottom:11px}
-.soa-item{background:var(--navy3);border-radius:7px;padding:9px 11px;border:1px solid rgba(255,255,255,.05)}
-.soa-term{font-size:12px;font-weight:700;color:var(--purple);margin-bottom:2px}
-.soa-desc{font-size:11px;color:var(--slate);line-height:1.4}
-.ready-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:11px}
-.ready-card{background:var(--navy3);border-radius:6px;padding:8px 10px;border:1px solid rgba(255,255,255,.05)}
-.ready-name{font-size:11px;font-weight:700;color:var(--green);margin-bottom:2px}
-.ready-desc{font-size:10px;color:var(--slate);line-height:1.35}
-.risk-list{display:flex;flex-direction:column;gap:7px;margin-bottom:11px}
-.risk-row{background:var(--navy3);border-radius:7px;padding:9px 11px;border:1px solid rgba(255,255,255,.05);display:flex;gap:8px;align-items:flex-start}
-.risk-badge{font-size:11px;font-weight:700;padding:2px 8px;border-radius:10px;flex-shrink:0;min-width:60px;text-align:center}
-.risk-desc{font-size:12px;color:var(--slate);line-height:1.45}
-.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:11px}
-.sum-card{background:var(--navy3);border-radius:9px;padding:11px;border:1px solid rgba(255,255,255,.06)}
-.sum-num{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:4px;letter-spacing:1px}
-.sum-text{font-size:11px;color:var(--white2);line-height:1.5}
-.sum-text strong{color:var(--white)}
-#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
-#progress-fill{height:100%;background:var(--teal);transition:width .4s}
-#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
-.ctrl-btn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0;color:var(--white2)}
-.ctrl-btn:active{background:var(--navy4)}.ctrl-btn svg{width:16px;height:16px}
-.ctrl-btn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}
-.ctrl-btn.primary svg{width:18px;height:18px}
-.ctrl-btn:disabled{opacity:.3;cursor:not-allowed}
-.slide-counter{flex:1;text-align:center;font-size:12px;color:var(--slate2)}
-.slide-counter strong{color:var(--slate)}
-.voice-status{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
-.voice-dots{display:flex;gap:3px;align-items:center}
-.voice-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vdot 1.2s infinite}
-.voice-dot:nth-child(2){animation-delay:.2s}.voice-dot:nth-child(3){animation-delay:.4s}
-@keyframes vdot{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
-.speed-btn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
-.swipe-hint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+.section-tag{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
+.slide-num{font-size:11px;color:var(--slate2);margin-bottom:8px}
+h1{font-family:'Playfair Display',serif;font-size:clamp(22px,4.5vw,40px);font-weight:700;line-height:1.15;margin-bottom:16px}
+h2{font-family:'Playfair Display',serif;font-size:clamp(18px,3.5vw,28px);font-weight:600;line-height:1.2;margin-bottom:12px}
+.lead{font-size:clamp(13px,1.8vw,16px);color:var(--slate);line-height:1.65;margin-bottom:14px}
+.card{border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid}
+.card-teal{background:var(--teal3);border-color:rgba(45,212,191,0.25)}
+.card-blue{background:var(--blue2);border-color:rgba(96,165,250,0.25)}
+.card-purple{background:var(--purple2);border-color:rgba(167,139,250,0.25)}
+.card-gold{background:var(--gold2);border-color:rgba(240,180,41,0.25)}
+.card-coral{background:var(--coral2);border-color:rgba(251,113,133,0.25)}
+.card-amber{background:var(--amber2);border-color:rgba(252,211,77,0.25)}
+.card-green{background:var(--green2);border-color:rgba(74,222,128,0.25)}
+.card h3{font-size:13px;font-weight:600;margin-bottom:4px}
+.card p,.card li{font-size:12.5px;color:var(--slate);line-height:1.5}
+.card ul{padding-left:14px}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin:2px}
+.pill-teal{background:var(--teal3);color:var(--teal)}
+.pill-gold{background:var(--gold2);color:var(--gold)}
+.pill-blue{background:var(--blue2);color:var(--blue)}
+.pill-coral{background:var(--coral2);color:var(--coral)}
+.pill-purple{background:var(--purple2);color:var(--purple)}
+.pill-green{background:var(--green2);color:var(--green)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.exam-box{background:rgba(240,180,41,0.08);border:1px solid rgba(240,180,41,0.3);border-radius:10px;padding:11px 13px;margin-top:10px}
+.exam-box .exam-label{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-bottom:5px}
+.exam-box p{font-size:12.5px;color:var(--slate);line-height:1.5}
+.step-row{display:flex;align-items:flex-start;gap:10px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.step-row:last-child{border-bottom:none}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--gold2);color:var(--gold);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-text{font-size:13px;color:var(--white2);line-height:1.5}
+.step-text strong{color:var(--white);font-weight:600}
+.engage-row{border-radius:10px;padding:11px 13px;margin-bottom:7px;border-left:3px solid}
+.e-row-id{border-left-color:var(--teal);background:var(--teal4)}
+.e-row-def{border-left-color:var(--blue);background:rgba(96,165,250,0.06)}
+.e-row-impl{border-left-color:var(--purple);background:rgba(167,139,250,0.06)}
+.e-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.e-title{font-size:13px;font-weight:600;margin-bottom:3px}
+.e-body{font-size:12.5px;color:var(--slate);line-height:1.45}
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:100;padding:12px 16px;background:linear-gradient(to top,rgba(8,14,26,0.95),transparent);display:flex;align-items:center;justify-content:space-between;gap:8px}
+#nav button{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--white);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s}
+#nav button:hover{background:rgba(255,255,255,0.12)}
+#nav button:disabled{opacity:0.3;cursor:default}
+#play-btn{background:var(--gold2)!important;border-color:rgba(240,180,41,0.4)!important;color:var(--gold)!important;min-width:80px}
+.speed-btn{font-size:12px!important;padding:8px 10px!important}
+#progress-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;flex:1;padding:0 4px}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2);transition:background .2s}
+.dot.done{background:var(--gold)}
+.dot.cur{background:var(--gold);transform:scale(1.4)}
 </style>
 </head>
 <body>
+
 <div id="start-overlay">
-  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="50" cy="150" r="180" fill="#FBBF24"/><circle cx="380" cy="400" r="140" fill="#2DD4BF"/><circle cx="200" cy="650" r="100" fill="#4ADE80"/></svg>
-  <div class="start-logo">TOGAF Foundation · Day 12</div>
-  <div class="start-title">ADM Guidelines<br>&amp; Techniques</div>
-  <p class="start-sub">20 slides with voiceover narration.<br>Week 3 finale · Approx. 30 minutes.</p>
-  <div class="start-meta"><span class="start-pill">📊 20 slides</span><span class="start-pill">🎙 Narrated</span><span class="start-pill">🏁 Week 3</span></div>
-  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Presentation</button>
-  <p class="start-note">Tap Start to enable voice · Swipe or use controls to navigate</p>
+  <div class="start-logo">TOGAF Foundation · Day 12 · Week 3</div>
+  <h1 class="start-title">ADM Guidelines & Techniques:<br>Iteration, Classes of Engagement<br>& Architecture Patterns</h1>
+  <p class="start-sub">20 slides · ~30 min · narrated with voiceover</p>
+  <div class="start-meta">
+    <span class="start-pill">Week 3</span>
+    <span class="start-pill">ADM Techniques</span>
+    <span class="start-pill">Part 2 + Part 3</span>
+  </div>
+  <button class="start-btn" onclick="startDeck()">▶ Begin Session</button>
 </div>
-<div id="deck">
-  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
-  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
-  <div style="padding:2px 16px 0"><div class="voice-status" id="voice-status"></div><div class="swipe-hint">swipe left/right to navigate</div></div>
-  <div id="controls">
-    <button class="ctrl-btn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
-    <button class="ctrl-btn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
-    <button class="ctrl-btn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
-    <div class="slide-counter"><strong id="slide-num">1</strong> / <span id="slide-total">20</span></div>
-    <button class="speed-btn" id="speed-btn" onclick="cycleSpeed()">1×</button>
-    <button class="ctrl-btn" id="btn-done" onclick="markDone()" title="Mark complete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+
+<div id="deck" style="display:none">
+
+<!-- SLIDE 1 -->
+<div class="slide">
+  <div class="section-tag pill-gold" style="color:var(--gold)">Section 1 of 5 · ADM Iteration</div>
+  <h1>ADM Iteration<br>& Cycles</h1>
+  <p class="lead">The ADM diagram looks sequential — but in practice, iteration is central to how it works. Part 3 of the TOGAF Standard defines how and when to iterate.</p>
+  <div class="card card-gold"><h3>Why iteration exists</h3><p>A single linear pass through the ADM cannot adequately handle the complexity of large-scale enterprise architecture. Iteration allows architects to refine, revisit, and progressively elaborate their work.</p></div>
+</div>
+
+<!-- SLIDE 2 -->
+<div class="slide">
+  <div class="slide-num">2 / 20</div>
+  <h2>The 4 ADM Iteration Cycles</h2>
+  <p class="lead">TOGAF defines four types of iteration cycle, each serving a different purpose:</p>
+  <div class="card card-teal"><h3>Architecture Capability Iteration</h3><p>Creates and evolves the architecture capability itself — establishing or adjusting the architecture approach, principles, scope, and governance.</p></div>
+  <div class="card card-blue"><h3>Architecture Development Iteration</h3><p>Creates architecture content by cycling through Business, IS, and Technology phases — converging on a coherent target architecture.</p></div>
+  <div class="card card-purple"><h3>Transition Planning Iteration</h3><p>Creates formal change roadmaps — the Architecture Roadmap and Implementation & Migration Plan.</p></div>
+  <div class="card card-gold"><h3>Architecture Governance Iteration</h3><p>Governs the implementation of change progressing towards the defined Target Architecture.</p></div>
+</div>
+
+<!-- SLIDE 3 -->
+<div class="slide">
+  <div class="slide-num">3 / 20</div>
+  <h2>Iteration Between ADM Cycles</h2>
+  <p class="lead">Multiple complete ADM cycles can run at different levels of the Architecture Landscape — each driven by its own Request for Architecture Work.</p>
+  <div class="card card-teal"><h3>Strategic Architecture</h3><p>Broad, shallow — whole enterprise view. Sets context for all lower-level work. Runs its own ADM cycle.</p></div>
+  <div class="card card-blue"><h3>Segment Architecture</h3><p>A business unit or functional area. Constrained by the Strategic Architecture above it.</p></div>
+  <div class="card card-purple"><h3>Capability Architecture</h3><p>Specific capability or solution. Most detailed. Bounded by the Segment Architecture.</p></div>
+  <div class="exam-box"><div class="exam-label">★ Exam tip</div><p>These three levels — Strategic, Segment, Capability — map directly to the Architecture Landscape levels and the three Classes of Architecture Engagement covered next.</p></div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide">
+  <div class="slide-num">4 / 20</div>
+  <h2>Baseline First vs Target First</h2>
+  <p class="lead">Within an ADM cycle, two approaches can be taken:</p>
+  <div class="card card-gold">
+    <h3>Baseline First</h3>
+    <p>Assess the current state first to identify problems and improvement opportunities. Best when the baseline is complex or poorly understood — common where business units have had high autonomy.</p>
+  </div>
+  <div class="card card-teal">
+    <h3>Target First</h3>
+    <p>Elaborate the target solution in detail first, then map back to baseline to identify change. Best when a target state is already agreed at a high level and the enterprise wants to transition effectively.</p>
+  </div>
+  <div class="exam-box"><div class="exam-label">★ Exam tip</div><p>The exam may ask which approach suits a given scenario. Messy, complex, highly autonomous environment = Baseline First. Clear agreed vision, known target = Target First.</p></div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide">
+  <div class="section-tag pill-teal" style="color:var(--teal)">Section 2 of 5 · Classes of Engagement ★ Exam Focus</div>
+  <h1>Classes of<br>Architecture<br>Engagement</h1>
+  <p class="lead">TOGAF Part 3 §2.3 defines three areas of architecture engagement — contexts in which an architecture function is called upon to help the enterprise.</p>
+  <div class="exam-box"><div class="exam-label">★ Why this matters in the exam</div><p>Foundation questions frequently describe a scenario and ask which class of engagement applies, or ask you to match an engagement type to its iteration focus.</p></div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide">
+  <div class="slide-num">6 / 20</div>
+  <h2>The Three Engagement Areas</h2>
+  <div class="engage-row e-row-id">
+    <div class="e-label" style="color:var(--teal)">Area 1</div>
+    <div class="e-title">Identification of Required Change</div>
+    <div class="e-body">Architecture as a technique to provide visibility of IT capability for strategic decision-making and alignment. Used outside any specific change initiative.</div>
+  </div>
+  <div class="engage-row e-row-def">
+    <div class="e-label" style="color:var(--blue)">Area 2</div>
+    <div class="e-title">Definition of Change</div>
+    <div class="e-body">Where a need to change has been identified, architecture defines the nature and extent of that change in a structured way.</div>
+  </div>
+  <div class="engage-row e-row-impl">
+    <div class="e-label" style="color:var(--purple)">Area 3</div>
+    <div class="e-title">Implementation of Change</div>
+    <div class="e-body">Architecture provides design governance to change initiatives — big-picture visibility, structural constraints, and criteria for evaluating technical decisions.</div>
   </div>
 </div>
+
+<!-- SLIDE 7 -->
+<div class="slide">
+  <div class="slide-num">7 / 20</div>
+  <h2>6 Engagement Types in Detail</h2>
+  <p class="lead">The three areas break down into six specific engagement types:</p>
+  <div class="card card-teal"><h3>Supporting Business Strategy</h3><p>EA provides visibility of change opportunities, tests feasibility of strategic choices. Scope: broad, shallow, baseline first.</p></div>
+  <div class="card card-teal"><h3>Architectural Portfolio Management of the Landscape</h3><p>Links IT portfolio performance to strategic needs. Identifies misalignment and change opportunities.</p></div>
+  <div class="card card-blue"><h3>Architectural Portfolio Management of Projects</h3><p>Adds architectural factors to project priority and funding decisions. Links project scope to architectural impact.</p></div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide">
+  <div class="slide-num">8 / 20</div>
+  <h2>6 Engagement Types (continued)</h2>
+  <div class="card card-blue"><h3>Architectural Definition of Foundational Change Initiatives</h3><p>Change efforts with a known objective but not yet scoped. Architecture brings structure to problem definition — baseline first, then vision.</p></div>
+  <div class="card card-blue"><h3>Architectural Definition of Bounded Change Initiatives</h3><p>Change efforts where the desired outcome is agreed. Architecture elaborates the target — target first, using the agreed vision as constraint.</p></div>
+  <div class="card card-purple"><h3>Architectural Governance of Change Implementation</h3><p>Ensures projects realise intended benefit, stay aligned with each other and with business need. Governance iteration cycle.</p></div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide">
+  <div class="slide-num">9 / 20</div>
+  <h2>Engagement Types — Summary Table</h2>
+  <p class="lead">Each engagement type maps to a specific iteration focus and scope:</p>
+  <div class="card card-gold">
+    <h3 style="margin-bottom:8px">Quick reference</h3>
+    <div class="step-row"><div class="step-num" style="background:var(--teal3);color:var(--teal)">1</div><div class="step-text"><strong>Supporting Business Strategy</strong> — Capability + Development (Baseline First) · Broad, shallow</div></div>
+    <div class="step-row"><div class="step-num" style="background:var(--teal3);color:var(--teal)">2</div><div class="step-text"><strong>Portfolio Mgmt of Landscape</strong> — Capability + Development (Baseline First) · IT assessment</div></div>
+    <div class="step-row"><div class="step-num" style="background:var(--blue2);color:var(--blue)">3</div><div class="step-text"><strong>Portfolio Mgmt of Projects</strong> — Transition + Governance · Project sequencing</div></div>
+    <div class="step-row"><div class="step-num" style="background:var(--blue2);color:var(--blue)">4</div><div class="step-text"><strong>Foundational Change</strong> — Capability + Development (Baseline First) + Transition</div></div>
+    <div class="step-row"><div class="step-num" style="background:var(--blue2);color:var(--blue)">5</div><div class="step-text"><strong>Bounded Change</strong> — Development (Target First) + Transition</div></div>
+    <div class="step-row"><div class="step-num" style="background:var(--purple2);color:var(--purple)">6</div><div class="step-text"><strong>Governance of Change</strong> — Architecture Governance iteration</div></div>
+  </div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide">
+  <div class="slide-num">10 / 20</div>
+  <h2>Architecture Partitioning</h2>
+  <p class="lead">Part 3 Chapter 4 covers how to divide architecture work across teams and levels.</p>
+  <div class="card card-teal"><h3>Why partition?</h3><p>To avoid duplicate or conflicting work across different architecture teams. Partitions define clear boundaries of responsibility.</p></div>
+  <div class="card card-blue"><h3>Types of partition</h3><ul><li>Federated architectures — teams work within defined scopes</li><li>Partitions must have clear re-use and compliance relationships</li><li>A higher-level architecture constrains lower-level partitions</li></ul></div>
+  <div class="card card-purple"><h3>Relationship to iteration</h3><p>Phase F (Migration Planning) can initiate new more detailed architecture projects — this is how the hierarchy of Strategic → Segment → Capability architectures is created.</p></div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide">
+  <div class="section-tag pill-purple" style="color:var(--purple)">Section 3 of 5 · Architecture Patterns</div>
+  <h1>Architecture<br>Patterns</h1>
+  <p class="lead">Part 2 Chapter 4 of the TOGAF Standard introduces architecture patterns as a technique for reusing proven solutions across different architecture engagements.</p>
+  <div class="card card-purple"><h3>The core definition</h3><p>"A pattern is an idea that has been useful in one practical context and will probably be useful in others." (Fowler)</p></div>
+  <div class="card card-gold"><h3>Patterns and building blocks</h3><p>Building blocks are <em>what</em> you use. Patterns tell you <em>how</em> to use them — when, why, and what trade-offs you make. Patterns combine ABBs and SBBs into proven configurations.</p></div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide">
+  <div class="slide-num">12 / 20</div>
+  <h2>Components of a Pattern</h2>
+  <p class="lead">TOGAF defines a standard structure for describing architecture patterns:</p>
+  <div class="grid2">
+    <div class="card card-purple"><h3>Name</h3><p>A meaningful, memorable identifier — usually one word or a short phrase.</p></div>
+    <div class="card card-blue"><h3>Problem</h3><p>The intent — the goals and objectives to be reached within this context.</p></div>
+    <div class="card card-teal"><h3>Context</h3><p>The preconditions under which the pattern applies — the initial state before applying it.</p></div>
+    <div class="card card-gold"><h3>Forces</h3><p>Relevant constraints and how they interact. The trade-offs that make the problem difficult.</p></div>
+    <div class="card card-coral"><h3>Solution</h3><p>The architectural resolution — how the forces are resolved.</p></div>
+    <div class="card card-green"><h3>Resulting context</h3><p>The state after applying the pattern, including unresolved forces and related patterns.</p></div>
+  </div>
+</div>
+
+<!-- SLIDE 13 -->
+<div class="slide">
+  <div class="slide-num">13 / 20</div>
+  <h2>Patterns & the Architecture Continuum</h2>
+  <p class="lead">Architecture patterns sit at different levels of the Enterprise Continuum:</p>
+  <div class="card card-teal"><h3>Foundation Architecture patterns</h3><p>Apply to all enterprises — e.g. the TOGAF Technical Reference Model itself is a foundation-level pattern.</p></div>
+  <div class="card card-blue"><h3>Common Systems patterns</h3><p>Apply across multiple enterprises in similar contexts — e.g. SOA patterns, Cloud patterns.</p></div>
+  <div class="card card-purple"><h3>Industry patterns</h3><p>Apply within a sector — e.g. banking reference architectures.</p></div>
+  <div class="card card-gold"><h3>Organisation-Specific patterns</h3><p>Reusable solutions proven within your own enterprise — stored in the Architecture Repository.</p></div>
+  <div class="exam-box"><div class="exam-label">★ Exam tip</div><p>Patterns are referenced in Phases A through D as architecture resources. They don't replace building blocks — they describe how to combine them effectively.</p></div>
+</div>
+
+<!-- SLIDE 14 -->
+<div class="slide">
+  <div class="section-tag pill-coral" style="color:var(--coral)">Section 4 of 5 · Risk & Security</div>
+  <h2>Risk Management in TOGAF</h2>
+  <p class="lead">Part 2 Chapter 9. Risk management is applied throughout the ADM — not just in one phase.</p>
+  <div class="card card-coral"><h3>Risk Classification</h3><p>Risks are classified by impact and likelihood. TOGAF uses a standard risk matrix with categories from low to critical.</p></div>
+  <div class="card card-gold"><h3>4 Risk Treatment Options</h3><ul><li><strong>Avoid</strong> — change the plan to eliminate the risk</li><li><strong>Transfer</strong> — shift the risk (e.g. insurance, contracts)</li><li><strong>Mitigate</strong> — reduce probability or impact</li><li><strong>Accept</strong> — acknowledge and document the residual risk</li></ul></div>
+  <div class="card card-purple"><h3>Initial vs Residual Risk</h3><p>Initial Risk = before mitigations. Residual Risk = what remains after mitigation actions. Phase G (Implementation Governance) monitors residual risks.</p></div>
+</div>
+
+<!-- SLIDE 15 -->
+<div class="slide">
+  <div class="slide-num">15 / 20</div>
+  <h2>Security Architecture in ADM</h2>
+  <p class="lead">Security is a cross-cutting concern — it appears in every ADM phase, not just Technology Architecture.</p>
+  <div class="card card-teal"><h3>Phase A</h3><p>Security requirements identified as stakeholder concerns. Security risks noted in Architecture Vision.</p></div>
+  <div class="card card-blue"><h3>Phase B</h3><p>Business security requirements, roles, responsibilities, compliance obligations.</p></div>
+  <div class="card card-purple"><h3>Phase C</h3><p>Data classification, application security patterns, access controls.</p></div>
+  <div class="card card-gold"><h3>Phase D</h3><p>Security infrastructure — firewalls, identity management, encryption, network segmentation.</p></div>
+  <div class="exam-box"><div class="exam-label">★ Exam tip</div><p>Security is not just Phase D. The TOGAF Standard explicitly states that security requirements must be addressed across all phases. Foundation questions test this cross-phase awareness.</p></div>
+</div>
+
+<!-- SLIDE 16 -->
+<div class="slide">
+  <div class="slide-num">16 / 20</div>
+  <h2>SOA in the ADM</h2>
+  <p class="lead">Service-Oriented Architecture (SOA) is handled as an architectural style — the ADM is adapted, not replaced.</p>
+  <div class="card card-teal"><h3>Primary home: Phase C</h3><p>Services are defined as Architecture Building Blocks (ABBs) in Phase C — Application Architecture. Services map to SBBs during implementation.</p></div>
+  <div class="card card-blue"><h3>SOA across phases</h3><ul><li><strong>Phase A:</strong> SOA strategic direction established</li><li><strong>Phase B:</strong> Business services identified</li><li><strong>Phase C:</strong> Application services designed as ABBs</li><li><strong>Phase D:</strong> Technology platform for services defined</li></ul></div>
+  <div class="exam-box"><div class="exam-label">★ Exam tip</div><p>SOA services appear as ABBs in the Application Architecture (Phase C). They become SBBs when specific products are selected in Phase D or E.</p></div>
+</div>
+
+<!-- SLIDE 17 -->
+<div class="slide">
+  <div class="section-tag pill-gold" style="color:var(--gold)">Section 5 of 5 · Business Transformation Readiness</div>
+  <h2>Business Transformation<br>Readiness Assessment</h2>
+  <p class="lead">Part 2 Chapter 8. A structured technique for assessing whether an enterprise is ready to execute a transformation programme.</p>
+  <div class="card card-gold"><h3>When it's used</h3><p>Primarily in Phase A (assess readiness) and Phase E (confirm readiness before finalising the roadmap).</p></div>
+  <div class="card card-teal"><h3>The 8 readiness dimensions</h3><ul><li>Vision · Desire, Willingness, and Resolve</li><li>Need · Business Case · Funding</li><li>Leadership · Governance · Accountability</li><li>Ability to Implement Change</li></ul></div>
+  <div class="card card-blue"><h3>Output</h3><p>Each factor is rated on a maturity scale. Risks and actions are defined for factors below threshold. Feeds into the Implementation Plan in Phase F.</p></div>
+</div>
+
+<!-- SLIDE 18 -->
+<div class="slide">
+  <div class="slide-num">18 / 20</div>
+  <h2>Architecture Alternatives & Trade-offs</h2>
+  <p class="lead">Part 2 Chapter 10. A technique for choosing between candidate target architectures when there is no single obvious solution.</p>
+  <div class="card card-gold"><h3>The Trade-off Method</h3><ul><li><strong>Define criteria</strong> — what matters? (cost, risk, time, quality)</li><li><strong>Identify alternatives</strong> — two or more viable architectures</li><li><strong>Score each alternative</strong> against the criteria</li><li><strong>Select and document</strong> the chosen approach with rationale</li></ul></div>
+  <div class="card card-purple"><h3>When to use it</h3><p>Used in Phase A when scoping alternatives, and in Phases B–D when evaluating different architecture options. Common in Phase E when comparing implementation strategies.</p></div>
+</div>
+
+<!-- SLIDE 19 -->
+<div class="slide">
+  <div class="slide-num">19 / 20</div>
+  <h2>Day 12 — Full Recap</h2>
+  <div class="card card-gold"><h3>ADM Iteration</h3><div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:5px"><span class="pill pill-teal">Capability Iteration</span><span class="pill pill-blue">Development Iteration</span><span class="pill pill-purple">Transition Iteration</span><span class="pill pill-gold">Governance Iteration</span></div></div>
+  <div class="card card-teal"><h3>Classes of Engagement</h3><div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:5px"><span class="pill pill-teal">Identification of Change</span><span class="pill pill-blue">Definition of Change</span><span class="pill pill-purple">Implementation of Change</span></div></div>
+  <div class="card card-purple"><h3>Architecture Patterns</h3><p style="margin-top:4px">Idea proven in one context, reusable in others. Components: Name, Problem, Context, Forces, Solution. Sit at all levels of the Enterprise Continuum.</p></div>
+  <div class="card card-blue"><h3>Other techniques</h3><div style="display:flex;flex-wrap:wrap;gap:3px;margin-top:5px"><span class="pill pill-coral">Risk Management</span><span class="pill pill-teal">Security (cross-phase)</span><span class="pill pill-blue">SOA in Phase C</span><span class="pill pill-gold">Readiness Assessment</span></div></div>
+</div>
+
+<!-- SLIDE 20 -->
+<div class="slide">
+  <div style="text-align:center;padding:20px 0">
+    <div style="font-size:48px;margin-bottom:16px">🏆</div>
+    <h2 style="margin-bottom:12px">Week 3 Complete!</h2>
+    <p class="lead" style="max-width:420px;margin:0 auto 20px">You've covered all ADM Governance and Technique topics — including the Classes of Engagement and Architecture Patterns that frequently appear in the exam.</p>
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:center;margin-bottom:20px">
+      <div class="card card-gold" style="max-width:380px;width:100%;text-align:left"><h3>Next — Week 4 (Day 13)</h3><p>Architecture Content Framework: Deliverables, Artifacts, Building Blocks, and the Enterprise Metamodel.</p></div>
+    </div>
+    <button onclick="markDone()" style="background:var(--gold);color:var(--navy);border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:600;cursor:pointer">Mark Day 12 Done ✓</button>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<div id="nav" style="display:none">
+  <button onclick="prevSlide()" id="prev-btn">← Prev</button>
+  <div id="progress-dots"></div>
+  <button onclick="togglePlay()" id="play-btn">▶ Play</button>
+  <button onclick="cycleSpeed()" class="speed-btn" id="speed-btn">1×</button>
+  <button onclick="nextSlide()" id="next-btn">Next →</button>
+</div>
+
 <script>
-const SLIDES=[
-{type:"title",bg:"navy",
-html:`<div class="title-eyebrow">TOGAF Foundation · Day 12 of 20</div><h1 class="title-h">ADM Guidelines<br>&amp; Techniques</h1><div class="title-rule"></div><p class="title-sub">The practical toolkit for applying the ADM — iteration patterns, security, SOA, transformation readiness, and risk management.</p><div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">🏁 Week 3 finale</span></div>`,
-voice:`Welcome to Day 12 — the final session of Week 3. Today is ADM Guidelines and Techniques. The ADM is a flexible framework, not a rigid script. This session covers the practical tools that help you apply it in the real world. We'll cover the three ADM iteration patterns, security as a cross-cutting concern, SOA in the ADM, the Business Transformation Readiness Assessment, and TOGAF's risk management approach. Let's close out Week 3 strong.`},
+const TOTAL=20;
+let cur=0,isPlaying=false,utterance=null,touchStartX=0;
+const speeds=[0.8,1,1.25,1.5];let speedIdx=1;
 
-{type:"section",bg:"teal",
-html:`<div class="section-num">01</div><div class="section-label">Section One</div><h2 class="section-h">ADM Iteration Patterns</h2><p class="section-desc">The ADM is designed to be iterated — not just run once. Three patterns govern how.</p>`,
-voice:`Section one: ADM Iteration Patterns. The ADM is depicted as a cycle for good reason — it is designed to be repeated.`},
-
-{type:"content",
-html:`<div class="content-label">Three iteration patterns</div><h2 class="content-h">How the ADM Gets Repeated</h2>
-<div class="iter-list">
-  <div class="iter-card"><div class="iter-head arch">🔄 Architecture Iteration</div><div class="iter-body">Full ADM cycle repeated — completing B through H, then returning to A for the next architecture engagement. The standard pattern for enterprises running an ongoing architecture practice.</div></div>
-  <div class="iter-card"><div class="iter-head trans">🔄 Transition Iteration</div><div class="iter-body">Iterating within Phases E and F to plan multiple transition architectures. Rather than one massive transition, each E/F iteration plans one coherent transition step in detail.</div></div>
-  <div class="iter-card"><div class="iter-head cap">🔄 Capability Iteration</div><div class="iter-body">Multiple simultaneous or sequential ADM cycles at different scopes — enterprise-level and business-unit level simultaneously. Each feeds into the others through the Architecture Repository.</div></div>
-</div>
-<div class="callout teal"><div class="callout-label">Scope flexibility</div><p>Not every cycle covers all BDAT domains. An iteration focused on a platform refresh might only touch Phase D. A business transformation might focus on Phase B. The ADM adapts to the need.</p></div>
-<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Three patterns:</strong> Architecture (full cycle), Transition (within E/F), Capability (multiple scoped cycles). Iteration is a design feature — not a workaround.</div></div>`,
-voice:`The ADM supports three iteration patterns. Architecture Iteration repeats the full ADM cycle — completing Phases B through H, then returning to Phase A for the next engagement. This is the standard pattern for enterprises with an ongoing architecture practice. Transition Iteration iterates within Phases E and F to plan multiple transition architectures — instead of one massive transformation plan, each iteration plans one transition step in detail. Capability Iteration runs multiple simultaneous ADM cycles at different scopes — one at enterprise level and separate cycles for business units or specific capabilities, all feeding into each other through the Architecture Repository. Not every cycle needs to cover all BDAT domains — the ADM adapts to what's actually needed.`},
-
-{type:"section",bg:"blue",
-html:`<div class="section-num">02</div><div class="section-label">Section Two</div><h2 class="section-h">Security Architecture in the ADM</h2><p class="section-desc">Security is not a Phase D afterthought — it's woven into every phase.</p>`,
-voice:`Section two: Security Architecture in the ADM. The most important thing to know: security is a cross-cutting concern, not a technology domain.`},
-
-{type:"content",
-html:`<div class="content-label">Cross-cutting concern</div><h2 class="content-h">Security Through Every Phase</h2>
-<div class="callout blue"><div class="callout-label">Core principle</div><p>Security is <strong>integrated throughout the ADM</strong> — not added at the end. Every phase has security considerations. Treating security as a Phase D technology concern is one of the most common architecture mistakes.</p></div>
-<div class="sec-grid">
-  <div class="sec-card"><div class="sec-phase">Phase A — Vision</div><div class="sec-desc">Security stakeholders identified. Regulatory constraints (GDPR, PCI-DSS) captured as requirements.</div></div>
-  <div class="sec-card"><div class="sec-phase">Phase B — Business</div><div class="sec-desc">Business security policies defined. Access control principles. Governance controls.</div></div>
-  <div class="sec-card"><div class="sec-phase">Phase C — IS</div><div class="sec-desc">Data classification applied. Application security controls — auth, encryption, audit logging.</div></div>
-  <div class="sec-card"><div class="sec-phase">Phase D — Technology</div><div class="sec-desc">Security platform services — identity management, PKI, SIEM, network security.</div></div>
-  <div class="sec-card"><div class="sec-phase">Phase G — Governance</div><div class="sec-desc">Security conformance in contracts. Compliance reviews. Pen testing as milestone gate.</div></div>
-  <div class="sec-card"><div class="sec-phase">Phase H — Change</div><div class="sec-desc">New security threats assessed as change drivers. Security architecture updated accordingly.</div></div>
-</div>
-<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">Security spans <strong>Business (policies) → IS (data classification, app controls) → Technology (platform services)</strong>. Never just Phase D. The exam tests this.</div></div>`,
-voice:`Security must be integrated throughout the ADM — not bolted on at the end. Every phase has specific security activities. Phase A: identify security stakeholders and capture regulatory constraints like GDPR and PCI-DSS. Phase B: define business security policies, access control principles, and governance controls. Phase C: apply data classification to data entities and specify application security controls — authentication, encryption, audit logging. Phase D: specify the security services in the Application Platform — identity management, PKI, SIEM, network security. Phase G: include security conformance requirements in Architecture Contracts and conduct security reviews at milestone gates. Phase H: assess new security threats as change drivers. The exam frequently presents security as a Phase D concern only. That is wrong. Security spans Business architecture, Information Systems architecture, and Technology architecture.`},
-
-{type:"section",bg:"purple",
-html:`<div class="section-num">03</div><div class="section-label">Section Three</div><h2 class="section-h">SOA in the ADM</h2><p class="section-desc">Service-Oriented Architecture — how it fits into the TOGAF framework.</p>`,
-voice:`Section three: SOA in the ADM. Service-Oriented Architecture is explicitly supported by TOGAF as a design approach.`},
-
-{type:"content",
-html:`<div class="content-label">Services in TOGAF</div><h2 class="content-h">SOA Concepts</h2>
-<div class="callout purple"><div class="callout-label">Where SOA lives</div><p>SOA is primarily addressed in <strong>Phase C — Application Architecture</strong>. Applications are designed as reusable services with defined interfaces. SOA aligns with the Enterprise Continuum through services as ABBs and SBBs.</p></div>
-<div class="soa-list">
-  <div class="soa-item"><div class="soa-term">Service</div><div class="soa-desc">A discrete, reusable business capability exposed through a well-defined interface. Can be independently deployed and discovered.</div></div>
-  <div class="soa-item"><div class="soa-term">Service Contract</div><div class="soa-desc">The formal specification of a service — what it accepts, returns, and guarantees. The application-level equivalent of an Architecture Contract.</div></div>
-  <div class="soa-item"><div class="soa-term">Loose Coupling</div><div class="soa-desc">Services communicate through interfaces without internal dependencies. Enables independent change and reduces cascade failures.</div></div>
-  <div class="soa-item"><div class="soa-term">Service Reuse</div><div class="soa-desc">A service built for one function consumed by multiple others. Directly supports Enterprise Continuum reusability goals.</div></div>
-</div>
-<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">SOA is primarily addressed in <strong>Phase C</strong>. Services become ABBs and SBBs in the Enterprise Continuum. If asked which phase SOA applies to — <strong>Phase C</strong>.</div></div>`,
-voice:`SOA is explicitly supported by TOGAF and is primarily addressed in Phase C — Application Architecture. Four core SOA concepts matter for TOGAF. A Service is a discrete, reusable business capability exposed through a well-defined interface — independently deployable and discoverable. A Service Contract formally specifies a service's interface — what it accepts, what it returns, and what quality it guarantees. It's the application-level equivalent of an Architecture Contract. Loose Coupling means services communicate through interfaces without internal dependencies, enabling independent change. And Service Reuse means a service built for one business function can be consumed by multiple others — directly supporting the Enterprise Continuum's reusability goals. SOA services become Architecture Building Blocks and Solution Building Blocks in the Enterprise Continuum. For the exam: SOA is primarily Phase C.`},
-
-{type:"section",bg:"green",
-html:`<div class="section-num">04</div><div class="section-label">Section Four</div><h2 class="section-h">Business Transformation Readiness Assessment</h2><p class="section-desc">Eight dimensions that determine whether an organisation can actually execute its transformation.</p>`,
-voice:`Section four: the Business Transformation Readiness Assessment. Even the best architecture fails if the organisation isn't ready to change.`},
-
-{type:"content",
-html:`<div class="content-label">Eight readiness dimensions</div><h2 class="content-h">Is the Organisation Ready?</h2>
-<div class="callout green"><div class="callout-label">Used in Phases A and E</div><p>Phase A: informs scope and constraints of the Architecture Vision. Phase E: readiness gaps become explicit <strong>work packages</strong> in the implementation plan.</p></div>
-<div class="ready-grid">
-  <div class="ready-card"><div class="ready-name">Vision</div><div class="ready-desc">Clear, compelling, shared picture of the target state?</div></div>
-  <div class="ready-card"><div class="ready-name">Desire &amp; Will</div><div class="ready-desc">Genuine desire and political will from key leaders?</div></div>
-  <div class="ready-card"><div class="ready-name">Need</div><div class="ready-desc">Recognised urgent business need — not comfortable status quo?</div></div>
-  <div class="ready-card"><div class="ready-name">Funding</div><div class="ready-desc">Committed, sustained funding for the full programme?</div></div>
-  <div class="ready-card"><div class="ready-name">Ability</div><div class="ready-desc">Skills, capabilities, and capacity to deliver?</div></div>
-  <div class="ready-card"><div class="ready-name">Governance</div><div class="ready-desc">Effective structures for decisions, escalations, accountability?</div></div>
-  <div class="ready-card"><div class="ready-name">Enterprise Capacity</div><div class="ready-desc">Can the org transform while keeping operations running?</div></div>
-  <div class="ready-card"><div class="ready-name">HR Readiness</div><div class="ready-desc">Staffing, training, change management plans in place?</div></div>
-</div>
-<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">Used in <strong>Phase A</strong> (scope/constraints) and <strong>Phase E</strong> (readiness gaps become work packages). Know all 8 dimensions.</div></div>`,
-voice:`The Business Transformation Readiness Assessment evaluates eight dimensions. Vision — is there a clear, compelling, shared picture of where the transformation is going? Desire and Will — do key leaders genuinely want this and have the political will to drive it? Need — is there a recognised, urgent business need, or are people comfortable with the status quo? Funding — is there committed, sustained funding for the full programme? Ability — does the organisation have the skills, capabilities, and capacity to actually deliver? Governance — are there effective structures for decisions, escalations, and accountability? Enterprise Capacity — can the organisation transform while keeping normal operations running? And HR Readiness — are staffing, training, and change management plans in place? This assessment is used in Phase A to inform scope and constraints, and in Phase E where readiness gaps become explicit work packages.`},
-
-{type:"section",bg:"amber",
-html:`<div class="section-num">05</div><div class="section-label">Section Five</div><h2 class="section-h">Risk Management in TOGAF</h2><p class="section-desc">Four mitigation options, two risk levels, and where risks are recorded.</p>`,
-voice:`Section five: risk management in TOGAF. Risk runs throughout the ADM — and TOGAF provides a clear approach to handling it.`},
-
-{type:"content",
-html:`<div class="content-label">Four mitigation options</div><h2 class="content-h">Managing Architecture Risk</h2>
-<div class="callout amber"><div class="callout-label">Two risk levels</div><p><strong>Initial risk</strong> — assessed before any mitigation is applied. <strong>Residual risk</strong> — what remains after mitigation controls are in place. Both are documented. Residual risks above threshold require escalation.</p></div>
-<div class="risk-list">
-  <div class="risk-row"><span class="risk-badge" style="background:rgba(251,113,133,.2);color:var(--coral)">Avoid</span><div class="risk-desc">Change the plan to eliminate the risk entirely. Best option when cost of avoidance is low relative to risk impact.</div></div>
-  <div class="risk-row"><span class="risk-badge" style="background:var(--blue2);color:var(--blue)">Transfer</span><div class="risk-desc">Shift the risk to another party through insurance, contracts, or outsourcing. Risk doesn't disappear — it moves.</div></div>
-  <div class="risk-row"><span class="risk-badge" style="background:var(--amber2);color:var(--amber)">Mitigate</span><div class="risk-desc">Reduce likelihood or impact through controls, safeguards, or contingency plans. Most common approach.</div></div>
-  <div class="risk-row"><span class="risk-badge" style="background:var(--green2);color:var(--green)">Accept</span><div class="risk-desc">Formally acknowledge and monitor the risk. Used when cost of mitigation exceeds impact, or risk is unavoidable.</div></div>
-</div>
-<div class="callout teal"><div class="callout-label">Where risks are recorded</div><p>All accepted and transferred risks are recorded in the <strong>Governance Log</strong> within the Architecture Repository — creating an audit trail visible to the Architecture Board.</p></div>
-<div class="sum-grid">
-  <div class="sum-card"><div class="sum-num">01</div><div class="sum-text"><strong>3 iteration patterns</strong> — Architecture, Transition, Capability. Deliberate design feature.</div></div>
-  <div class="sum-card"><div class="sum-num">02</div><div class="sum-text"><strong>Security is cross-cutting</strong> — every phase from A to H. Not just Phase D.</div></div>
-  <div class="sum-card"><div class="sum-num">03</div><div class="sum-text"><strong>SOA = Phase C</strong> — services as reusable ABBs/SBBs. Loose coupling + service contracts.</div></div>
-  <div class="sum-card"><div class="sum-num">04</div><div class="sum-text"><strong>Readiness = 8 dimensions</strong> — Phases A and E. Gaps become work packages.</div></div>
-</div>`,
-voice:`Risk management in TOGAF starts with two levels. Initial risk is assessed before any mitigation. Residual risk is what remains after controls are applied. Both are documented. Four mitigation options are available. Avoid — change the plan to eliminate the risk entirely, best when avoidance is cheaper than the impact. Transfer — shift the risk to another party through insurance, contracts, or outsourcing — the risk moves, it doesn't disappear. Mitigate — reduce likelihood or impact through controls and contingency plans, the most common approach. Accept — formally acknowledge and monitor the risk, used when mitigation cost exceeds the impact or the risk is unavoidable. All accepted and transferred risks are recorded in the Governance Log within the Architecture Repository, creating a visible audit trail for the Architecture Board. Four week-3 takeaways: three iteration patterns — Architecture, Transition, Capability. Security is cross-cutting across every phase. SOA is primarily Phase C. And the Readiness Assessment has 8 dimensions, used in Phases A and E.`},
-
-{type:"title",bg:"end",
-html:`<div class="title-eyebrow">Day 12 Complete · Week 3 Done! 🎉</div><h1 class="title-h" style="font-size:clamp(22px,5.5vw,38px)">Guidelines &amp; Techniques — done.<br>Week 3 — done!</h1><div class="title-rule"></div><p class="title-sub" style="margin-bottom:24px">Week 4 covers the core TOGAF frameworks: <strong>Architecture Content Framework, Enterprise Continuum &amp; Repository, Architecture Capability, and Architecture Governance</strong>.</p>
-<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
-  <a href="togaf-day12.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Open reading version · Take the quiz</a>
-  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 12 as done</button>
-</div>`,
-voice:`Congratulations — Day 12 done, Week 3 done! You've now covered the entire ADM from Phase A through Phase H, plus Requirements Management and the ADM's practical guidelines and techniques. That's the full process cycle of TOGAF complete. Take the Day 12 quiz to cement the week's learning. Week 4 moves into the core frameworks that underpin the ADM — the Architecture Content Framework, the Enterprise Continuum and Repository, Architecture Capability, and Architecture Governance. These are the structural foundations of TOGAF. See you in Week 4.`},
+const voiceover=[
+  "Welcome to Day 12 — the final session of Week 3. Today we cover ADM iteration cycles, the Classes of Architecture Engagement from Part 3, Architecture Patterns from Part 2, and the remaining ADM techniques. This session fills in gaps that Foundation exam questions regularly test.",
+  "TOGAF defines four ADM iteration cycles. Architecture Capability Iteration establishes or adjusts the architecture capability — the foundation work. Architecture Development Iteration cycles through the B, C, and D phases to converge on a target. Transition Planning Iteration creates the roadmap and implementation plan. Architecture Governance Iteration governs change progressing towards the target.",
+  "Iteration can also happen between complete ADM cycles. A Strategic Architecture covers the whole enterprise at a shallow level. A Segment Architecture covers one business area, constrained by the Strategic above it. A Capability Architecture addresses a specific solution, constrained by the Segment above. These three levels map directly to the Classes of Engagement we cover next.",
+  "Within an ADM cycle, you choose either Baseline First or Target First. Baseline First means assessing the current state first — best when the baseline is messy or poorly understood. Target First means elaborating the target first, then mapping back — best when the target is already agreed and clear.",
+  "Now for a key exam topic: Classes of Architecture Engagement from TOGAF Part 3. The architecture function is called upon in three different areas: Identification of Required Change, Definition of Change, and Implementation of Change. Each area has specific engagement types with different iteration focuses.",
+  "The three engagement areas break down as follows. Identification of Required Change is about providing strategic visibility — used outside any specific change initiative. Definition of Change is where architecture defines the nature and scope of a known change. Implementation of Change is architecture governance — ensuring projects realise their intended benefit.",
+  "The six engagement types within Identification of Required Change are: Supporting Business Strategy, which tests feasibility of strategic choices with a broad, shallow, baseline-first scope. And Architectural Portfolio Management of the Landscape, which links IT portfolio performance to strategic need and identifies areas of misalignment.",
+  "Within Definition of Change, you have two types. Architectural Definition of Foundational Change Initiatives addresses change efforts with a known objective but uncertain scope — baseline first is used to understand the problem before defining the solution. Architectural Definition of Bounded Change Initiatives addresses change efforts where the target is already agreed — target first is appropriate here.",
+  "The summary table to remember: Supporting Business Strategy and Portfolio Management of the Landscape both use Capability and Development iterations with Baseline First. Portfolio Management of Projects uses Transition and Governance iterations. Foundational Change uses Capability, Development Baseline First, and Transition. Bounded Change uses Development Target First and Transition. Governance of Change uses only the Architecture Governance iteration.",
+  "Architecture Partitioning from Part 3 Chapter 4 addresses how to divide work across teams. Different teams work in defined scope partitions that must have clear compliance relationships with each other. A higher-level architecture always constrains lower-level partitions. Phase F Migration Planning is the mechanism that initiates more detailed architecture projects — this is how the Strategic, Segment, and Capability hierarchy develops over time.",
+  "Architecture Patterns are introduced in Part 2 Chapter 4. The core idea is that a pattern is something proven useful in one practical context that will probably be useful in others. In TOGAF, patterns sit above building blocks — building blocks are what you use, patterns tell you how to combine them, when, and why, along with the trade-offs involved.",
+  "An architecture pattern has a defined structure: Name — memorable and meaningful. Problem — the intent and goals. Context — the preconditions for applying it. Forces — the constraints and trade-offs that make the problem difficult. Solution — how the forces are resolved. Resulting context — the new state after applying the pattern. And Related Patterns — how this connects to others.",
+  "Patterns sit at all levels of the Enterprise Continuum. Foundation patterns like the Technical Reference Model apply to all enterprises. Common Systems patterns like SOA and Cloud design patterns apply across multiple enterprises. Industry patterns apply within a sector. And Organisation-Specific patterns are reusable solutions proven within your own enterprise, stored in the Architecture Repository.",
+  "Risk Management from Part 2 Chapter 9. TOGAF defines four risk treatment options: Avoid by changing the plan to eliminate the risk. Transfer by shifting it through insurance or contracts. Mitigate by reducing probability or impact. And Accept by documenting the residual risk. Initial risk is assessed before mitigations. Residual risk is what remains after them. Phase G monitors residual risks during implementation.",
+  "Security architecture is a cross-cutting concern. In Phase A, security requirements are identified as stakeholder concerns. Phase B captures business security roles and compliance obligations. Phase C addresses data classification and application security patterns. Phase D handles infrastructure security. The exam tests that security is not just a Phase D concern — it runs through every phase.",
+  "SOA in the ADM. Services are primarily designed in Phase C Application Architecture as Architecture Building Blocks. In Phase A, SOA strategic direction is set. Phase B identifies business services. Phase C designs application services as ABBs. Phase D defines the technology platform. Services become Solution Building Blocks when specific products are selected in Phases D or E.",
+  "Business Transformation Readiness Assessment from Part 2 Chapter 8. This technique, used primarily in Phase A and Phase E, assesses whether the enterprise is ready to execute a transformation. Eight dimensions are evaluated: Vision, Desire and Resolve, Need, Business Case, Funding, Leadership, Governance and Accountability, and the Ability to Implement Change.",
+  "Architecture Alternatives and Trade-offs from Part 2 Chapter 10 is a technique for choosing between candidate architectures. You define criteria — cost, risk, time, quality — identify the alternatives, score each, and select the best with documented rationale. It is used in Phase A for scoping alternatives, in Phases B through D for architecture options, and commonly in Phase E for implementation strategies.",
+  "Day 12 full recap. ADM iteration: four cycles — Capability, Development, Transition, and Governance. Classes of Engagement: three areas — Identification, Definition, and Implementation of Change — with six specific engagement types. Architecture Patterns: proven reusable configurations of building blocks. Other techniques: Risk Management, Security cross-phase, SOA in Phase C, and Readiness Assessment.",
+  "Week 3 complete! You have now covered all ADM Governance and Technique topics. Next week — Week 4 beginning Day 13 — covers the Architecture Content Framework: Deliverables, Artifacts, Building Blocks, and the Enterprise Metamodel."
 ];
 
-let cur=0,play=false,spdIdx=1,utt=null,tx=0,anim=false;
-const SPDS=[0.8,1,1.2,1.5];
-const wrap=document.getElementById("slides-wrap");
-document.getElementById("slide-total").textContent=SLIDES.length;
-function getBg(b){return{navy:"var(--navy2)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",green:"linear-gradient(135deg,#0A1A10,#0D2218)",amber:"linear-gradient(135deg,#1A1000,#251800)",coral:"linear-gradient(135deg,#1A0A0E,#2A0D15)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"}[b]||"var(--navy2)";}
-SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="s"+i;d.style.background=getBg(s.bg);d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
-function goTo(i,dir){if(anim||i<0||i>=SLIDES.length)return;anim=true;stopSp();const f=document.getElementById("s"+cur),t=document.getElementById("s"+i);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");anim=false;cur=i;upUI();if(play)spk();},420);}
-function nextSlide(){if(cur<SLIDES.length-1)goTo(cur+1,1);}
-function prevSlide(){if(cur>0)goTo(cur-1,-1);}
-function upUI(){document.getElementById("slide-num").textContent=cur+1;document.getElementById("progress-fill").style.width=((cur+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=cur===0;document.getElementById("btn-next").disabled=cur===SLIDES.length-1;}
-function spk(){stopSp();if(!("speechSynthesis"in window))return;const txt=SLIDES[cur].voice;if(!txt){if(play)setTimeout(nextSlide,800);return;}utt=new SpeechSynthesisUtterance(txt);utt.rate=SPDS[spdIdx];utt.lang="en-GB";const vs=speechSynthesis.getVoices();const p=vs.find(v=>v.lang.startsWith("en")&&(v.name.includes("Daniel")||v.name.includes("Samantha")||v.name.includes("Karen")||v.name.includes("Google UK")))||vs.find(v=>v.lang.startsWith("en"))||vs[0];if(p)utt.voice=p;utt.onstart=()=>setSt("speaking");utt.onend=()=>{setSt("");if(play&&cur<SLIDES.length-1)setTimeout(nextSlide,600);else if(cur===SLIDES.length-1){play=false;upPlay();}};utt.onerror=()=>setSt("");speechSynthesis.speak(utt);}
-function stopSp(){if("speechSynthesis"in window)speechSynthesis.cancel();utt=null;setSt("");}
-function togglePlay(){play=!play;upPlay();if(play)spk();else stopSp();}
-function upPlay(){document.getElementById("play-icon").innerHTML=play?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
-function setSt(s){const el=document.getElementById("voice-status");el.innerHTML=s==="speaking"?`<div class="voice-dots"><div class="voice-dot"></div><div class="voice-dot"></div><div class="voice-dot"></div></div><span>Narrating…</span>`:s||"";}
-function cycleSpeed(){spdIdx=(spdIdx+1)%SPDS.length;document.getElementById("speed-btn").textContent=SPDS[spdIdx]+"×";if(play){stopSp();setTimeout(spk,100);}}
-function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[12]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="var(--teal3)";b.style.borderColor="var(--teal)";b.querySelector("svg").style.stroke="var(--teal)";goTo(SLIDES.length-1,1);}
-document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";upUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{play=true;upPlay();spk();},400);}});
-wrap.addEventListener("touchstart",e=>{tx=e.touches[0].clientX;},{passive:true});
-wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-tx;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
-document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
-if("speechSynthesis"in window)speechSynthesis.onvoiceschanged=()=>{};
+function buildDots(){const d=document.getElementById('progress-dots');d.innerHTML='';for(let i=0;i<TOTAL;i++){const s=document.createElement('span');s.className='dot'+(i===0?' cur':'');d.appendChild(s);}}
+function updateDots(){document.querySelectorAll('.dot').forEach((d,i)=>{d.className='dot'+(i<cur?' done':i===cur?' cur':'');});}
+function showSlide(n){document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('active',i===n));document.getElementById('prev-btn').disabled=n===0;document.getElementById('next-btn').disabled=n===TOTAL-1;updateDots();}
+function nextSlide(){stopSpeech();if(cur<TOTAL-1){cur++;showSlide(cur);if(isPlaying)speakCurrent();}}
+function prevSlide(){stopSpeech();if(cur>0){cur--;showSlide(cur);if(isPlaying)speakCurrent();}}
+function speakCurrent(){if(!('speechSynthesis' in window))return;stopSpeech();utterance=new SpeechSynthesisUtterance(voiceover[cur]);utterance.rate=speeds[speedIdx];utterance.onend=()=>{if(isPlaying&&cur<TOTAL-1){cur++;showSlide(cur);speakCurrent();}else if(cur===TOTAL-1){isPlaying=false;updatePlayBtn();}};speechSynthesis.speak(utterance);}
+function stopSpeech(){if(utterance){speechSynthesis.cancel();utterance=null;}}
+function togglePlay(){isPlaying=!isPlaying;if(isPlaying)speakCurrent();else stopSpeech();updatePlayBtn();}
+function updatePlayBtn(){document.getElementById('play-btn').textContent=isPlaying?'⏸ Pause':'▶ Play';}
+function cycleSpeed(){speedIdx=(speedIdx+1)%speeds.length;document.getElementById('speed-btn').textContent=speeds[speedIdx]+'×';if(isPlaying&&utterance){const pos=cur;stopSpeech();cur=pos;speakCurrent();}}
+function markDone(){try{const p=JSON.parse(localStorage.getItem('togaf_progress')||'{}');p['day12']=true;localStorage.setItem('togaf_progress',JSON.stringify(p));}catch(e){}}
+function startDeck(){
+  document.getElementById('start-overlay').style.display='none';
+  const d=document.getElementById('deck');d.style.display='block';
+  document.getElementById('nav').style.display='flex';
+  buildDots();showSlide(0);
+  if(/iPhone|iPad|iPod/.test(navigator.userAgent)){const primer=new SpeechSynthesisUtterance('');primer.volume=0;speechSynthesis.speak(primer);setTimeout(()=>{isPlaying=true;updatePlayBtn();speakCurrent();},400);}
+}
+const wrap=document.getElementById('deck');
+wrap.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-touchStartX;if(Math.abs(dx)>50){if(dx<0)nextSlide();else prevSlide();}},{passive:true});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowRight'||e.key==='ArrowDown')nextSlide();if(e.key==='ArrowLeft'||e.key==='ArrowUp')prevSlide();if(e.key===' '){e.preventDefault();togglePlay();}});
 </script>
 </body>
 </html>

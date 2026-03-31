@@ -3,395 +3,526 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Day 3 Slides — Phase A: Architecture Vision</title>
+<title>Day 3 Slides — Phase A: Architecture Vision & Scoping</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
   --navy:#080E1A;--navy2:#0D1526;--navy3:#152035;--navy4:#1C2D48;
-  --teal:#2DD4BF;--teal3:rgba(45,212,191,0.15);
+  --teal:#2DD4BF;--teal2:#1BA898;--teal3:rgba(45,212,191,0.15);--teal4:rgba(45,212,191,0.08);
   --gold:#F0B429;--gold2:rgba(240,180,41,0.15);
   --slate:#94A3B8;--slate2:#64748B;--slate3:#334155;
-  --white:#F8FAFC;--white2:#E2E8F0;
+  --white:#F8FAFC;--white2:#E2E8F0;--white3:#CBD5E1;
   --coral:#FB7185;--coral2:rgba(251,113,133,0.15);
   --blue:#60A5FA;--blue2:rgba(96,165,250,0.12);
   --purple:#A78BFA;--purple2:rgba(167,139,250,0.12);
   --green:#4ADE80;--green2:rgba(74,222,128,0.12);
-  --amber:#FBBF24;--amber2:rgba(251,191,36,0.12);
+  --amber:#FCD34D;--amber2:rgba(252,211,77,0.12);
 }
 html,body{width:100%;height:100%;overflow:hidden;background:var(--navy);font-family:'DM Sans',sans-serif;color:var(--white)}
-#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center}
-.start-geo{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;opacity:0.06}
-.start-logo{font-family:'Playfair Display',serif;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:0.8}
-.start-title{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,42px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;padding:0 24px;margin-bottom:12px}
-.start-sub{font-size:14px;color:var(--slate);text-align:center;padding:0 32px;line-height:1.6;margin-bottom:48px}
-.start-meta{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-bottom:56px}
-.start-pill{font-size:12px;padding:5px 14px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate);font-weight:500}
-.start-btn{display:flex;align-items:center;gap:10px;padding:16px 36px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:700;border:none;cursor:pointer;transition:transform .15s,opacity .15s}
-.start-btn:active{transform:scale(0.97)}
-.start-btn svg{width:18px;height:18px}
-.start-note{font-size:11px;color:var(--slate2);margin-top:16px;text-align:center}
-#deck{width:100%;height:100%;position:relative;overflow:hidden;display:flex;flex-direction:column}
-.slide{position:absolute;inset:0;display:flex;flex-direction:column;overflow:hidden;opacity:0;pointer-events:none}
+#start-overlay{position:fixed;inset:0;z-index:200;background:var(--navy);display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.start-logo{font-size:13px;letter-spacing:3px;text-transform:uppercase;color:var(--teal);margin-bottom:40px;opacity:0.8}
+.start-title{font-family:'Playfair Display',serif;font-size:clamp(22px,5vw,38px);font-weight:700;color:var(--white);text-align:center;line-height:1.2;padding:0 24px;margin-bottom:12px}
+.start-sub{font-size:14px;color:var(--slate);text-align:center;padding:0 32px;line-height:1.6;margin-bottom:40px}
+.start-meta{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:48px}
+.start-pill{font-size:12px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate)}
+.start-btn{display:flex;align-items:center;gap:10px;padding:14px 32px;border-radius:12px;background:var(--teal);color:var(--navy);font-size:15px;font-weight:600;border:none;cursor:pointer;transition:transform .15s,opacity .15s}
+.start-btn:hover{opacity:0.9;transform:scale(1.02)}
+#deck{width:100%;height:100%;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;padding:clamp(16px,3vw,36px);display:flex;flex-direction:column;justify-content:center;opacity:0;transition:opacity .35s;pointer-events:none;overflow-y:auto}
 .slide.active{opacity:1;pointer-events:all}
-.slide.exit-left{animation:exitLeft .4s cubic-bezier(.4,0,.2,1) forwards}
-.slide.enter-right{animation:enterRight .4s cubic-bezier(.4,0,.2,1) forwards}
-.slide.exit-right{animation:exitRight .4s cubic-bezier(.4,0,.2,1) forwards}
-.slide.enter-left{animation:enterLeft .4s cubic-bezier(.4,0,.2,1) forwards}
-@keyframes exitLeft{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-60px)}}
-@keyframes enterRight{from{opacity:0;transform:translateX(60px)}to{opacity:1;transform:translateX(0)}}
-@keyframes exitRight{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(60px)}}
-@keyframes enterLeft{from{opacity:0;transform:translateX(-60px)}to{opacity:1;transform:translateX(0)}}
-.slide-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:20px 20px 0;scrollbar-width:none}
-.slide-body::-webkit-scrollbar{display:none}
-.slide-title .slide-body{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:32px 28px}
-.title-eyebrow{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:16px}
-.title-h{font-family:'Playfair Display',serif;font-size:clamp(28px,7vw,52px);font-weight:700;line-height:1.1;color:var(--white);margin-bottom:16px}
-.title-rule{width:48px;height:3px;background:var(--teal);border-radius:2px;margin-bottom:20px}
-.title-sub{font-size:15px;color:var(--slate);line-height:1.7;font-weight:300;max-width:440px}
-.title-tags{display:flex;gap:8px;flex-wrap:wrap;margin-top:24px}
-.title-tag{font-size:11px;padding:4px 12px;border-radius:20px;border:1px solid var(--slate3);color:var(--slate2)}
-.slide-section .slide-body{display:flex;flex-direction:column;justify-content:center;padding:32px 28px}
-.section-num{font-family:'Playfair Display',serif;font-size:72px;font-weight:700;color:var(--teal3);line-height:1;margin-bottom:8px}
-.section-label{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
-.section-h{font-family:'Playfair Display',serif;font-size:clamp(24px,6vw,40px);font-weight:700;color:var(--white);line-height:1.15;margin-bottom:16px}
-.section-desc{font-size:15px;color:var(--slate);line-height:1.7;max-width:400px}
-.content-label{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:10px}
-.content-h{font-family:'Playfair Display',serif;font-size:clamp(18px,4.5vw,28px);font-weight:600;color:var(--white);line-height:1.2;margin-bottom:16px}
-.callout{border-radius:10px;padding:14px 16px;margin-bottom:14px}
-.callout.teal{background:var(--teal3);border-left:3px solid var(--teal)}
-.callout.gold{background:var(--gold2);border-left:3px solid var(--gold)}
-.callout.blue{background:var(--blue2);border-left:3px solid var(--blue)}
-.callout.purple{background:var(--purple2);border-left:3px solid var(--purple)}
-.callout.green{background:var(--green2);border-left:3px solid var(--green)}
-.callout.amber{background:var(--amber2);border-left:3px solid var(--amber)}
-.callout-label{font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;margin-bottom:5px}
-.callout.teal .callout-label{color:var(--teal)}
-.callout.gold .callout-label{color:var(--gold)}
-.callout.blue .callout-label{color:var(--blue)}
-.callout.purple .callout-label{color:var(--purple)}
-.callout.green .callout-label{color:var(--green)}
-.callout.amber .callout-label{color:var(--amber)}
-.callout p{font-size:14px;line-height:1.6;margin:0}
-.callout.teal p{color:rgba(45,212,191,.9)}
-.callout.gold p{color:rgba(240,180,41,.9)}
-.callout.blue p{color:rgba(96,165,250,.9)}
-.callout.purple p{color:rgba(167,139,250,.9)}
-.callout.green p{color:rgba(74,222,128,.9)}
-.callout.amber p{color:rgba(251,191,36,.9)}
-.bullet-list{display:flex;flex-direction:column;gap:9px;margin-bottom:14px}
-.bullet{display:flex;gap:12px;align-items:flex-start}
-.bullet-dot{width:6px;height:6px;border-radius:50%;background:var(--teal);flex-shrink:0;margin-top:8px}
-.bullet-text{font-size:14px;color:var(--white2);line-height:1.55}
-.bullet-text strong{color:var(--white);font-weight:600}
-.bullet-text em{color:var(--teal);font-style:normal}
-.exam-bar{background:var(--gold2);border:1px solid rgba(240,180,41,.25);border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;gap:10px;align-items:flex-start}
-.exam-star{font-size:16px;flex-shrink:0}
-.exam-text{font-size:13px;color:rgba(240,180,41,.9);line-height:1.6}
-.exam-text strong{color:var(--gold)}
-.doc-card{background:var(--navy3);border-radius:10px;margin-bottom:12px;overflow:hidden;border:1px solid rgba(255,255,255,.06)}
-.doc-header{padding:9px 14px;font-size:12px;font-weight:700;display:flex;align-items:center;gap:6px}
-.doc-header.saw{background:var(--teal3);color:var(--teal)}
-.doc-header.av{background:var(--blue2);color:var(--blue)}
-.doc-header.raw{background:var(--amber2);color:var(--amber)}
-.doc-body{padding:8px 14px 12px;display:flex;flex-direction:column;gap:4px}
-.doc-row{font-size:12px;color:var(--slate);display:flex;gap:6px}
-.doc-row::before{content:'→';color:var(--teal);flex-shrink:0}
-.sh-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.sh-card{background:var(--navy3);border-radius:8px;padding:10px 12px;border:1px solid rgba(255,255,255,.05)}
-.sh-role{font-size:10px;font-weight:700;color:var(--teal);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
-.sh-concern{font-size:12px;color:var(--slate);line-height:1.5}
-.io-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.io-box{background:var(--navy3);border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.05)}
-.io-header{padding:8px 12px;font-size:10px;font-weight:700;letter-spacing:.7px;text-transform:uppercase}
-.io-header.in{background:var(--blue2);color:var(--blue)}
-.io-header.out{background:var(--teal3);color:var(--teal)}
-.io-list{list-style:none;padding:8px 12px;display:flex;flex-direction:column;gap:3px}
-.io-list li{font-size:12px;color:var(--slate);display:flex;gap:5px}
-.io-list li::before{content:'·';color:var(--slate2);flex-shrink:0}
-.chain-row{display:flex;align-items:center;gap:6px;padding:10px 12px;background:var(--navy3);border-radius:8px;margin-bottom:8px;border:1px solid rgba(255,255,255,.05)}
-.chain-badge{font-size:11px;font-weight:700;padding:3px 9px;border-radius:20px;flex-shrink:0;white-space:nowrap}
-.chain-arrow{color:var(--teal);font-size:14px;flex-shrink:0}
-.chain-desc{font-size:12px;color:var(--slate);flex:1}
-.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.sum-card{background:var(--navy3);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,.06)}
-.sum-num{font-family:'Playfair Display',serif;font-size:11px;font-weight:700;color:var(--teal);margin-bottom:5px;letter-spacing:1px}
-.sum-text{font-size:12px;color:var(--white2);line-height:1.55}
-.sum-text strong{color:var(--white)}
-#progress-track{height:2px;background:var(--navy4);width:100%;flex-shrink:0}
-#progress-fill{height:100%;background:var(--teal);transition:width .4s cubic-bezier(.4,0,.2,1)}
-#controls{flex-shrink:0;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px));background:var(--navy2);border-top:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:8px}
-.ctrl-btn{width:40px;height:40px;border-radius:50%;background:var(--navy3);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;flex-shrink:0;color:var(--white2)}
-.ctrl-btn:active{background:var(--navy4)}
-.ctrl-btn svg{width:16px;height:16px}
-.ctrl-btn.primary{background:var(--teal);border-color:var(--teal);color:var(--navy);width:44px;height:44px}
-.ctrl-btn.primary svg{width:18px;height:18px}
-.ctrl-btn:disabled{opacity:.3;cursor:not-allowed}
-.slide-counter{flex:1;text-align:center;font-size:12px;color:var(--slate2)}
-.slide-counter strong{color:var(--slate)}
-.voice-status{font-size:11px;color:var(--slate2);text-align:center;padding:4px 0 0;display:flex;align-items:center;justify-content:center;gap:6px;min-height:18px}
-.voice-dots{display:flex;gap:3px;align-items:center}
-.voice-dot{width:4px;height:4px;border-radius:50%;background:var(--teal);animation:vdot 1.2s infinite}
-.voice-dot:nth-child(2){animation-delay:.2s}
-.voice-dot:nth-child(3){animation-delay:.4s}
-@keyframes vdot{0%,80%,100%{transform:scaleY(.4);opacity:.4}40%{transform:scaleY(1);opacity:1}}
-.speed-btn{font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:var(--navy3);border:1px solid rgba(255,255,255,.08);color:var(--slate);cursor:pointer}
-.swipe-hint{font-size:10px;color:var(--slate3);text-align:center;padding:2px 0}
+.section-tag{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
+.slide-num{font-size:11px;color:var(--slate2);margin-bottom:8px}
+h1{font-family:'Playfair Display',serif;font-size:clamp(22px,4.5vw,42px);font-weight:700;line-height:1.15;margin-bottom:16px}
+h2{font-family:'Playfair Display',serif;font-size:clamp(18px,3.5vw,30px);font-weight:600;line-height:1.2;margin-bottom:12px}
+.lead{font-size:clamp(14px,2vw,17px);color:var(--slate);line-height:1.65;margin-bottom:16px}
+.card{border-radius:12px;padding:14px 16px;margin-bottom:10px;border:1px solid}
+.card-teal{background:var(--teal3);border-color:rgba(45,212,191,0.25)}
+.card-blue{background:var(--blue2);border-color:rgba(96,165,250,0.25)}
+.card-purple{background:var(--purple2);border-color:rgba(167,139,250,0.25)}
+.card-gold{background:var(--gold2);border-color:rgba(240,180,41,0.25)}
+.card-coral{background:var(--coral2);border-color:rgba(251,113,133,0.25)}
+.card-amber{background:var(--amber2);border-color:rgba(252,211,77,0.25)}
+.card-green{background:var(--green2);border-color:rgba(74,222,128,0.25)}
+.card h3{font-size:13px;font-weight:600;margin-bottom:5px}
+.card p,.card li{font-size:13px;color:var(--slate);line-height:1.55}
+.card ul{padding-left:16px}
+.pill{display:inline-block;font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;margin:2px}
+.pill-teal{background:var(--teal3);color:var(--teal)}
+.pill-gold{background:var(--gold2);color:var(--gold)}
+.pill-blue{background:var(--blue2);color:var(--blue)}
+.pill-coral{background:var(--coral2);color:var(--coral)}
+.pill-purple{background:var(--purple2);color:var(--purple)}
+.pill-green{background:var(--green2);color:var(--green)}
+.pill-amber{background:var(--amber2);color:var(--amber)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid4{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.exam-box{background:rgba(240,180,41,0.08);border:1px solid rgba(240,180,41,0.3);border-radius:10px;padding:12px 14px;margin-top:12px}
+.exam-box .exam-label{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--gold);text-transform:uppercase;margin-bottom:6px}
+.exam-box p{font-size:13px;color:var(--slate);line-height:1.5}
+.phase-strip{display:flex;flex-wrap:wrap;gap:4px;margin:12px 0}
+.phase-pill{font-size:10px;padding:3px 8px;border-radius:6px;border:1px solid var(--slate3);color:var(--slate2)}
+.phase-pill.active{background:var(--teal3);border-color:var(--teal2);color:var(--teal);font-weight:600}
+.step-row{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05)}
+.step-row:last-child{border-bottom:none}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--teal3);color:var(--teal);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-text{font-size:13px;color:var(--white2);line-height:1.5}
+.step-text strong{color:var(--white);font-weight:600}
+.big-num{font-size:clamp(40px,8vw,72px);font-weight:700;line-height:1;margin-bottom:4px}
+.dim-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.dim-box{border-radius:10px;padding:12px 13px;border:1px solid}
+.dim-q{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px}
+.dim-body{font-size:12px;color:var(--slate);line-height:1.5}
+.scope-visual{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.scope-bar{border-radius:8px;padding:9px 13px;display:flex;align-items:center;gap:10px}
+.scope-icon{font-size:18px;width:28px;text-align:center}
+.scope-label{font-size:13px;font-weight:600}
+.scope-sub{font-size:12px;color:var(--slate);margin-top:2px}
+/* nav */
+#nav{position:fixed;bottom:0;left:0;right:0;z-index:100;padding:12px 16px;background:linear-gradient(to top,rgba(8,14,26,0.95),transparent);display:flex;align-items:center;justify-content:space-between;gap:8px}
+#nav button{background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);color:var(--white);border-radius:8px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;transition:background .15s}
+#nav button:hover{background:rgba(255,255,255,0.12)}
+#nav button:disabled{opacity:0.3;cursor:default}
+#play-btn{background:var(--teal3)!important;border-color:var(--teal2)!important;color:var(--teal)!important;min-width:80px}
+.speed-btn{font-size:12px!important;padding:8px 10px!important}
+#progress-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;flex:1;padding:0 4px}
+.dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.2);transition:background .2s}
+.dot.done{background:var(--teal2)}
+.dot.cur{background:var(--teal);transform:scale(1.4)}
 </style>
 </head>
 <body>
+
 <div id="start-overlay">
-  <svg class="start-geo" viewBox="0 0 400 700" fill="none"><circle cx="350" cy="80" r="180" fill="#2DD4BF"/><circle cx="20" cy="400" r="120" fill="#60A5FA"/><circle cx="300" cy="600" r="100" fill="#A78BFA"/></svg>
   <div class="start-logo">TOGAF Foundation · Day 3</div>
-  <div class="start-title">Phase A:<br>Architecture Vision</div>
-  <p class="start-sub">20 slides with voiceover narration.<br>Approx. 30 minutes to complete.</p>
-  <div class="start-meta"><span class="start-pill">📊 20 slides</span><span class="start-pill">🎙 Voice narration</span><span class="start-pill">⏱ ~30 min</span></div>
-  <button class="start-btn" id="start-btn"><svg viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg>Start Presentation</button>
-  <p class="start-note">Tap Start to enable voice narration · Swipe or use controls to navigate</p>
+  <h1 class="start-title">Phase A: Architecture Vision<br>& Architecture Scoping</h1>
+  <p class="start-sub">20 slides · ~30 min · narrated with voiceover</p>
+  <div class="start-meta">
+    <span class="start-pill">Week 1</span>
+    <span class="start-pill">ADM</span>
+    <span class="start-pill">Phase A</span>
+    <span class="start-pill">Scoping</span>
+  </div>
+  <button class="start-btn" onclick="startDeck()">▶ Begin Session</button>
 </div>
-<div id="deck">
-  <div id="progress-track"><div id="progress-fill" style="width:5%"></div></div>
-  <div id="slides-wrap" style="flex:1;position:relative;overflow:hidden"></div>
-  <div style="padding:2px 16px 0"><div class="voice-status" id="voice-status"></div><div class="swipe-hint">swipe left/right to navigate</div></div>
-  <div id="controls">
-    <button class="ctrl-btn" id="btn-prev" onclick="prevSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 3L5 8l5 5"/></svg></button>
-    <button class="ctrl-btn primary" id="btn-play" onclick="togglePlay()"><svg id="play-icon" viewBox="0 0 18 18" fill="currentColor"><path d="M4 3l11 6-11 6V3z"/></svg></button>
-    <button class="ctrl-btn" id="btn-next" onclick="nextSlide()"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></button>
-    <div class="slide-counter"><strong id="slide-num">1</strong> / <span id="slide-total">20</span></div>
-    <button class="speed-btn" id="speed-btn" onclick="cycleSpeed()">1×</button>
-    <button class="ctrl-btn" id="btn-done" onclick="markDone()" title="Mark complete"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2.5 8.5l4 4 7-8"/></svg></button>
+
+<div id="deck" style="display:none">
+
+<!-- SLIDE 1: Section opener -->
+<div class="slide">
+  <div class="section-tag pill-teal" style="color:var(--teal)">Section 1 of 5 · Phase A Overview</div>
+  <h1>Phase A:<br>Architecture Vision</h1>
+  <p class="lead">The first formal phase of the ADM. Before any architecture is designed, you need agreement on <em>why</em> you are doing it, <em>what</em> it will cover, and <em>who</em> it matters to.</p>
+  <div class="phase-strip">
+    <span class="phase-pill">Prelim</span>
+    <span class="phase-pill active">A. Vision</span>
+    <span class="phase-pill">B. Business</span>
+    <span class="phase-pill">C. IS</span>
+    <span class="phase-pill">D. Technology</span>
+    <span class="phase-pill">E–H</span>
   </div>
 </div>
+
+<!-- SLIDE 2: Phase A objectives -->
+<div class="slide">
+  <div class="slide-num">2 / 20</div>
+  <h2>Phase A — Objectives</h2>
+  <p class="lead">Phase A sets the entire context for the architecture engagement. There are three core objectives:</p>
+  <div class="card card-teal"><h3>1. Establish the architecture project</h3><p>Secure formal recognition and approval to proceed with the architecture work.</p></div>
+  <div class="card card-blue"><h3>2. Develop Architecture Vision</h3><p>Create a high-level aspirational view of the target architecture aligned to business goals and stakeholder concerns.</p></div>
+  <div class="card card-purple"><h3>3. Get approval via Statement of Architecture Work</h3><p>Produce a Statement of Architecture Work (SAW) that formally describes the scope, approach, and schedule — and secure sign-off.</p></div>
+</div>
+
+<!-- SLIDE 3: Phase A steps overview -->
+<div class="slide">
+  <div class="slide-num">3 / 20</div>
+  <h2>Phase A — 11 Steps</h2>
+  <div class="step-row"><div class="step-num">1</div><div class="step-text"><strong>Establish the architecture project</strong> — set up governance and funding</div></div>
+  <div class="step-row"><div class="step-num">2</div><div class="step-text"><strong>Identify stakeholders, concerns, and requirements</strong></div></div>
+  <div class="step-row"><div class="step-num">3</div><div class="step-text"><strong>Confirm business goals, drivers, and constraints</strong></div></div>
+  <div class="step-row"><div class="step-num">4</div><div class="step-text"><strong>Evaluate capabilities</strong> — assess current state vs desired</div></div>
+  <div class="step-row"><div class="step-num">5</div><div class="step-text"><strong>Assess business transformation readiness</strong></div></div>
+  <div class="step-row"><div class="step-num">6</div><div class="step-text"><strong>Define scope</strong> — breadth, depth, domains, time</div></div>
+  <div class="step-row"><div class="step-num">7</div><div class="step-text"><strong>Confirm architecture principles</strong></div></div>
+  <div class="step-row"><div class="step-num">8</div><div class="step-text"><strong>Develop Architecture Vision</strong></div></div>
+  <div class="step-row"><div class="step-num">9</div><div class="step-text"><strong>Define target value propositions and KPIs</strong></div></div>
+  <div class="step-row"><div class="step-num">10</div><div class="step-text"><strong>Identify transformation risks and mitigations</strong></div></div>
+  <div class="step-row"><div class="step-num">11</div><div class="step-text"><strong>Develop Statement of Architecture Work — secure approval</strong></div></div>
+</div>
+
+<!-- SLIDE 4: Key inputs -->
+<div class="slide">
+  <div class="slide-num">4 / 20</div>
+  <h2>Phase A — Key Inputs</h2>
+  <p class="lead">Phase A draws on a wide range of existing materials:</p>
+  <div class="grid2">
+    <div class="card card-teal"><h3>External</h3><ul><li>TOGAF Standard</li><li>Industry reference models</li><li>Relevant standards</li></ul></div>
+    <div class="card card-blue"><h3>Non-architectural</h3><ul><li>Board strategy papers</li><li>Business plans</li><li>Request for Architecture Work</li></ul></div>
+    <div class="card card-purple"><h3>Architectural</h3><ul><li>Architecture principles</li><li>Governance framework</li><li>Architecture Repository</li></ul></div>
+    <div class="card card-gold"><h3>From Preliminary</h3><ul><li>Tailored TOGAF framework</li><li>Principles catalogue</li><li>Org model for EA</li></ul></div>
+  </div>
+</div>
+
+<!-- SLIDE 5: Section opener - Scoping -->
+<div class="slide">
+  <div class="section-tag pill-gold" style="color:var(--gold)">Section 2 of 5 · Architecture Scoping ★ Exam Focus</div>
+  <h1>Scoping the<br>Architecture</h1>
+  <p class="lead">Step 6 of Phase A is Define Scope. TOGAF defines four dimensions of scope — and the exam tests all four. Getting this wrong leads to architects duplicating work or leaving gaps.</p>
+  <div class="exam-box">
+    <div class="exam-label">★ Why this matters in the exam</div>
+    <p>Questions often describe an architecture scenario and ask which scoping dimension is being addressed, or ask you to identify which dimension is missing from a given scope statement.</p>
+  </div>
+</div>
+
+<!-- SLIDE 6: 4 Dimensions overview -->
+<div class="slide">
+  <div class="slide-num">6 / 20</div>
+  <h2>The 4 Dimensions of Scope</h2>
+  <p class="lead">TOGAF Part 1 §1.5 defines four dimensions used to define and limit architecture scope:</p>
+  <div class="scope-visual">
+    <div class="scope-bar" style="background:var(--teal3);border:1px solid rgba(45,212,191,0.3)">
+      <div class="scope-icon">↔</div>
+      <div><div class="scope-label" style="color:var(--teal)">Breadth</div><div class="scope-sub">What portion of the enterprise is in scope?</div></div>
+    </div>
+    <div class="scope-bar" style="background:var(--blue2);border:1px solid rgba(96,165,250,0.3)">
+      <div class="scope-icon">↕</div>
+      <div><div class="scope-label" style="color:var(--blue)">Depth</div><div class="scope-sub">How much detail is required?</div></div>
+    </div>
+    <div class="scope-bar" style="background:var(--purple2);border:1px solid rgba(167,139,250,0.3)">
+      <div class="scope-icon">⏱</div>
+      <div><div class="scope-label" style="color:var(--purple)">Time Period</div><div class="scope-sub">What horizon does the architecture cover?</div></div>
+    </div>
+    <div class="scope-bar" style="background:var(--gold2);border:1px solid rgba(240,180,41,0.3)">
+      <div class="scope-icon">⬡</div>
+      <div><div class="scope-label" style="color:var(--gold)">Architecture Domains</div><div class="scope-sub">Which of the 4 domains are included?</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: Breadth -->
+<div class="slide">
+  <div class="slide-num">7 / 20</div>
+  <h2>Dimension 1: Breadth</h2>
+  <p class="lead">Breadth defines the <strong>horizontal extent</strong> of the architecture — which parts of the enterprise are covered.</p>
+  <div class="card card-teal">
+    <h3>The core question</h3>
+    <p>What is the full extent of the enterprise, and what <strong>part</strong> of that extent will this architecture effort deal with?</p>
+  </div>
+  <div class="card card-blue">
+    <h3>Why it's not simple</h3>
+    <ul>
+      <li>Many enterprises span multiple business units that could each be considered enterprises in their own right</li>
+      <li>Modern enterprises extend beyond traditional boundaries — including suppliers, partners, and customers</li>
+      <li>Breadth must be set to reflect the <strong>organisational authority</strong> of the architecture team</li>
+    </ul>
+  </div>
+  <div class="exam-box"><div class="exam-label">★ Exam tip</div><p>Breadth answers "how wide?" — horizontally across the organisation. Narrowing breadth = focusing on one division, region, or business unit rather than the whole enterprise.</p></div>
+</div>
+
+<!-- SLIDE 8: Depth -->
+<div class="slide">
+  <div class="slide-num">8 / 20</div>
+  <h2>Dimension 2: Depth</h2>
+  <p class="lead">Depth defines the <strong>level of detail</strong> the architecture will descend to — and where it stops before becoming system design or engineering.</p>
+  <div class="card card-blue">
+    <h3>The core question</h3>
+    <p>To what level of detail should the architecture go? How much architecture is <em>enough</em>? Where is the line between architecture and system design?</p>
+  </div>
+  <div class="card card-purple">
+    <h3>Abstraction levels</h3>
+    <ul>
+      <li><strong>Contextual</strong> — strategic overview, whole enterprise</li>
+      <li><strong>Conceptual</strong> — domain-level concepts, no technology specifics</li>
+      <li><strong>Logical</strong> — functional components, platform-independent</li>
+      <li><strong>Physical</strong> — specific products, configurations</li>
+    </ul>
+  </div>
+  <div class="exam-box"><div class="exam-label">★ Exam tip</div><p>Depth answers "how deep?" — how much detail. A strategic architecture is shallow; a solution architecture is deep. The ADM can be applied at any depth level.</p></div>
+</div>
+
+<!-- SLIDE 9: Time Period -->
+<div class="slide">
+  <div class="slide-num">9 / 20</div>
+  <h2>Dimension 3: Time Period</h2>
+  <p class="lead">Time Period defines the <strong>planning horizon</strong> for the Architecture Vision and how many Transition Architectures will be needed.</p>
+  <div class="card card-purple">
+    <h3>The core question</h3>
+    <p>What time period needs to be articulated for the Architecture Vision? Does the same time period apply to the detailed Architecture Description?</p>
+  </div>
+  <div class="card card-gold">
+    <h3>Transition Architectures</h3>
+    <p>If the target is far away, the team defines <strong>Transition Architectures</strong> — intermediate stable states on the path to the target. The number of Transition Architectures and their time periods are scoping decisions made in Phase A.</p>
+  </div>
+  <div class="exam-box"><div class="exam-label">★ Exam tip</div><p>Time Period answers "how far ahead?" — typically a 3-5 year horizon for enterprise architecture. Transition Architectures are how you bridge the gap between now and that horizon.</p></div>
+</div>
+
+<!-- SLIDE 10: Architecture Domains -->
+<div class="slide">
+  <div class="slide-num">10 / 20</div>
+  <h2>Dimension 4: Architecture Domains</h2>
+  <p class="lead">A complete Enterprise Architecture covers all four domains — but resource constraints mean you often cannot do all four at once.</p>
+  <div class="grid4">
+    <div class="card card-teal"><h3>Business</h3><p>Phase B — strategy, capabilities, processes, organisation</p></div>
+    <div class="card card-blue"><h3>Data</h3><p>Phase C — data entities, data management, information flows</p></div>
+    <div class="card card-purple"><h3>Application</h3><p>Phase C — logical and physical applications, interactions</p></div>
+    <div class="card card-gold"><h3>Technology</h3><p>Phase D — platforms, infrastructure, standards</p></div>
+  </div>
+  <div class="exam-box"><div class="exam-label">★ Exam tip</div><p>Domains answer "which architecture types?" A Technology-only architecture is a valid scoped engagement. TOGAF says breadth, depth, and time are determined first — then suitable domains are selected to match.</p></div>
+</div>
+
+<!-- SLIDE 11: Scoping worked example -->
+<div class="slide">
+  <div class="slide-num">11 / 20</div>
+  <h2>Scoping — Worked Example</h2>
+  <p class="lead">Scenario: A bank is launching a new digital lending product and wants architecture support.</p>
+  <div class="scope-visual">
+    <div class="scope-bar" style="background:var(--teal3);border:1px solid rgba(45,212,191,0.3)">
+      <div class="scope-icon">↔</div>
+      <div><div class="scope-label" style="color:var(--teal)">Breadth</div><div class="scope-sub">Retail Banking division only — not the whole bank</div></div>
+    </div>
+    <div class="scope-bar" style="background:var(--blue2);border:1px solid rgba(96,165,250,0.3)">
+      <div class="scope-icon">↕</div>
+      <div><div class="scope-label" style="color:var(--blue)">Depth</div><div class="scope-sub">Logical level — no specific product selection yet</div></div>
+    </div>
+    <div class="scope-bar" style="background:var(--purple2);border:1px solid rgba(167,139,250,0.3)">
+      <div class="scope-icon">⏱</div>
+      <div><div class="scope-label" style="color:var(--purple)">Time Period</div><div class="scope-sub">18-month target with one Transition Architecture at 9 months</div></div>
+    </div>
+    <div class="scope-bar" style="background:var(--gold2);border:1px solid rgba(240,180,41,0.3)">
+      <div class="scope-icon">⬡</div>
+      <div><div class="scope-label" style="color:var(--gold)">Domains</div><div class="scope-sub">Business + Application + Data (Technology excluded — handled separately)</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 12: Section opener - Key outputs -->
+<div class="slide">
+  <div class="section-tag pill-teal" style="color:var(--teal)">Section 3 of 5 · Phase A Outputs</div>
+  <h2>Phase A — Key Outputs</h2>
+  <p class="lead">The primary output is the <strong>Statement of Architecture Work</strong> — but Phase A also produces several other key artefacts:</p>
+  <div class="card card-teal"><h3>Statement of Architecture Work (SAW)</h3><p>Defines scope, approach, schedule, and resource requirements. Formally approved by sponsors. This is the contract for the architecture engagement.</p></div>
+  <div class="card card-blue"><h3>Architecture Vision</h3><p>A high-level description of the target architecture — a summary view of what the future state looks like, without full detail.</p></div>
+  <div class="card card-purple"><h3>Refined Architecture Principles</h3><p>Principles confirmed or updated for this specific engagement.</p></div>
+  <div class="card card-gold"><h3>Communications Plan</h3><p>How architecture information will be shared with stakeholders throughout the engagement.</p></div>
+</div>
+
+<!-- SLIDE 13: Statement of Architecture Work -->
+<div class="slide">
+  <div class="slide-num">13 / 20</div>
+  <h2>Statement of Architecture Work</h2>
+  <p class="lead">The SAW is the most important output of Phase A. It is the formal document that authorises the architecture work to proceed.</p>
+  <div class="card card-teal">
+    <h3>Typical contents of the SAW</h3>
+    <ul>
+      <li>Title and scope of the architecture work</li>
+      <li>Business context and drivers</li>
+      <li>Architecture Vision (high-level)</li>
+      <li>Proposed approach, including which ADM phases will be used</li>
+      <li>Roles, responsibilities, and governance arrangements</li>
+      <li>Schedule and resource plan</li>
+      <li>Risk and assumptions</li>
+      <li>Request for Architecture Work reference (the trigger)</li>
+    </ul>
+  </div>
+  <div class="exam-box"><div class="exam-label">★ Exam tip</div><p>The SAW is the output of Phase A. The <strong>Request for Architecture Work</strong> is the input that triggers Phase A. Don't confuse these two documents.</p></div>
+</div>
+
+<!-- SLIDE 14: Architecture Vision document -->
+<div class="slide">
+  <div class="slide-num">14 / 20</div>
+  <h2>The Architecture Vision Document</h2>
+  <p class="lead">The Architecture Vision is a concise view of the target enterprise architecture — created to agree direction before the full detailed architecture is developed.</p>
+  <div class="grid2">
+    <div class="card card-teal"><h3>What it contains</h3><ul><li>Problem description</li><li>Objective of the engagement</li><li>Summary of baseline and target</li><li>Stakeholder map</li><li>Key concerns addressed</li></ul></div>
+    <div class="card card-blue"><h3>Why it exists</h3><p>Stakeholders need a clear, accessible summary before committing to a full architecture engagement. The Vision gets early alignment without the cost of full Architecture Definition.</p></div>
+  </div>
+  <div class="exam-box"><div class="exam-label">★ Exam tip</div><p>The Architecture Vision is a <strong>deliverable</strong> (a formal work product). It is also the name of Phase A itself. In exam questions, context matters — "Architecture Vision" could mean the phase OR the document.</p></div>
+</div>
+
+<!-- SLIDE 15: Section opener - Stakeholders -->
+<div class="slide">
+  <div class="section-tag pill-purple" style="color:var(--purple)">Section 4 of 5 · Stakeholders & Concerns</div>
+  <h2>Stakeholders & Concerns in Phase A</h2>
+  <p class="lead">Identifying and addressing stakeholder concerns is a core activity of Phase A. The architecture exists to address these concerns — not to demonstrate technical elegance.</p>
+  <div class="card card-purple"><h3>Stakeholder concerns drive architecture</h3><ul><li>Each stakeholder type has different concerns</li><li>Architecture Views are created to address specific concerns</li><li>Unaddressed concerns = architecture gaps</li></ul></div>
+  <div class="card card-gold"><h3>Tools used in Phase A</h3><ul><li>Stakeholder map (power/interest grid)</li><li>Concerns catalogue</li><li>Communications Plan</li><li>Architecture Vision document</li></ul></div>
+</div>
+
+<!-- SLIDE 16: Concerns and viewpoints -->
+<div class="slide">
+  <div class="slide-num">16 / 20</div>
+  <h2>Concerns → Viewpoints → Views</h2>
+  <p class="lead">TOGAF uses a structured approach to ensure architecture addresses what matters to stakeholders:</p>
+  <div class="step-row"><div class="step-num">1</div><div class="step-text"><strong>Concern</strong> — what a stakeholder cares about (e.g., "how does this affect security?")</div></div>
+  <div class="step-row"><div class="step-num">2</div><div class="step-text"><strong>Viewpoint</strong> — a convention for constructing and interpreting a view addressing that concern (e.g., Security Viewpoint)</div></div>
+  <div class="step-row"><div class="step-num">3</div><div class="step-text"><strong>View</strong> — the actual representation of the architecture from that perspective (e.g., Security Architecture diagram)</div></div>
+  <div class="exam-box"><div class="exam-label">★ Exam tip</div><p>A <strong>viewpoint</strong> is the template/pattern. A <strong>view</strong> is the instance created from that template for a specific architecture. This distinction is frequently tested.</p></div>
+</div>
+
+<!-- SLIDE 17: Section opener - Common exam traps -->
+<div class="slide">
+  <div class="section-tag pill-coral" style="color:var(--coral)">Section 5 of 5 · Exam Focus</div>
+  <h2>Common Phase A<br>Exam Traps</h2>
+  <p class="lead">These distinctions come up repeatedly in Foundation exam questions:</p>
+  <div class="card card-coral"><h3>Request for Architecture Work ≠ Statement of Architecture Work</h3><p>The Request is the INPUT to Phase A (the trigger). The Statement is the OUTPUT of Phase A (the authorisation). Don't swap them.</p></div>
+  <div class="card card-blue"><h3>Architecture Vision ≠ Architecture Definition Document</h3><p>Vision = high-level summary from Phase A. Architecture Definition Document = detailed output built across Phases B, C, D.</p></div>
+  <div class="card card-purple"><h3>Viewpoint ≠ View</h3><p>Viewpoint is the pattern/template. View is the actual diagram or description created using that template.</p></div>
+</div>
+
+<!-- SLIDE 18: Scoping exam traps -->
+<div class="slide">
+  <div class="slide-num">18 / 20</div>
+  <h2>Scoping — Exam Traps</h2>
+  <div class="card card-gold">
+    <h3>Trap 1: Confusing Breadth and Domains</h3>
+    <p>"We will only address IT systems, not business processes" — this is a <strong>Domains</strong> decision (excluding Business domain), not a Breadth decision. Breadth = which part of the enterprise. Domains = which architecture types.</p>
+  </div>
+  <div class="card card-teal">
+    <h3>Trap 2: Forgetting the Time Period</h3>
+    <p>Questions about Transition Architectures often hinge on Time Period scoping. The number and timing of Transition Architectures is decided in Phase A, not Phase E.</p>
+  </div>
+  <div class="card card-coral">
+    <h3>Trap 3: Depth vs Detail Phase</h3>
+    <p>Depth is set in Phase A as part of scoping. It doesn't mean the detailed descriptions are done in Phase A — they're done in Phases B–D. Phase A just decides how deep those later phases will go.</p>
+  </div>
+</div>
+
+<!-- SLIDE 19: Quick recap -->
+<div class="slide">
+  <div class="slide-num">19 / 20</div>
+  <h2>Day 3 — Quick Recap</h2>
+  <div class="card card-teal"><h3>Phase A Purpose</h3><p>Secure approval, define scope, produce Architecture Vision and Statement of Architecture Work.</p></div>
+  <div class="card card-gold"><h3>4 Dimensions of Scope</h3><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px"><span class="pill pill-teal">Breadth</span><span class="pill pill-blue">Depth</span><span class="pill pill-purple">Time Period</span><span class="pill pill-gold">Domains</span></div></div>
+  <div class="card card-blue"><h3>Key Outputs</h3><div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px"><span class="pill pill-teal">Statement of Architecture Work</span><span class="pill pill-blue">Architecture Vision</span><span class="pill pill-purple">Principles (refined)</span></div></div>
+  <div class="card card-purple"><h3>Key Distinctions</h3><p>Request for Architecture Work (input) vs Statement of Architecture Work (output). Viewpoint (template) vs View (instance).</p></div>
+</div>
+
+<!-- SLIDE 20: Completion -->
+<div class="slide">
+  <div style="text-align:center;padding:20px 0">
+    <div style="font-size:48px;margin-bottom:16px">🎯</div>
+    <h2 style="margin-bottom:12px">Day 3 Complete</h2>
+    <p class="lead" style="max-width:400px;margin:0 auto 24px">Phase A and Architecture Scoping done. You now know all 4 scope dimensions — a topic the exam tests directly.</p>
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:center;margin-bottom:20px">
+      <div class="card card-teal" style="max-width:380px;width:100%"><h3>Tomorrow — Day 4</h3><p>Phase B: Business Architecture — baselines, targets, gap analysis, and business catalogs.</p></div>
+    </div>
+    <button onclick="markDone()" style="background:var(--teal);color:var(--navy);border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:600;cursor:pointer">Mark Day 3 Done ✓</button>
+  </div>
+</div>
+
+</div><!-- /deck -->
+
+<!-- Nav -->
+<div id="nav" style="display:none">
+  <button onclick="prevSlide()" id="prev-btn">← Prev</button>
+  <div id="progress-dots"></div>
+  <button onclick="togglePlay()" id="play-btn">▶ Play</button>
+  <button onclick="cycleSpeed()" class="speed-btn" id="speed-btn">1×</button>
+  <button onclick="nextSlide()" id="next-btn">Next →</button>
+</div>
+
 <script>
-const SLIDES=[
-{type:"title",bg:"navy",
-html:`<div class="title-eyebrow">TOGAF Foundation · Day 3 of 20</div><h1 class="title-h">Phase A:<br>Architecture Vision</h1><div class="title-rule"></div><p class="title-sub">Where the ADM cycle truly begins — scoping the work, securing sponsorship, engaging stakeholders, and creating the high-level vision that guides everything that follows.</p><div class="title-tags"><span class="title-tag">📊 5 topics</span><span class="title-tag">🎙 Narrated</span><span class="title-tag">⭐ Exam-ready</span></div>`,
-voice:`Welcome to Day 3. Today we deep-dive into Phase A of the ADM — Architecture Vision. This is where the architecture cycle truly begins. The Preliminary Phase set up the capability; Phase A starts the actual work. We'll cover the five objectives of Phase A, the Statement of Architecture Work, the Architecture Vision document, how to identify and manage stakeholders and their concerns, and the document chain connecting the Preliminary Phase to Phase A and beyond. Let's go.`},
+const TOTAL = 20;
+let cur = 0, isPlaying = false, utterance = null, touchStartX = 0, speed = 1;
+const speeds = [0.8, 1, 1.25, 1.5];
+let speedIdx = 1;
 
-{type:"section",bg:"teal",
-html:`<div class="section-num">01</div><div class="section-label">Section One</div><h2 class="section-h">Objectives of Phase A</h2><p class="section-desc">What Phase A sets out to achieve — scope, approval, stakeholder alignment, and vision.</p>`,
-voice:`Section one: the objectives of Phase A. Phase A is the first lettered phase of the ADM, triggered by the Request for Architecture Work from the Preliminary Phase.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">Phase A purpose</div><h2 class="content-h">Why Phase A Exists</h2>
-<div class="callout teal"><div class="callout-label">Core purpose</div><p>Phase A develops a <strong>high-level aspirational vision</strong> of the architecture capabilities and business value to be delivered. It establishes scope, constraints, and expectations before detailed work begins.</p></div>
-<div class="bullet-list">
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">The <em>architecture equivalent</em> of a project initiation document</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Answers: <strong>What are we trying to achieve? Who cares? What constraints apply? Do we have authority to proceed?</strong></div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Poor Phase A = rework in B, C, D — missed stakeholders, vague objectives, scope creep</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Good Phase A = <strong>clear mandate, aligned stakeholders, scoped work</strong></div></div>
-</div>`,
-voice:`Phase A develops a high-level aspirational vision of the architecture capabilities and business value to be delivered. Think of it as the architecture equivalent of a project initiation document. It answers four fundamental questions before any detailed work begins: what are we trying to achieve, who cares about it, what constraints apply, and do we have the authority to proceed? Getting Phase A right is the single greatest determinant of architecture project success. Poor scoping here causes expensive rework in Phases B, C, and D.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">Five objectives</div><h2 class="content-h">What Phase A Achieves</h2>
-<div class="bullet-list">
-  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Develop the Architecture Vision</strong> — high-level view of the target architecture, showing how it delivers business goals</div></div>
-  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Obtain Approval</strong> — secure formal sign-off from sponsors to commit resources and proceed</div></div>
-  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Define Scope</strong> — which BDAT domains, business units, time horizons, and explicit out-of-scope items</div></div>
-  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Identify Stakeholders</strong> — everyone with an interest; document their concerns and plan communications</div></div>
-  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Define Constraints &amp; Assumptions</strong> — time, budget, technology, regulatory constraints that shape all subsequent work</div></div>
-</div>
-<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Exam tip:</strong> Phase A is triggered by the <strong>Request for Architecture Work</strong> and produces the <strong>Statement of Architecture Work</strong> and <strong>Architecture Vision</strong>. These three documents are frequently confused.</div></div>`,
-voice:`Phase A has five key objectives. First: develop the Architecture Vision — a high-level view of the target architecture. Second: obtain approval — formal sign-off from sponsors to commit resources. Third: define scope — which architecture domains, business units, and time horizons are included. Fourth: identify stakeholders — everyone with an interest, with their concerns documented. Fifth: define constraints and assumptions that will shape all subsequent phases. The exam frequently tests the document chain: the Request for Architecture Work triggers Phase A, and Phase A produces the Statement of Architecture Work and the Architecture Vision.`},
-
-{type:"section",bg:"blue",
-html:`<div class="section-num">02</div><div class="section-label">Section Two</div><h2 class="section-h">Statement of Architecture Work</h2><p class="section-desc">The formal mandate that authorises the architecture team to proceed through Phases B to H.</p>`,
-voice:`Section two: the Statement of Architecture Work. This is the formal project mandate produced by Phase A.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">The mandate document</div><h2 class="content-h">What the SoAW Is</h2>
-<div class="callout blue"><div class="callout-label">Definition</div><p>The <strong>Statement of Architecture Work (SoAW)</strong> defines the scope and approach for the architecture project. It is the formal contract between the architecture team and the sponsoring organisation — authorising work through Phase H.</p></div>
-<div class="doc-card"><div class="doc-header saw">📄 SoAW — Key Contents</div><div class="doc-body">
-  <div class="doc-row">Title and scope of the architecture work</div>
-  <div class="doc-row">Business context and goals being addressed</div>
-  <div class="doc-row">Architecture scope — domains, time horizons, geography</div>
-  <div class="doc-row">Constraints — known limitations on the architecture</div>
-  <div class="doc-row">Roles and responsibilities — who does what</div>
-  <div class="doc-row">Acceptance criteria — how success will be measured</div>
-  <div class="doc-row">Schedule, budget, and risk approach</div>
-</div></div>`,
-voice:`The Statement of Architecture Work — or SoAW — defines the scope and approach for the architecture project. It is the formal contract between the architecture team and the sponsoring organisation. Once approved, it authorises the team to proceed through all remaining phases from B through H. It contains: the title and scope of the work, business context and goals, architecture scope covering domains and time horizons, known constraints, roles and responsibilities, acceptance criteria, schedule, budget, and risk approach.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">Critical distinction</div><h2 class="content-h">SoAW vs Request for Architecture Work</h2>
-<div class="chain-row"><span class="chain-badge" style="background:var(--amber2);color:var(--amber)">Prelim Output</span><span class="chain-arrow">→</span><span class="chain-desc"><strong style="color:var(--white)">Request for Architecture Work</strong> — issued by sponsor, triggers Phase A</span></div>
-<div class="chain-row" style="margin-bottom:16px"><span class="chain-badge" style="background:var(--teal3);color:var(--teal)">Phase A Output</span><span class="chain-arrow">→</span><span class="chain-desc"><strong style="color:var(--white)">Statement of Architecture Work</strong> — produced by architects, authorises B–H</span></div>
-<div class="bullet-list">
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Request = <em>"We need architecture work done"</em> — from the business to architects</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Statement = <em>"Here is exactly what we will do and how"</em> — from architects back to business</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Changes to SoAW scope after approval require <strong>formal change control</strong></div></div>
-</div>
-<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text"><strong>Never confuse these two.</strong> The <strong>Request</strong> is the Phase A input. The <strong>Statement</strong> is the Phase A output. A common exam trap: "which document triggers Phase A?" — always the <em>Request</em>, never the Statement.</div></div>`,
-voice:`The most common exam trap with Phase A is confusing the Request for Architecture Work with the Statement of Architecture Work. Here's the chain clearly. The Preliminary Phase produces the Request for Architecture Work — issued by the sponsor, it says "we need architecture work done." This triggers Phase A. Phase A then produces the Statement of Architecture Work — produced by the architects, it says "here is exactly what we will do and how." That statement then authorises Phases B through H. One goes in, one comes out. The Request triggers Phase A. The Statement is produced by Phase A. Never confuse them.`},
-
-{type:"section",bg:"purple",
-html:`<div class="section-num">03</div><div class="section-label">Section Three</div><h2 class="section-h">Architecture Vision Document</h2><p class="section-desc">The high-level aspirational picture of the target state — written for stakeholders, not just architects.</p>`,
-voice:`Section three: the Architecture Vision document. While the Statement of Architecture Work defines how the work will be done, the Architecture Vision defines what the target architecture will look like.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">The vision document</div><h2 class="content-h">Architecture Vision — What It Is</h2>
-<div class="callout purple"><div class="callout-label">Definition</div><p>The <strong>Architecture Vision</strong> is a high-level, aspirational description of the target enterprise architecture. It communicates the intended outcome to stakeholders clearly and compellingly — without the technical detail of later phases.</p></div>
-<div class="doc-card"><div class="doc-header av">🎯 Architecture Vision — Key Contents</div><div class="doc-body">
-  <div class="doc-row">Problem description — business problem being addressed</div>
-  <div class="doc-row">Baseline Architecture — high-level current state</div>
-  <div class="doc-row">Target Architecture — high-level future state</div>
-  <div class="doc-row">Value proposition — business benefits</div>
-  <div class="doc-row">Risk assessment — key risks</div>
-  <div class="doc-row">Stakeholder map and key concerns</div>
-  <div class="doc-row">Summary of changes to be made</div>
-</div></div>`,
-voice:`The Architecture Vision is a high-level, aspirational description of the target enterprise architecture. It communicates the intended outcome to stakeholders in a way that is clear and compelling — without the technical detail that will come in Phases B, C, and D. It contains: the problem description — what business problem is being addressed, the Baseline Architecture — a high-level view of the current state, the Target Architecture — the desired future state, the value proposition explaining the business benefits, a risk assessment, the stakeholder map and their key concerns, and a summary of the changes to be made.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">Baseline vs target</div><h2 class="content-h">Current State vs Future State</h2>
-<div class="callout green"><div class="callout-label">Fundamental ADM concept</div><p>Every ADM phase from B to D works by documenting a <strong>Baseline Architecture</strong> (current state), defining a <strong>Target Architecture</strong> (future state), and performing a <strong>Gap Analysis</strong> to identify what needs to change.</p></div>
-<div class="bullet-list">
-  <div class="bullet"><div class="bullet-dot" style="background:var(--blue)"></div><div class="bullet-text"><strong>Baseline Architecture</strong> — how things work today. "As-is" state. Documents existing systems, processes, capabilities.</div></div>
-  <div class="bullet"><div class="bullet-dot" style="background:var(--teal)"></div><div class="bullet-text"><strong>Target Architecture</strong> — how things should work after transformation. "To-be" state. Describes the desired future.</div></div>
-  <div class="bullet"><div class="bullet-dot" style="background:var(--gold)"></div><div class="bullet-text"><strong>Gap Analysis</strong> — the difference between baseline and target. Gaps become the work items in Phase E and F.</div></div>
-</div>
-<div class="callout amber"><div class="callout-label">Why this matters</div><p>Phase A introduces these concepts at a high level. Phases B, C, and D develop detailed baseline and target architectures for each domain. The gaps identified across all phases feed Phase E — Opportunities and Solutions.</p></div>`,
-voice:`The Architecture Vision introduces two critical concepts that run throughout the entire ADM: Baseline and Target Architecture. The Baseline Architecture — sometimes called the as-is state — documents how things work today: existing systems, processes, and capabilities. The Target Architecture — the to-be state — describes the desired future after the transformation. Gap Analysis then identifies the difference between them — and those gaps become the work items in Phases E and F. Phase A introduces these at a high level. Phases B, C, and D develop them in detail for each architecture domain.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">Communication tool</div><h2 class="content-h">Vision as a Stakeholder Document</h2>
-<div class="callout teal"><div class="callout-label">Key characteristic</div><p>The Architecture Vision is written to be understood by <strong>non-technical executives and business sponsors</strong> — not just architects. It must articulate <em>business value</em>, not technical specifications.</p></div>
-<div class="bullet-list">
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Uses <strong>business language</strong> — capabilities, outcomes, value — not technical jargon</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Shows <strong>how architecture delivers business goals</strong> — makes the link explicit</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Must be <strong>compelling</strong> — it is used to gain sponsorship and secure resources</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Deliberately avoids the technical depth of Phases B, C, D — that detail comes later</div></div>
-</div>
-<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">Phase A has <strong>two primary outputs</strong>: the Statement of Architecture Work (the mandate) and the Architecture Vision (the high-level target). Know what each contains and who it is for.</div></div>`,
-voice:`An important characteristic of the Architecture Vision is that it is written for business stakeholders, not just architects. It must use business language — capabilities, outcomes, value — not technical jargon. It shows how the architecture delivers business goals, making that link explicit. And it must be compelling, because it is used to gain sponsorship and secure the resources needed for the full architecture engagement. The technical depth comes in Phases B, C, and D. The Vision is intentionally high-level to enable alignment before that investment is made.`},
-
-{type:"section",bg:"green",
-html:`<div class="section-num">04</div><div class="section-label">Section Four</div><h2 class="section-h">Stakeholder Identification &amp; Concerns</h2><p class="section-desc">Understanding who cares about the architecture, what they worry about, and how concerns drive architecture views.</p>`,
-voice:`Section four: stakeholder identification and concerns. TOGAF places enormous emphasis on this in Phase A — and for good reason.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">Why it matters</div><h2 class="content-h">Stakeholders in Phase A</h2>
-<div class="callout blue"><div class="callout-label">Core principle</div><p>A technically excellent architecture that does not address stakeholder concerns will be <strong>rejected or ignored</strong>. The purpose of architecture is to serve the enterprise — and the enterprise is made up of people with different goals, worries, and priorities.</p></div>
-<div class="sh-grid">
-  <div class="sh-card"><div class="sh-role">CEO / Exec Sponsor</div><div class="sh-concern">Strategic alignment, ROI, competitive advantage, business risk</div></div>
-  <div class="sh-card"><div class="sh-role">CIO / IT Director</div><div class="sh-concern">Technical feasibility, integration complexity, skills, budget</div></div>
-  <div class="sh-card"><div class="sh-role">Business Unit Leaders</div><div class="sh-concern">Operational impact, change disruption, staff requirements</div></div>
-  <div class="sh-card"><div class="sh-role">Security &amp; Compliance</div><div class="sh-concern">Regulation, data protection, auditability, security architecture</div></div>
-  <div class="sh-card"><div class="sh-role">Enterprise Architects</div><div class="sh-concern">Technical coherence, standards, reuse, maintainability</div></div>
-  <div class="sh-card"><div class="sh-role">End Users</div><div class="sh-concern">Usability, performance, availability, training and support</div></div>
-</div>`,
-voice:`A technically excellent architecture that nobody wants is worthless. TOGAF recognises this by making stakeholder management a central Phase A activity. Different stakeholders have very different concerns. The CEO worries about strategic alignment and ROI. The CIO worries about technical feasibility and budget. Business unit leaders worry about operational disruption. Security and compliance worry about regulation. Enterprise architects care about technical coherence and standards. End users care about usability and performance. All of these concerns must be identified and addressed.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">Concerns drive views</div><h2 class="content-h">The Concern → View Chain</h2>
-<div class="callout teal"><div class="callout-label">Critical linkage</div><p>Each stakeholder concern determines which <strong>architecture views</strong> need to be produced in Phases B, C, and D. This is why stakeholder identification in Phase A directly shapes all subsequent architecture work.</p></div>
-<div class="bullet-list">
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Identify stakeholders</strong> → document their concerns (Phase A)</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Match concerns to viewpoints</strong> → select or create the right viewpoint template</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Apply viewpoints to architecture</strong> → produce the views (Phases B, C, D)</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text"><strong>Present views to stakeholders</strong> → gain confirmation and approval</div></div>
-</div>
-<div class="callout purple"><div class="callout-label">Stakeholder Map</div><p>A visual tool plotting stakeholders against <strong>interest</strong> and <strong>influence</strong>. High interest + high influence = most critical stakeholders requiring deepest engagement throughout the ADM.</p></div>`,
-voice:`Here is one of the most important linkages in TOGAF: concerns drive views. The process is: identify stakeholders and document their concerns in Phase A. Then match those concerns to viewpoints — the templates for architecture views. Apply the viewpoints to the architecture in Phases B, C, and D to produce the views. Then present the views to stakeholders to gain their confirmation and approval. This chain — concern to viewpoint to view — is fundamental. Phase A also produces a Stakeholder Map: a visual tool that plots stakeholders against their interest in the architecture and their influence over it. High interest plus high influence equals the most critical stakeholders.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">Communications plan</div><h2 class="content-h">Planning Stakeholder Engagement</h2>
-<div class="callout gold"><div class="callout-label">Communications Plan</div><p>A structured plan for how the architecture team will engage with each stakeholder group throughout the ADM — what they'll receive, how frequently, and in what format.</p></div>
-<div class="bullet-list">
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Produced in <strong>Phase A</strong> as part of stakeholder management</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Specifies: audience, message content, communication frequency, format, owner</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Ensures the right people get the right information at the right time</div></div>
-  <div class="bullet"><div class="bullet-dot"></div><div class="bullet-text">Different stakeholder groups need <strong>very different communications</strong> — executives want summaries, developers want detail</div></div>
-</div>
-<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">The <strong>Communications Plan</strong> is a Phase A output — not something produced later. It is part of the stakeholder management work done in Phase A.</div></div>`,
-voice:`As part of Phase A's stakeholder management work, the architecture team produces a Communications Plan. This is a structured plan that says: for each stakeholder group, what information will they receive, how frequently, and in what format. The CEO needs executive summaries at key milestones. Developers need technical detail during Phases B through D. The Communications Plan ensures the right people get the right information at the right time throughout the ADM cycle. It is produced in Phase A — not as an afterthought later.`},
-
-{type:"section",bg:"coral",
-html:`<div class="section-num">05</div><div class="section-label">Section Five</div><h2 class="section-h">Inputs &amp; Outputs of Phase A</h2><p class="section-desc">The complete document picture — what comes in, what goes out, and the critical chain from Preliminary Phase to Phase B.</p>`,
-voice:`Section five: the inputs and outputs of Phase A. This is pure exam content — know what feeds in and what comes out.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">The IO picture</div><h2 class="content-h">Phase A — Inputs &amp; Outputs</h2>
-<div class="io-grid">
-  <div class="io-box"><div class="io-header in">Key Inputs</div><ul class="io-list">
-    <li><strong style="color:var(--amber)">Request for Architecture Work ★</strong></li>
-    <li>Architecture Principles (from Prelim)</li>
-    <li>Tailored Architecture Framework</li>
-    <li>Architecture Repository</li>
-    <li>Organisational Model for EA</li>
-    <li>Governance &amp; support frameworks</li>
-  </ul></div>
-  <div class="io-box"><div class="io-header out">Key Outputs</div><ul class="io-list">
-    <li><strong style="color:var(--teal)">Statement of Architecture Work ★</strong></li>
-    <li><strong style="color:var(--teal)">Architecture Vision ★</strong></li>
-    <li>Approved Statement of Architecture Work</li>
-    <li>Architecture Repository (updated)</li>
-    <li>Communications Plan</li>
-    <li>Refined business goals</li>
-  </ul></div>
-</div>
-<div class="exam-bar"><div class="exam-star">⭐</div><div class="exam-text">The <strong>★ starred items</strong> are the most tested. Request for Architecture Work = input. Statement of Architecture Work + Architecture Vision = outputs.</div></div>`,
-voice:`Here is the complete Phase A input-output picture. The primary input is the Request for Architecture Work — produced in the Preliminary Phase and starred because it's the most critical input. Other inputs include the Architecture Principles, Tailored Architecture Framework, Architecture Repository, Organisational Model, and Governance frameworks. The primary outputs are the Statement of Architecture Work and the Architecture Vision — both starred because they're the most tested. Other outputs include the approved Statement, an updated Architecture Repository, the Communications Plan, and refined business goals.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">The document chain</div><h2 class="content-h">From Prelim to Phase B</h2>
-<div class="chain-row"><span class="chain-badge" style="background:rgba(74,222,128,.15);color:var(--green)">Preliminary</span><span class="chain-arrow">→</span><span class="chain-desc">Produces <strong style="color:var(--white)">Request for Architecture Work</strong></span></div>
-<div style="text-align:center;color:var(--slate2);font-size:12px;margin:4px 0">↓ triggers</div>
-<div class="chain-row"><span class="chain-badge" style="background:var(--teal3);color:var(--teal)">Phase A</span><span class="chain-arrow">→</span><span class="chain-desc">Produces <strong style="color:var(--white)">Statement of Architecture Work</strong> + <strong style="color:var(--white)">Architecture Vision</strong></span></div>
-<div style="text-align:center;color:var(--slate2);font-size:12px;margin:4px 0">↓ authorises</div>
-<div class="chain-row"><span class="chain-badge" style="background:var(--blue2);color:var(--blue)">Phase B</span><span class="chain-arrow">→</span><span class="chain-desc">Develops detailed <strong style="color:var(--white)">Business Architecture</strong> (baseline + target)</span></div>
-<div class="callout amber" style="margin-top:12px"><div class="callout-label">Key insight</div><p>Phase B uses the Architecture Vision as its <strong>scope boundary</strong>. The detailed work in B, C, and D expands on — but must stay consistent with — the high-level vision produced in Phase A.</p></div>`,
-voice:`Here is the complete document chain from the Preliminary Phase through to Phase B. The Preliminary Phase produces the Request for Architecture Work. That triggers Phase A. Phase A produces the Statement of Architecture Work and the Architecture Vision. Those outputs authorise Phase B. Phase B then develops the detailed Business Architecture — the detailed baseline and target — staying consistent with the high-level vision Phase A produced. The Vision from Phase A acts as the scope boundary and guiding direction for all the detailed work that follows. This chain is fundamental exam knowledge.`},
-
-{type:"content",bg:"",
-html:`<div class="content-label">Session summary</div><h2 class="content-h">Key Takeaways — Day 3</h2>
-<div class="sum-grid">
-  <div class="sum-card"><div class="sum-num">01</div><div class="sum-text"><strong>Phase A = project initiation</strong> — scope, approval, stakeholders, vision. Triggered by Request for Architecture Work.</div></div>
-  <div class="sum-card"><div class="sum-num">02</div><div class="sum-text"><strong>SoAW = the mandate</strong> — output of Phase A. Formal contract authorising B through H. Must be approved before proceeding.</div></div>
-  <div class="sum-card"><div class="sum-num">03</div><div class="sum-text"><strong>Architecture Vision = high-level target state</strong> — aspirational, business language, baseline vs target, written for sponsors.</div></div>
-  <div class="sum-card"><div class="sum-num">04</div><div class="sum-text"><strong>Concerns drive views</strong> — stakeholder concerns → viewpoints → views in B, C, D. Communications Plan is a Phase A output.</div></div>
-  <div class="sum-card"><div class="sum-num">05</div><div class="sum-text"><strong>Document chain:</strong> Request (Prelim) → Phase A → Statement + Vision → authorises Phase B onwards.</div></div>
-  <div class="sum-card"><div class="sum-num">06</div><div class="sum-text"><strong>Baseline vs Target</strong> — introduced in Phase A, detailed in B/C/D. Gap between them drives Phase E work.</div></div>
-</div>`,
-voice:`Six takeaways from Day 3. One: Phase A is project initiation — scope, approval, stakeholders, vision, triggered by the Request for Architecture Work. Two: the Statement of Architecture Work is the formal mandate and Phase A output authorising phases B through H. Three: the Architecture Vision is a high-level aspirational target state, written in business language for sponsors. Four: stakeholder concerns drive views — concerns map to viewpoints which produce views in Phases B, C, and D. The Communications Plan is a Phase A output. Five: the document chain is Preliminary produces Request, Phase A produces Statement plus Vision, which authorises Phase B. Six: Baseline versus Target Architecture is introduced in Phase A and detailed in B, C, and D — the gap between them drives Phase E.`},
-
-{type:"title",bg:"end",
-html:`<div class="title-eyebrow">Day 3 Complete</div><h1 class="title-h" style="font-size:clamp(24px,6vw,40px)">Phase A — done.</h1><div class="title-rule"></div><p class="title-sub" style="margin-bottom:24px">Next up: <strong>Day 4 — Phase B: Business Architecture</strong>. You'll learn how to develop the detailed business architecture, identify capabilities and value streams, and perform gap analysis.</p>
-<div style="display:flex;flex-direction:column;gap:10px;max-width:320px">
-  <a href="togaf-day3.html" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal3);border:1px solid rgba(45,212,191,.25);border-radius:10px;text-decoration:none;color:var(--teal);font-size:14px;font-weight:500">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h12M2 8h8M2 12h10"/></svg>Open reading version · Take the quiz
-  </a>
-  <button onclick="markDone()" style="display:flex;align-items:center;gap:8px;padding:12px 16px;background:var(--teal);border:none;border-radius:10px;color:var(--navy);font-size:14px;font-weight:600;cursor:pointer;justify-content:center">
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2.5 8.5l4 4 7-8"/></svg>Mark Day 3 as done
-  </button>
-</div>`,
-voice:`Congratulations — Day 3 is complete. You now understand Phase A in depth: the objectives, the Statement of Architecture Work, the Architecture Vision, stakeholder management, and the document chain. Before Day 4, open the reading version and take the quiz to lock in what you've learned. Day 4 covers Phase B — Business Architecture — where we develop the detailed business architecture including capabilities, value streams, and gap analysis. See you there.`},
+const voiceover = [
+  "Welcome to Day 3. Today we cover Phase A — Architecture Vision, and a crucial exam topic: how to scope an architecture using TOGAF's four dimensions. Tap Play to hear each slide narrated.",
+  "Phase A has three core objectives. First: establish the architecture project — this means securing formal recognition and funding to proceed. Second: develop the Architecture Vision — a high-level picture of where you're heading. Third: produce the Statement of Architecture Work and get it approved. Without that approval, you cannot proceed to Phase B.",
+  "Phase A has eleven steps. The most important for the exam are step six — Define Scope — and step eleven — produce the Statement of Architecture Work and secure approval. The steps for identifying stakeholders, confirming business goals, and assessing readiness all feed into those two key outputs.",
+  "Phase A draws on a wide range of inputs. From outside the enterprise you have TOGAF itself and relevant standards. Non-architectural inputs include board strategy papers and the Request for Architecture Work — the formal trigger for the engagement. From the Preliminary Phase you receive the tailored framework and architecture principles catalogue.",
+  "Now for the exam highlight of Day 3: Architecture Scoping. TOGAF defines four dimensions for scoping an architecture engagement. These are Breadth, Depth, Time Period, and Architecture Domains. Each answers a different question about the limits of the architecture work. The exam will test whether you can identify which dimension is being addressed in a given scenario.",
+  "The four dimensions are: Breadth — how wide? Which part of the enterprise? Depth — how detailed? Where does architecture end and system design begin? Time Period — how far ahead? How many Transition Architectures? And Architecture Domains — which of the four TOGAF domains are included: Business, Data, Application, or Technology?",
+  "Breadth answers how wide the architecture extends horizontally across the organisation. Large enterprises are often federations of multiple business units, each of which could validly be considered an enterprise in its own right. The breadth must be set to match the organisational authority of the architecture team. You can only govern what you have authority over.",
+  "Depth answers how detailed the architecture goes. TOGAF defines four abstraction levels: Contextual at the strategic overview level, Conceptual at the domain concept level, Logical for functional components without technology specifics, and Physical for actual products and configurations. The deeper you go, the closer you get to system design and engineering.",
+  "Time Period answers how far ahead the architecture looks. The Architecture Vision typically covers a three to five year horizon. If the target is far away, Transition Architectures are defined as intermediate stable states. Crucially, the number and timing of Transition Architectures is decided here in Phase A — not later in Phase E.",
+  "Architecture Domains answers which of the four TOGAF architecture types are included. A complete enterprise architecture covers Business, Data, Application, and Technology. But resource constraints often mean not all four can be developed at once. TOGAF says you determine breadth, depth, and time first — then select which domains are appropriate for that scope.",
+  "Here is a worked scoping example. A bank launches a digital lending product. Breadth: the Retail Banking division only — not the whole bank. Depth: logical level — no specific product selection yet. Time Period: eighteen months target with one Transition Architecture at nine months. Domains: Business, Application, and Data — Technology is excluded and handled separately. This is a perfectly valid scoped engagement.",
+  "Phase A produces several key outputs. The most important is the Statement of Architecture Work — the formal approval document. It is supported by the Architecture Vision document, refined Architecture Principles, and a Communications Plan for stakeholder engagement throughout the project.",
+  "The Statement of Architecture Work is the most important Phase A output. It defines the scope, approach, and schedule, and formally authorises the architecture work to proceed. It references the Request for Architecture Work — the document that triggered Phase A. Do not confuse these two: the Request is the input, the Statement is the output.",
+  "The Architecture Vision document is a concise, accessible summary of the target architecture. It exists to get early alignment from stakeholders before the full detailed Architecture Definition is developed across Phases B, C, and D. It is both a deliverable and the name of the phase itself.",
+  "Identifying stakeholder concerns is central to Phase A. Architecture exists to address concerns — not for its own sake. The tools used are the stakeholder map, which plots stakeholders on a power-interest grid; the concerns catalogue; the Communications Plan; and the Architecture Vision document itself.",
+  "TOGAF uses a structured chain: Concerns lead to Viewpoints, which lead to Views. A stakeholder concern identifies what needs to be addressed. A Viewpoint is the template or convention for constructing a view that addresses that concern. A View is the actual diagram or description produced using that viewpoint. This three-level distinction is frequently tested.",
+  "Let's look at the most common exam traps for Phase A. First: the Request for Architecture Work is the INPUT — it triggers Phase A. The Statement of Architecture Work is the OUTPUT — it authorises the work. Second: the Architecture Vision is a high-level summary from Phase A. The Architecture Definition Document is the detailed output built across Phases B, C, and D. These are very different documents.",
+  "More scoping traps. Confusing Breadth and Domains is common. Saying we will only address IT systems is a Domains decision — excluding Business domain — not a Breadth decision. Forgetting Time Period is also common: the number of Transition Architectures is decided in Phase A, not Phase E. And remember — Depth is scoped in Phase A, but the detailed work happens later in Phases B through D.",
+  "Quick recap for Day 3. Phase A purpose: secure approval, define scope, produce Architecture Vision and Statement of Architecture Work. The four scoping dimensions: Breadth, Depth, Time Period, and Architecture Domains. Key distinctions: Request versus Statement of Architecture Work, and Viewpoint versus View.",
+  "Day 3 complete. You have now covered Phase A and all four dimensions of Architecture Scoping — a direct exam topic. Tomorrow, Day 4, we move into Phase B: Business Architecture, covering baselines, targets, and gap analysis."
 ];
 
-let current=0,isPlaying=false,speedIdx=1,utterance=null,touchStartX=0,animating=false;
-const SPEEDS=[0.8,1,1.2,1.5];
-const wrap=document.getElementById("slides-wrap");
-document.getElementById("slide-total").textContent=SLIDES.length;
-function getBg(b){return{navy:"var(--navy2)",teal:"linear-gradient(135deg,#0A1F2F,#0D2A3A)",blue:"linear-gradient(135deg,#0A1525,#0D1F3A)",purple:"linear-gradient(135deg,#120E2A,#1A1235)",green:"linear-gradient(135deg,#0A1A10,#0D2218)",coral:"linear-gradient(135deg,#1A0A0E,#2A0D15)",end:"linear-gradient(135deg,#080E1A,#0D1526 60%,#152035)"}[b]||"var(--navy2)";}
-SLIDES.forEach((s,i)=>{const d=document.createElement("div");d.className="slide slide-"+(s.type||"content");d.id="slide-"+i;d.style.background=getBg(s.bg);d.innerHTML=`<div class="slide-body">${s.html}</div>`;if(i===0)d.classList.add("active");wrap.appendChild(d);});
-function goTo(idx,dir){if(animating||idx<0||idx>=SLIDES.length)return;animating=true;stopSpeech();const f=document.getElementById("slide-"+current),t=document.getElementById("slide-"+idx);f.classList.remove("active");t.classList.add("active");f.classList.add(dir>0?"exit-left":"exit-right");t.classList.add(dir>0?"enter-right":"enter-left");t.querySelector(".slide-body").scrollTop=0;setTimeout(()=>{f.classList.remove("exit-left","exit-right","active");t.classList.remove("enter-right","enter-left");animating=false;current=idx;updateUI();if(isPlaying)speakCurrent();},420);}
-function nextSlide(){if(current<SLIDES.length-1)goTo(current+1,1);}
-function prevSlide(){if(current>0)goTo(current-1,-1);}
-function updateUI(){document.getElementById("slide-num").textContent=current+1;document.getElementById("progress-fill").style.width=((current+1)/SLIDES.length*100)+"%";document.getElementById("btn-prev").disabled=current===0;document.getElementById("btn-next").disabled=current===SLIDES.length-1;}
-function speakCurrent(){stopSpeech();if(!("speechSynthesis"in window)){setVoiceStatus("Voice not supported");return;}const text=SLIDES[current].voice;if(!text){if(isPlaying)setTimeout(nextSlide,800);return;}utterance=new SpeechSynthesisUtterance(text);utterance.rate=SPEEDS[speedIdx];utterance.pitch=1;utterance.lang="en-GB";const v=speechSynthesis.getVoices();const p=v.find(x=>x.lang.startsWith("en")&&(x.name.includes("Daniel")||x.name.includes("Samantha")||x.name.includes("Karen")||x.name.includes("Google UK")||x.name.includes("Alex")))||v.find(x=>x.lang.startsWith("en"))||v[0];if(p)utterance.voice=p;utterance.onstart=()=>setVoiceStatus("speaking");utterance.onend=()=>{setVoiceStatus("");if(isPlaying&&current<SLIDES.length-1)setTimeout(nextSlide,600);else if(current===SLIDES.length-1){isPlaying=false;updatePlayBtn();}};utterance.onerror=()=>setVoiceStatus("");speechSynthesis.speak(utterance);}
-function stopSpeech(){if("speechSynthesis"in window)speechSynthesis.cancel();utterance=null;setVoiceStatus("");}
-function togglePlay(){isPlaying=!isPlaying;updatePlayBtn();if(isPlaying)speakCurrent();else stopSpeech();}
-function updatePlayBtn(){document.getElementById("play-icon").innerHTML=isPlaying?'<rect x="3" y="2" width="4" height="14" rx="1" fill="currentColor"/><rect x="11" y="2" width="4" height="14" rx="1" fill="currentColor"/>':'<path d="M4 3l11 6-11 6V3z"/>';}
-function setVoiceStatus(s){const el=document.getElementById("voice-status");el.innerHTML=s==="speaking"?`<div class="voice-dots"><div class="voice-dot"></div><div class="voice-dot"></div><div class="voice-dot"></div></div><span>Narrating…</span>`:s||"";}
-function cycleSpeed(){speedIdx=(speedIdx+1)%SPEEDS.length;document.getElementById("speed-btn").textContent=SPEEDS[speedIdx]+"×";if(isPlaying){stopSpeech();setTimeout(speakCurrent,100);}}
-function markDone(){try{const d=JSON.parse(localStorage.getItem("togaf_done")||"{}");d[3]=true;localStorage.setItem("togaf_done",JSON.stringify(d));}catch(e){}const b=document.getElementById("btn-done");b.style.background="var(--teal3)";b.style.borderColor="var(--teal)";b.querySelector("svg").style.stroke="var(--teal)";goTo(SLIDES.length-1,1);}
-document.getElementById("start-btn").addEventListener("click",()=>{document.getElementById("start-overlay").style.display="none";document.getElementById("deck").style.display="flex";updateUI();if("speechSynthesis"in window){const p=new SpeechSynthesisUtterance(" ");p.volume=0;speechSynthesis.speak(p);setTimeout(()=>{isPlaying=true;updatePlayBtn();speakCurrent();},400);}});
-wrap.addEventListener("touchstart",e=>{touchStartX=e.touches[0].clientX;},{passive:true});
-wrap.addEventListener("touchend",e=>{const dx=e.changedTouches[0].clientX-touchStartX;if(Math.abs(dx)>50){dx<0?nextSlide():prevSlide();}},{passive:true});
-document.addEventListener("keydown",e=>{if(e.key==="ArrowRight"||e.key==="ArrowDown")nextSlide();if(e.key==="ArrowLeft"||e.key==="ArrowUp")prevSlide();if(e.key===" "){e.preventDefault();togglePlay();}});
-if("speechSynthesis"in window)speechSynthesis.onvoiceschanged=()=>{};
-document.getElementById("deck").style.display="none";
+function buildDots(){
+  const d=document.getElementById('progress-dots');
+  d.innerHTML='';
+  for(let i=0;i<TOTAL;i++){const s=document.createElement('span');s.className='dot'+(i===0?' cur':'');d.appendChild(s);}
+}
+
+function updateDots(){
+  document.querySelectorAll('.dot').forEach((d,i)=>{
+    d.className='dot'+(i<cur?' done':i===cur?' cur':'');
+  });
+}
+
+function showSlide(n){
+  document.querySelectorAll('.slide').forEach((s,i)=>s.classList.toggle('active',i===n));
+  document.getElementById('prev-btn').disabled=n===0;
+  document.getElementById('next-btn').disabled=n===TOTAL-1;
+  updateDots();
+}
+
+function nextSlide(){stopSpeech();if(cur<TOTAL-1){cur++;showSlide(cur);if(isPlaying)speakCurrent();}}
+function prevSlide(){stopSpeech();if(cur>0){cur--;showSlide(cur);if(isPlaying)speakCurrent();}}
+
+function speakCurrent(){
+  if(!('speechSynthesis' in window))return;
+  stopSpeech();
+  utterance=new SpeechSynthesisUtterance(voiceover[cur]);
+  utterance.rate=speeds[speedIdx];
+  utterance.onend=()=>{if(isPlaying&&cur<TOTAL-1){cur++;showSlide(cur);speakCurrent();}else if(cur===TOTAL-1){isPlaying=false;updatePlayBtn();}};
+  speechSynthesis.speak(utterance);
+}
+
+function stopSpeech(){if(utterance){speechSynthesis.cancel();utterance=null;}}
+
+function togglePlay(){
+  isPlaying=!isPlaying;
+  if(isPlaying)speakCurrent();else stopSpeech();
+  updatePlayBtn();
+}
+
+function updatePlayBtn(){document.getElementById('play-btn').textContent=isPlaying?'⏸ Pause':'▶ Play';}
+
+function cycleSpeed(){
+  speedIdx=(speedIdx+1)%speeds.length;
+  document.getElementById('speed-btn').textContent=speeds[speedIdx]+'×';
+  if(isPlaying&&utterance){const pos=cur;stopSpeech();cur=pos;speakCurrent();}
+}
+
+function markDone(){
+  try{const p=JSON.parse(localStorage.getItem('togaf_progress')||'{}');p['day3']=true;localStorage.setItem('togaf_progress',JSON.stringify(p));}catch(e){}
+  document.querySelector('.slide.active button')&&(document.querySelector('.slide.active button').textContent='Day 3 Done ✓');
+}
+
+function startDeck(){
+  document.getElementById('start-overlay').style.display='none';
+  const d=document.getElementById('deck');d.style.display='block';
+  document.getElementById('nav').style.display='flex';
+  buildDots();showSlide(0);
+  // iOS audio prime
+  if(/iPhone|iPad|iPod/.test(navigator.userAgent)){
+    const primer=new SpeechSynthesisUtterance('');primer.volume=0;
+    speechSynthesis.speak(primer);
+    setTimeout(()=>{isPlaying=true;updatePlayBtn();speakCurrent();},400);
+  }
+}
+
+const wrap=document.getElementById('deck');
+wrap.addEventListener('touchstart',e=>{touchStartX=e.touches[0].clientX;},{passive:true});
+wrap.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-touchStartX;if(Math.abs(dx)>50){if(dx<0)nextSlide();else prevSlide();}},{passive:true});
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')nextSlide();
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')prevSlide();
+  if(e.key===' '){e.preventDefault();togglePlay();}
+});
 </script>
 </body>
 </html>
